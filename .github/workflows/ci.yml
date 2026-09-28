@@ -71,4 +71,8 @@ jobs:
       - run: pnpm --dir apps/web lint --max-warnings=0
       - run: pnpm --dir apps/web typecheck
       - run: pnpm --dir apps/web test
+      - name: generated run data (web-data branch)
+        run: |
+          git fetch --depth 1 origin web-data
+          git archive --format=tar FETCH_HEAD runs | tar -xf - -C apps/web/public
       - run: pnpm --dir apps/web build
