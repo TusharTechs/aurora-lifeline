@@ -13,15 +13,19 @@ gcloud config set project "$PROJECT" >/dev/null
 PROJECT_NUMBER="$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')"
 
 echo "== Enabling pre-approved APIs (docs/COSTS.md §1a)"
-gcloud services enable \
-  aiplatform.googleapis.com run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com \
-  storage.googleapis.com bigquery.googleapis.com bigquerystorage.googleapis.com firestore.googleapis.com \
-  firebase.googleapis.com firebasehosting.googleapis.com identitytoolkit.googleapis.com fcm.googleapis.com \
-  fcmregistrations.googleapis.com firebaseappcheck.googleapis.com earthengine.googleapis.com \
-  texttospeech.googleapis.com maps-backend.googleapis.com apikeys.googleapis.com secretmanager.googleapis.com \
-  iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com cloudresourcemanager.googleapis.com \
-  serviceusage.googleapis.com logging.googleapis.com monitoring.googleapis.com pubsub.googleapis.com \
-  eventarc.googleapis.com cloudscheduler.googleapis.com billingbudgets.googleapis.com
+APIS=(
+  aiplatform run cloudbuild artifactregistry storage bigquery bigquerystorage firestore
+  firebase firebasehosting identitytoolkit fcm fcmregistrations firebaseappcheck
+  earthengine texttospeech maps-backend apikeys secretmanager iam iamcredentials sts
+  cloudresourcemanager serviceusage logging monitoring pubsub eventarc cloudscheduler
+  billingbudgets
+)
+# The Service Usage API accepts at most 20 services per request.
+for ((i = 0; i < ${#APIS[@]}; i += 15)); do
+  batch=("${APIS[@]:i:15}")
+  gcloud services enable "${batch[@]/%/.googleapis.com}" \
+    || { echo "API enable failed; fix the error above and re-run" >&2; exit 1; }
+done
 
 echo "== Firestore (default) in $REGION"
 gcloud firestore databases describe --database="(default)" >/dev/null 2>&1 \
