@@ -9,12 +9,15 @@ Two passes over a Geofabrik extract:
 * ``network``: everything the graph needs inside a bounding box: drivable roads (with bridge,
   ford and tunnel tags and full node lists), waterways (for culverts), and points of interest
   (health facilities, shelters, substations).
+* ``places``: named settlements (city, town, village, hamlet, suburb) inside a bounding box, with
+  Telugu, Hindi and Odia names where mapped. Used only to label action sites ("near Uppada").
 
 Outputs are GeoParquet files under data/ref/osm/<extract>/.
 
 Usage:
     python -m aurora_pipelines.osm_extract boundaries --pbf <file.osm.pbf> --out <dir>
     python -m aurora_pipelines.osm_extract network --pbf <file> --bbox W S E N --out <dir>
+    python -m aurora_pipelines.osm_extract places --pbf <file> --bbox W S E N --out <dir>
 """
 
 import argparse
@@ -193,6 +196,43 @@ def extract_network(pbf: Path, bbox: tuple[float, float, float, float], out: Pat
     print(f"network: {len(roads)} roads, {len(h.waterways)} waterways, {len(pois)} POIs -> {out}")
 
 
+PLACE_KINDS = ("city", "town", "village", "hamlet", "suburb")
+
+
+def extract_places(pbf: Path, bbox: tuple[float, float, float, float], out: Path) -> None:
+    """Named place nodes in ``bbox`` -> places.parquet (name, name_te, name_hi, name_or, place)."""
+    w, s, e, n = bbox
+    rows = []
+    fp = osmium.FileProcessor(str(pbf), osmium.osm.NODE).with_filter(
+        osmium.filter.KeyFilter("place")
+    )
+    for raw in fp:
+        obj: Any = raw
+        tags = obj.tags
+        name = tags.get("name")
+        kind = tags.get("place")
+        if not name or kind not in PLACE_KINDS:
+            continue
+        lon, lat = obj.location.lon, obj.location.lat
+        if not (w <= lon <= e and s <= lat <= n):
+            continue
+        rows.append(
+            {
+                "osm_id": obj.id,
+                "name": name,
+                "name_en": tags.get("name:en"),
+                "name_te": tags.get("name:te"),
+                "name_hi": tags.get("name:hi"),
+                "name_or": tags.get("name:or"),
+                "place": kind,
+                "geometry": Point(lon, lat),
+            }
+        )
+    out.mkdir(parents=True, exist_ok=True)
+    gpd.GeoDataFrame(rows, crs=4326).to_parquet(out / "places.parquet")
+    print(f"places: {len(rows)} -> {out}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -205,10 +245,16 @@ def main() -> int:
     n.add_argument("--pbf", type=Path, required=True)
     n.add_argument("--bbox", type=float, nargs=4, metavar=("W", "S", "E", "N"), required=True)
     n.add_argument("--out", type=Path, required=True)
+    pl = sub.add_parser("places")
+    pl.add_argument("--pbf", type=Path, required=True)
+    pl.add_argument("--bbox", type=float, nargs=4, metavar=("W", "S", "E", "N"), required=True)
+    pl.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
     t = time.time()
     if args.cmd == "boundaries":
         extract_boundaries(args.pbf, args.out)
+    elif args.cmd == "places":
+        extract_places(args.pbf, tuple(args.bbox), args.out)
     else:
         extract_network(args.pbf, tuple(args.bbox), args.out)
     print(f"done in {time.time() - t:.0f} s")

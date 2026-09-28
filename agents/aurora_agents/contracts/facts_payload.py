@@ -23,7 +23,10 @@ class Fact(BaseModel):
     kind: Literal[
         "probability", "count", "time", "time_window", "place", "provenance", "text"
     ]
-    value: float | str | None
+    value: Annotated[
+        float | str | list[float | str] | None,
+        Field(description="Raw value; ranges and windows are [low, high]"),
+    ]
     unit: str | None
     required: bool
     text: Annotated[

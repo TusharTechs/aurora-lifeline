@@ -154,6 +154,31 @@ class Facility(BaseModel):
     badges: list[str]
 
 
+class NearPlace(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    name: str
+    name_te: str | None = None
+    name_hi: str | None = None
+    name_or: str | None = None
+    distance_km: Annotated[float, Field(ge=0.0)]
+
+
+class Site(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    lat: float
+    lon: float
+    crossing_type: Annotated[
+        str | None, Field(description="bridge, culvert, ford or null")
+    ]
+    road_class: str | None
+    road_name: str | None
+    near_place: NearPlace | None
+
+
 class Action(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -169,6 +194,12 @@ class Action(BaseModel):
     p_event: Annotated[float | None, Field(ge=0.0, le=1.0)]
     rank: Annotated[int, Field(ge=1)]
     evidence_ref: str
+    site: Annotated[
+        Site | None,
+        Field(
+            description="Where the action happens, for labels and advisories. Names are from OpenStreetMap."
+        ),
+    ] = None
 
 
 class Headline(BaseModel):

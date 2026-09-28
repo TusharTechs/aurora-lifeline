@@ -155,6 +155,8 @@ def main() -> int:
     for f in sorted((run / "districts").glob("*.json")):
         shutil.copy2(f, web_run / "districts" / f.name)
     shutil.copy2(run / "manifest.json", web_run / "manifest.json")
+    if (run / "areas.json").exists():
+        shutil.copy2(run / "areas.json", web_run / "areas.json")
 
     # Edges.
     edges = gpd.read_parquet(

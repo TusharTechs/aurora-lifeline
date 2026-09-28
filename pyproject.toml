@@ -41,7 +41,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["engine/aurora_engine/contracts", "data", "apps"]
+extend-exclude = ["agents/aurora_agents/contracts", "data", "apps"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PL", "NPY"]
@@ -51,8 +51,12 @@ ignore = ["PLR0913", "PLR2004"]
 known-first-party = ["aurora_engine", "aurora_agents", "aurora_api", "aurora_pipelines"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["PLR", "N802", "N806"]
+"tests/**" = ["PLR", "N802", "N806", "E501"]
 "pipelines/**" = ["PLR0912", "PLR0914", "PLR0915"]
+# Prompt text and Telugu/Hindi strings are content, not code.
+"agents/aurora_agents/facts.py" = ["E501", "RUF001", "PLR0917"]
+"agents/aurora_agents/advisory.py" = ["E501"]
+"agents/aurora_agents/ask.py" = ["E501", "PLR0915"]
 
 [tool.mypy]
 python_version = "3.12"

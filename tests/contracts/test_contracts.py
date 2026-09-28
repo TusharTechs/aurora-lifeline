@@ -8,7 +8,7 @@ import pytest
 import xmlschema
 from jsonschema import Draft7Validator, FormatChecker
 
-from aurora_engine.contracts import DistrictScenario, FieldObservation
+from aurora_agents.contracts import DistrictScenario, FieldObservation
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / "schemas"

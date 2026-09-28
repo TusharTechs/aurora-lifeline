@@ -55,7 +55,7 @@ jobs:
       - run: uv sync --locked
       - run: pnpm install --frozen-lockfile
       - name: Generated types match schemas/
-        run: make schemas && git diff --exit-code -- engine/aurora_engine/contracts apps/web/src/contracts
+        run: make schemas && git diff --exit-code -- agents/aurora_agents/contracts apps/web/src/contracts
 
   web:
     runs-on: ubuntu-latest

@@ -1,4 +1,4 @@
-"""Generates Pydantic v2 models from schemas/*.json into aurora_engine.contracts (make schemas)."""
+"""Generates Pydantic v2 models from schemas/*.json into aurora_agents.contracts (make schemas)."""
 
 import json
 import subprocess
@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
-OUT = ROOT / "engine" / "aurora_engine" / "contracts"
+OUT = ROOT / "agents" / "aurora_agents" / "contracts"
 
 
 def main() -> int:

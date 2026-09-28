@@ -152,4 +152,24 @@ export interface Action {
   p_event: number | null;
   rank: number;
   evidence_ref: string;
+  /**
+   * Where the action happens, for labels and advisories. Names are from OpenStreetMap.
+   */
+  site?: {
+    lat: number;
+    lon: number;
+    /**
+     * bridge, culvert, ford or null
+     */
+    crossing_type: string | null;
+    road_class: string | null;
+    road_name: string | null;
+    near_place: {
+      name: string;
+      name_te?: string | null;
+      name_hi?: string | null;
+      name_or?: string | null;
+      distance_km: number;
+    } | null;
+  };
 }

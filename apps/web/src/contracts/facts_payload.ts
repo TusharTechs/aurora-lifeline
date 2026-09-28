@@ -20,7 +20,10 @@ export interface FactsPayload {
 export interface Fact {
   id: string;
   kind: "probability" | "count" | "time" | "time_window" | "place" | "provenance" | "text";
-  value: number | string | null;
+  /**
+   * Raw value; ranges and windows are [low, high]
+   */
+  value: number | string | null | (number | string)[];
   unit: string | null;
   required: boolean;
   /**

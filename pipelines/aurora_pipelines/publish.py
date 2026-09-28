@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import yaml
 from jsonschema import Draft7Validator, FormatChecker
+from scipy.spatial import cKDTree
 
 from aurora_engine.facilities import HOSPITAL_TYPES
 from aurora_engine.reach import weighted_quantiles
@@ -90,6 +91,44 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def _site_labeller(osm_dir: Path, edges: pd.DataFrame) -> Any:
+    """Returns edge index -> site dict (road name from OSM, nearest named place within 10 km)."""
+    names = pd.read_parquet(osm_dir / "roads.parquet", columns=["way_id", "name"])
+    name_by_way = dict(zip(names["way_id"], names["name"], strict=True))
+    places = gpd.read_parquet(osm_dir / "places.parquet")
+    kx = 111.32 * np.cos(np.radians(16.5))  # km per degree of longitude at the region's latitude
+    pts = np.c_[places.geometry.x.to_numpy() * kx, places.geometry.y.to_numpy() * 110.57]
+    tree = cKDTree(pts)
+
+    def opt(v: object) -> str | None:
+        return str(v) if isinstance(v, str) and v else None
+
+    def site(e: int) -> dict[str, Any]:
+        row = edges.iloc[e]
+        lon, lat = float(row["mid_lon"]), float(row["mid_lat"])
+        dist, i = tree.query([lon * kx, lat * 110.57])
+        near = None
+        if dist <= 10.0:
+            p = places.iloc[int(i)]
+            near = {
+                "name": opt(p["name_en"]) or str(p["name"]),
+                "name_te": opt(p["name_te"]),
+                "name_hi": opt(p["name_hi"]),
+                "name_or": opt(p["name_or"]),
+                "distance_km": round(float(dist), 1),
+            }
+        return {
+            "lat": round(lat, 5),
+            "lon": round(lon, 5),
+            "crossing_type": opt(row["crossing_type"]),
+            "road_class": opt(row["road_class"]),
+            "road_name": opt(name_by_way.get(row["osm_way_id"])),
+            "near_place": near,
+        }
+
+    return site
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -116,8 +155,19 @@ def main() -> int:
     ce = np.load(run / "edge_closures.npz")
     edges = pd.read_parquet(
         build / "edges.parquet",
-        columns=["edge_id", "crossing_type", "road_class", "mid_lon", "mid_lat", "u", "v"],
+        columns=[
+            "edge_id",
+            "osm_way_id",
+            "crossing_type",
+            "road_class",
+            "mid_lon",
+            "mid_lat",
+            "u",
+            "v",
+        ],
     )
+    osm_dir = json.loads((build / "build_manifest.json").read_text())["inputs"]["osm_extract_dir"]
+    site_of = _site_labeller(ROOT / osm_dir / build.name, edges)
     now = pd.Timestamp(meta["now_utc"])
     landfall_h = float(meta["landfall_h"])
     horizon = int(meta["horizon_h"])
@@ -302,6 +352,7 @@ def main() -> int:
                     "p_event": round(float(p_close[e]), 3),
                     "rank": 0,
                     "evidence_ref": f"{args.run}/edge_closures.npz#edge={e}",
+                    "site": site_of(e),
                 }
             )
         # ``picked`` is already ordered by people protected x P(event) (ENGINE §9).
@@ -396,6 +447,22 @@ def main() -> int:
             f"facilities at risk P50 {head_fac[1]:.0f}; actions {len(actions)}; "
             f"{path.stat().st_size / 1024:.0f} KB"
         )
+
+    # District outlines for CAP <area><polygon> only (never rendered on the map), <= 100 points.
+    areas = {}
+    for code, geom in zip(
+        gpd.read_parquet(build / "districts.parquet")["osm_relation_id"].astype(str),
+        gpd.read_parquet(build / "districts.parquet").geometry,
+        strict=True,
+    ):
+        poly = max(getattr(geom, "geoms", [geom]), key=lambda g: g.area)
+        tol = 0.002
+        ring = poly.exterior.simplify(tol)
+        while len(ring.coords) > 100:
+            tol *= 1.5
+            ring = poly.exterior.simplify(tol)
+        areas[code] = [[round(x, 4), round(y, 4)] for x, y in ring.coords]
+    (run / "areas.json").write_text(json.dumps(areas, separators=(",", ":")))
 
     # Run manifest.
     inputs = [

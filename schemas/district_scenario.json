@@ -446,6 +446,53 @@
         },
         "evidence_ref": {
           "type": "string"
+        },
+        "site": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Where the action happens, for labels and advisories. Names are from OpenStreetMap.",
+          "required": ["lat", "lon", "crossing_type", "road_class", "road_name", "near_place"],
+          "properties": {
+            "lat": {
+              "type": "number"
+            },
+            "lon": {
+              "type": "number"
+            },
+            "crossing_type": {
+              "type": ["string", "null"],
+              "description": "bridge, culvert, ford or null"
+            },
+            "road_class": {
+              "type": ["string", "null"]
+            },
+            "road_name": {
+              "type": ["string", "null"]
+            },
+            "near_place": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "required": ["name", "distance_km"],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "name_te": {
+                  "type": ["string", "null"]
+                },
+                "name_hi": {
+                  "type": ["string", "null"]
+                },
+                "name_or": {
+                  "type": ["string", "null"]
+                },
+                "distance_km": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
         }
       }
     }

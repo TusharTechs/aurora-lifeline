@@ -5,14 +5,14 @@ description = "Gemini agents for AURORA Lifeline (bulletin reader, field verifie
 license = "Apache-2.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "aurora-engine",
+    "google-adk>=2.10,<3",
+    "google-cloud-storage>=2.18",
     "google-genai>=2.25,<3.0.0",
     "pdfplumber>=0.11",
     "pydantic>=2.9",
+    "shapely>=2.0",
+    "xmlschema>=3.4",
 ]
-
-[tool.uv.sources]
-aurora-engine = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.8,<0.13"]
