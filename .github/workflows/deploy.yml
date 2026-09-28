@@ -1,0 +1,90 @@
+name: deploy
+
+# Deploys the API (Cloud Run) and the site (Firebase Hosting) after CI passes on main.
+# Auth is Workload Identity Federation: short-lived tokens for the aurora-deploy service account,
+# accepted only for this repository's main branch (infra/cloudshell/03_github_deploy.sh).
+# No keys or secrets are stored in GitHub; web build settings come from Secret Manager.
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: aurora-lifeline
+  REGION: asia-south1
+  WIF_PROVIDER: projects/503386868260/locations/global/workloadIdentityPools/github/providers/aurora-lifeline
+  DEPLOY_SA: aurora-deploy@aurora-lifeline.iam.gserviceaccount.com
+  IMAGE: asia-south1-docker.pkg.dev/aurora-lifeline/aurora/api
+
+jobs:
+  api:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: published run data (web-data branch)
+        run: |
+          git fetch --depth 1 origin web-data
+          git archive --format=tar FETCH_HEAD runs | tar -xf - -C .
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: build and push image
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build -f services/api/Dockerfile -t "$IMAGE:$GITHUB_SHA" .
+          docker push "$IMAGE:$GITHUB_SHA"
+      - name: deploy Cloud Run service
+        run: |
+          gcloud run deploy aurora-api --image "$IMAGE:$GITHUB_SHA" --region "$REGION" \
+            --service-account "aurora-api@$PROJECT_ID.iam.gserviceaccount.com" \
+            --allow-unauthenticated --memory 1Gi --cpu 1 --concurrency 20 \
+            --min-instances 0 --max-instances 3 --timeout 120 \
+            --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GOOGLE_GENAI_USE_ENTERPRISE=true,GCS_BUCKET_DATA=$PROJECT_ID-data,AURORA_VERSION=${GITHUB_SHA::7}" \
+            --quiet
+
+  web:
+    if: github.event.workflow_run.conclusion == 'success'
+    needs: api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: published tiles and run data (web-data branch)
+        run: |
+          git fetch --depth 1 origin web-data
+          mkdir -p apps/web/public
+          git archive --format=tar FETCH_HEAD | tar -xf - -C apps/web/public
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: web build settings from Secret Manager
+        run: |
+          gcloud secrets versions access latest --secret=web-env > .env
+          while IFS='=' read -r _ v; do [ -n "$v" ] && echo "::add-mask::$v"; done < .env
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/web build
+      - name: deploy Hosting
+        run: pnpm exec firebase deploy --only hosting --project "$PROJECT_ID" --non-interactive

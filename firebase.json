@@ -2,19 +2,53 @@
   "hosting": {
     "public": "apps/web/out",
     "cleanUrls": false,
-    "trailingSlash": true,
     "ignore": ["firebase.json", "**/.*"],
     "headers": [
-      { "source": "**/*.pbf", "headers": [{ "key": "Content-Type", "value": "application/x-protobuf" }] },
+      {
+        "source": "**/*.pbf",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-protobuf"
+          }
+        ]
+      },
       {
         "source": "/tiles/**",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
       },
       {
         "source": "/runs/**",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
       },
-      { "source": "/latest.json", "headers": [{ "key": "Cache-Control", "value": "public, max-age=60" }] }
+      {
+        "source": "/latest.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=60"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "aurora-api",
+          "region": "asia-south1"
+        }
+      }
     ]
   }
 }

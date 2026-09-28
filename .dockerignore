@@ -1,0 +1,12 @@
+**
+!pyproject.toml
+!uv.lock
+!engine/pyproject.toml
+!pipelines/pyproject.toml
+!agents/pyproject.toml
+!agents/aurora_agents/**
+!services/api/pyproject.toml
+!services/api/aurora_api/**
+!schemas/**
+!runs/**
+**/__pycache__
