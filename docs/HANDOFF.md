@@ -10,11 +10,11 @@ Last updated 28 Sep 2026. Update this file at the end of every working session.
 | Idea selection | Done. Track 05, AURORA Lifeline, chosen unanimously by a four-judge panel (4.33 of 5) |
 | Spec, architecture, algorithms, agent specs, data bundle, build plan, costs, demo plan | Done (this handoff). Reviewed by three independent agents on 28 Sep, with all findings applied |
 | Cost approval | Owner approved a **US$150** budget on their Google Cloud account on 28 Sep. The owner has also offered to fund extra costs if needed; the per-item approval rules in `docs/COSTS.md` still apply |
-| Code | **Not started** |
+| Code | Phase 1 in progress: scaffold (1.1) done locally; schemas (1.3) next; raw track, OSM and reference downloads (1.4a) done |
 | Google Cloud project, billing link, APIs | Not created yet (owner actions below) |
 | Access requests (WeatherNext, Flood Hub, Earth Engine) | Not submitted yet (owner actions below) |
 
-**Next step:** Phase 1 in `docs/BUILD_PLAN.md`: scaffold, schemas, and the approval-free downloads (1.4a). Start with the 30-minute check of Montha coverage in Weather Lab and ECMWF.
+**Next step:** 1.3 schemas and codegen; IMD Montha bulletins and the demo-bulletin rule (SPEC §3); then 2.1 tracks. **Scope changed on 28 Sep (D14): the full project, including the former Demo Day features, ships by 30 Sep.**
 
 ## Verified during review (28 Sep 2026)
 
@@ -24,6 +24,7 @@ Last updated 28 Sep 2026. Update this file at the end of every working session.
 | Other components | google-adk is Apache-2.0. ECMWF `stream=enfo`, `type=tf` and `source="google"` work, CC BY 4.0. Geofabrik: Odisha is in `eastern-zone`, Andhra Pradesh in `southern-zone`. All Earth Engine IDs used exist, including `NASA/VIIRS/002/VNP46A2`. CAP 1.2 status and scope values and the XSD URL are correct |
 | IMD definitions | Rainfall categories: heavy 64.5–115.5, very heavy 115.6–204.4, extremely heavy >204.5 mm per 24 h. MSW is a 3-minute mean at 10 m |
 | Hosting, licences, formulas | Firebase Hosting returns 206 for single byte ranges. Licences as stated in `CLAUDE.md`. Holland (1980) formulas correct. The 0.3 m passability citation is correct |
+| Toolchain (28 Sep, build session 1) | google-genai 2.25.0: `Client(enterprise=..., vertexai=..., project=..., location=...)` exists; `ThinkingConfig.thinking_level` exists (`thinking_budget` also still exists in the SDK: do not use it on 3.x); `GenerateContentConfig` has `response_json_schema` as well as `response_schema`. GDAL 3.12.4 via rasterio/pyogrio wheels; ecCodes 2.49.0 via the `eccodeslib` wheel, which must be a direct dependency (uv's lock drops the transitive one). Next.js 16.3.6; TypeScript pinned to 6.x (typescript-eslint rejects TS 7.0); ESLint pinned to 9.x (eslint-plugin-react breaks on ESLint 10); firebase-tools 15.31.0 as a dev dependency |
 | Not yet verified | Gemini 3.7 Flash, 3.5 Flash-Lite and embedding-2 on Agent Platform. Earth Engine noncommercial eligibility. Weather Lab publication delay per model (needed for the "available at bulletin issue time" rule) |
 
 ## C0: Montha ensemble coverage (checked 28 Sep 2026, 18:10–18:20 IST)
@@ -75,26 +76,30 @@ Verified from the official page and its data feed on 27 Sep 2026.
 | D11 | Google Maps JavaScript API basemap with a vector Map ID | Familiar to officials; India pricing; avoids rendering boundaries ourselves |
 | D12 | Parametric insurance is at most one indicative panel on Demo Day | Politically sensitive; already done by competitors |
 | D13 | The team's earlier JanDrishti "Community Impact Graph" **concept** becomes the dependency engine, and its civic-reporting idea the field-truth loop | Keeps the best idea where it adds value. All code is written fresh during the hackathon. If any earlier code is reused, disclose and cite it under the originality rule |
+| D14 | **Full scope by 30 Sep.** The former Demo Day features are pulled into the submission, in this order after G1: Ask AURORA (ADK + Gemini, voice), Dana 2024 (Odisha) as a second replay, the indicative anticipatory-action trigger panel, the OR-Tools shelter optimiser, the Sitrep Extractor as a second validation, the full field loop. No work is planned after 30 Sep, so no separate Demo Day site | Owner decision, 28 Sep. The Top 20 is picked **overall**, not per track, so the bar is every submission. G1 stays a hard gate: a working end-to-end run comes before any addition |
+| D15 | Weather Lab `FNV3_LARGE_ENSEMBLE` (1,000 members) is the primary WeatherNext source, with FNV3 (50) and ECMWF ENS (52) alongside. Show per-source probabilities plus a source-balanced blend (each source weighted equally; PRIOR) | C0 found the 1,000-member ensemble. Equal weighting stops one source dominating by member count |
+| D16 | Google AI first: use a Google product wherever it does load-bearing work (WeatherNext, Gemini, ADK, Gemini Live and TTS, Earth Engine incl. AlphaEarth embeddings, Open Buildings, Flood Hub, Gemini embeddings). Publish "Open in AI Studio" links for each agent prompt on public data; the app's own calls stay on Agent Platform. No decorative uses | Owner direction, 28 Sep; the 25% criterion asks whether Google AI does meaningful work |
+| D17 | Toolchain: GDAL and ecCodes from wheels rather than Homebrew; gitleaks for secret scanning (pre-commit and CI); local, network-free pre-commit hooks; Cloud deploys from GitHub Actions via Workload Identity Federation | Smaller local footprint; no stored keys |
 
 ## Owner actions (only a human can do these)
 
 **Today, 28 Sep:**
 
-- [ ] Confirm the team is **registered on Hack2Skill** for codeforcommunities2; registration closes with submission on 30 Sep at 23:59 IST. Confirm the team size is allowed: the page says 1–4 and the generic T&C say 2–6.
+- [x] Confirm the team is **registered on Hack2Skill** for codeforcommunities2; registration closes with submission on 30 Sep at 23:59 IST. Confirm the team size is allowed: the page says 1–4 and the generic T&C say 2–6.
 - [ ] Create a Google Cloud project, suggested ID `aurora-lifeline-<suffix>`, under the owner's **personal** Google account. Link the billing account that holds the US$150.
 - [ ] Give Claude Code the project ID, the **billing account ID** and its **currency**, and say whether the US$150 is free-trial credit.
-- [ ] Authenticate locally: `gcloud auth login` and `gcloud auth application-default login`.
+- [ ] Authenticate locally with `gcloud auth login --no-launch-browser` and `gcloud auth application-default login --no-launch-browser` (open the printed link, paste the code back). Fallback: a service-account JSON key kept outside the repo.
 - [ ] Register for **Earth Engine** noncommercial use as an individual, and register the Cloud project: https://developers.google.com/earth-engine/guides/access. Eligibility is UNVERIFIED: the noncommercial page does not cover hackathons, and prize money may count as compensation. Answer the questionnaire truthfully. If it is not eligible, the fallback is in `docs/COSTS.md`.
 - [ ] Submit the **WeatherNext** data request form (free; 5–7 business days): https://developers.google.com/weathernext/guides/access-forecast
 - [ ] Join the **Flood Hub API** waitlist (free): https://developers.google.com/flood-forecasting
-- [ ] Create a **public GitHub repo** (`aurora-lifeline`, Apache-2.0) and give Claude Code push access.
+- [ ] Create a **public GitHub repo** `aurora-lifeline` (empty; no README, .gitignore or licence) and add the repo-scoped SSH deploy key Claude generated, with write access. Send the GitHub username.
 - [ ] **Firebase console:** add Firebase to the project and accept the terms. Enable Auth providers Email/Password and Anonymous. Generate the Web Push (VAPID) key pair under Project settings > Cloud Messaging and give Claude the public key (`NEXT_PUBLIC_FCM_VAPID_KEY`).
 - [ ] **Google Maps Platform > Map Management:** create a JavaScript **vector** Map ID and give it to Claude (`NEXT_PUBLIC_MAPS_MAP_ID`).
 - [ ] **LGD district lists:** at lgdirectory.gov.in > Download Directory, download the district lists for Andhra Pradesh and Odisha as CSV into `data/raw/lgd/<date>/`. The form has a CAPTCHA, so Claude cannot do this.
 - [ ] **MERIT Hydro:** if Earth Engine registration is not complete by 28 Sep 20:00, register on the University of Tokyo MERIT Hydro site and download the `hnd` tiles covering 10–25°N, 75–90°E yourself into `data/raw/merit_hydro/v1.0.1/`. Access uses an emailed password, which Claude cannot enter.
 - [ ] **healthsites.io** (optional): sign in with an OpenStreetMap account, create an API token, and put it in `.env` as `HEALTHSITES_TOKEN`. If it isn't there by 29 Sep 00:00, facilities come from OSM tags only.
 - [ ] **Approve or decline `recaptchaenterprise`** (App Check for the web; free up to 10,000 assessments a month). Until you approve, App Check runs in monitor-only mode.
-- [ ] **Email the organisers now** (build-with-ai-india@googlegroups.com):
+- [x] ~~Email the organisers~~ Not needed. Owner answers (28 Sep): no post-deadline work is planned; AI coding tools are allowed and will be declared in the submission; the Top 20 and prizes are overall, not per track. The original questions were:
   1. May the deployed link be updated after 30 Sep, or must Demo Day work use a separate link?
   2. Are prizes or shortlist places allocated per track?
   3. Does the generic Hack2Skill T&C apply (IP, right of first refusal, the "sole author" warranty given AI-assisted code)?

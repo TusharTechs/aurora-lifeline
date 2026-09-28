@@ -41,3 +41,6 @@ firestore-debug.log
 .DS_Store
 .idea/
 .vscode/
+
+# Machine-specific make settings
+/.local.mk

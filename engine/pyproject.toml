@@ -1,0 +1,36 @@
+[project]
+name = "aurora-engine"
+version = "0.1.0"
+description = "Deterministic hazard, network and validation engine for AURORA Lifeline"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "eccodes>=2.38",
+    "eccodeslib>=2.41 ; sys_platform != 'win32'",
+    "geopandas>=1.0",
+    "h3>=4.1",
+    "networkx>=3.4",
+    "numba>=0.60",
+    "numpy>=2.0",
+    "osmium>=4.0",
+    "pandas>=2.2",
+    "pdbufr>=0.11",
+    "pyarrow>=17",
+    "pydantic>=2.9",
+    "pyogrio>=0.10",
+    "pyproj>=3.7",
+    "pyyaml>=6.0",
+    "rasterio>=1.4",
+    "rustworkx>=0.15",
+    "scipy>=1.14",
+    "shapely>=2.0",
+    "xarray>=2024.10",
+]
+
+[build-system]
+requires = ["uv_build>=0.8,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "aurora_engine"
+module-root = ""

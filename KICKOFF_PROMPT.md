@@ -4,7 +4,7 @@ Paste the text below as your first message to Claude Code, from the repo root th
 
 ---
 
-You are the lead engineer on **AURORA Lifeline**, our Track 05 entry for the hackathon *Build with AI: Code for Communities, Second Edition*. The research, idea selection, spec and plan are finished and are in this repo. Your job is to build it.
+You are the lead engineer on **AURORA Lifeline**, our Track 05 entry for the hackathon _Build with AI: Code for Communities, Second Edition_. The research, idea selection, spec and plan are finished and are in this repo. Your job is to build it.
 
 **Deadline:** Gate G1 is 29 Sep 2026 at 23:00 IST. Code freeze is 30 Sep at 18:00 IST. We submit by 30 Sep at 22:00 IST; the portal closes at 23:59.
 

@@ -1,0 +1,7 @@
+docs/
+data/
+pnpm-lock.yaml
+apps/web/.next/
+apps/web/out/
+apps/web/src/contracts/
+.venv/

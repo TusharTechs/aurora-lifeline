@@ -1,0 +1,15 @@
+title = "AURORA Lifeline secret scan"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local caches and build outputs (git-ignored)"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)\.venv/''',
+  '''(^|/)data/''',
+  '''(^|/)\.next/''',
+  '''(^|/)out/''',
+  '''(^|/)\.git/''',
+]

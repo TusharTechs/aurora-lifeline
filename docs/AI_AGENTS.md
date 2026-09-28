@@ -25,15 +25,17 @@ from google import genai
 from google.genai import types
 
 # env: GOOGLE_GENAI_USE_ENTERPRISE=true, GOOGLE_CLOUD_PROJECT=..., GOOGLE_CLOUD_LOCATION=global
-client = genai.Client()          # or genai.Client(enterprise=True, project=..., location="global")
+client = genai.Client()  # or genai.Client(enterprise=True, project=..., location="global")
 # pin: google-genai>=2.25,<3.0.0  (3.0 removes automatic function calling from generate_content)
 
 config = types.GenerateContentConfig(
     system_instruction=SYSTEM,
     response_mime_type="application/json",
-    response_schema=BulletinReading,   # Pydantic model generated from schemas/, or response_json_schema=<dict>
-    max_output_tokens=16384,           # includes thinking tokens: keep generous
-    thinking_config=types.ThinkingConfig(thinking_level="low"),   # "medium" for drafting; never "minimal" or thinking_budget
+    response_schema=BulletinReading,  # Pydantic model generated from schemas/, or response_json_schema=<dict>
+    max_output_tokens=16384,  # includes thinking tokens: keep generous
+    thinking_config=types.ThinkingConfig(
+        thinking_level="low"
+    ),  # "medium" for drafting; never "minimal" or thinking_budget
 )
 resp = client.models.generate_content(model=MODEL, contents=parts, config=config)
 ```

@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+
+# pnpm 11 blocks dependency build scripts unless listed here.
+allowBuilds:
+  "@firebase/util": true
+  protobufjs: true
+  unrs-resolver: true
+  # Native regex addon pulled in by firebase-tools; it falls back to JS RegExp without it.
+  re2: false

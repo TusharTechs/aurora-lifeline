@@ -1,0 +1,25 @@
+[project]
+name = "aurora-pipelines"
+version = "0.1.0"
+description = "Cloud Run job entrypoints for AURORA Lifeline (exports, graph build, storm run, backtest)"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "aurora-agents",
+    "aurora-engine",
+    "earthengine-api>=1.4",
+    "google-cloud-bigquery>=3.27",
+    "google-cloud-storage>=2.18",
+]
+
+[tool.uv.sources]
+aurora-agents = { workspace = true }
+aurora-engine = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "aurora_pipelines"
+module-root = ""

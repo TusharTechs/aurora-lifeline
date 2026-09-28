@@ -2,7 +2,7 @@
 
 ## What we are building
 
-AURORA Lifeline is our entry for **Track 05 (Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster)** of the hackathon *Build with AI: Code for Communities, Second Edition* (Hack2Skill, Google Cloud and GDG India).
+AURORA Lifeline is our entry for **Track 05 (Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster)** of the hackathon _Build with AI: Code for Communities, Second Edition_ (Hack2Skill, Google Cloud and GDG India).
 
 It takes an official IMD cyclone forecast and turns it into what a district control room must act on before landfall:
 
@@ -12,19 +12,19 @@ It takes an official IMD cyclone forecast and turns it into what a district cont
 
 It also verifies field reports after landfall and scores every forecast against satellite radar.
 
-The one-line pitch: *"IMD tells you the storm. Web-DCRA tells you the district's risk. AURORA Lifeline tells you which PHC is cut off, how likely, when, and what to move there now."*
+The one-line pitch: _"IMD tells you the storm. Web-DCRA tells you the district's risk. AURORA Lifeline tells you which PHC is cut off, how likely, when, and what to move there now."_
 
 The current status of Web-DCRA is unverified (`docs/research/verify-policy.md` P1). In the deck, describe it as "district-level composite risk, as documented up to 2023".
 
 ## Deadlines (IST)
 
-| Date | What happens |
-| --- | --- |
-| 29 Sep, 23:00 | **Gate G1:** the Montha run works end to end (see `docs/BUILD_PLAN.md`) |
+| Date            | What happens                                                                                        |
+| --------------- | --------------------------------------------------------------------------------------------------- |
+| 29 Sep, 23:00   | **Gate G1:** the Montha run works end to end (see `docs/BUILD_PLAN.md`)                             |
 | **30 Sep 2026** | Code freeze at 18:00. Record the video 18:00–21:00. **Submit by 22:00.** Submission closes at 23:59 |
-| 1–15 Oct | Evaluation. The submitted tag and deployed link stay frozen |
-| 16 Oct | Top 20 shortlist |
-| 23 Oct | Virtual Demo Day. The Demo Day build continues on a branch and a separate Hosting site |
+| 1–15 Oct        | Evaluation. The submitted tag and deployed link stay frozen                                         |
+| 16 Oct          | Top 20 shortlist                                                                                    |
+| 23 Oct          | Virtual Demo Day. The Demo Day build continues on a branch and a separate Hosting site              |
 
 ## Read these before writing code
 
@@ -92,15 +92,15 @@ The current status of Web-DCRA is unverified (`docs/research/verify-policy.md` P
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| Web | Next.js (App Router) with `output: 'export'`: static only, no SSR, no framework-aware Firebase deploy. TypeScript strict; `@vis.gl/react-google-maps` + deck.gl (`GoogleMapsOverlay`, interleaved with a vector Map ID); Firebase JS SDK (Auth, Firestore, Messaging, App Check); Tailwind CSS. Hosted on Firebase Hosting |
-| API | Python 3.12 + FastAPI on Cloud Run (asia-south1). In the slice it also holds the in-memory recompute for the demo district |
+| Layer                | Choice                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web                  | Next.js (App Router) with `output: 'export'`: static only, no SSR, no framework-aware Firebase deploy. TypeScript strict; `@vis.gl/react-google-maps` + deck.gl (`GoogleMapsOverlay`, interleaved with a vector Map ID); Firebase JS SDK (Auth, Firestore, Messaging, App Check); Tailwind CSS. Hosted on Firebase Hosting                                           |
+| API                  | Python 3.12 + FastAPI on Cloud Run (asia-south1). In the slice it also holds the in-memory recompute for the demo district                                                                                                                                                                                                                                           |
 | Engine and pipelines | Python 3.12 package `aurora_engine`, run as Cloud Run jobs. Libraries: numpy, pandas, geopandas, shapely 2, rasterio, xarray, h3 (Apache-2.0), pyrosm and osmnx (MIT), pyosmium (BSD-2), rustworkx or networkx, numba, ortools, eccodes + pdbufr (Apache-2.0, for ECMWF BUFR tracks), earthengine-api, google-cloud-bigquery, google-cloud-storage, pdfplumber (MIT) |
-| AI | `google-genai>=2.25,<3.0.0` against Gemini Enterprise Agent Platform (`enterprise=True`; `vertexai=True` is the legacy alias); `google-adk` (Apache-2.0) for Ask AURORA (Demo Day) |
-| Data | BigQuery (`aurora_ref`, `aurora_runs`, `aurora_eval`); Cloud Storage (raw data, run outputs, quarantine); Firestore `(default)` (live state) |
-| Tiles | One tippecanoe run per layer (edges, settlements, facilities, surge, flood, tracks): `tippecanoe -e tiles/<run_id>/<layer> -l <layer> --no-tile-compression`. The static `z/x/y.pbf` directories match `district_scenario.tiles.url_template` and are served from Firebase Hosting. Headers are set in `firebase.json` |
-| Tooling | uv (Python), pnpm (Node), ruff + mypy, eslint + prettier, pytest, vitest, Playwright (one smoke test), k6 (load test), datamodel-code-generator and json-schema-to-typescript (codegen), GitHub Actions |
+| AI                   | `google-genai>=2.25,<3.0.0` against Gemini Enterprise Agent Platform (`enterprise=True`; `vertexai=True` is the legacy alias); `google-adk` (Apache-2.0) for Ask AURORA (Demo Day)                                                                                                                                                                                   |
+| Data                 | BigQuery (`aurora_ref`, `aurora_runs`, `aurora_eval`); Cloud Storage (raw data, run outputs, quarantine); Firestore `(default)` (live state)                                                                                                                                                                                                                         |
+| Tiles                | One tippecanoe run per layer (edges, settlements, facilities, surge, flood, tracks): `tippecanoe -e tiles/<run_id>/<layer> -l <layer> --no-tile-compression`. The static `z/x/y.pbf` directories match `district_scenario.tiles.url_template` and are served from Firebase Hosting. Headers are set in `firebase.json`                                               |
+| Tooling              | uv (Python), pnpm (Node), ruff + mypy, eslint + prettier, pytest, vitest, Playwright (one smoke test), k6 (load test), datamodel-code-generator and json-schema-to-typescript (codegen), GitHub Actions                                                                                                                                                              |
 
 ## Repo layout (target)
 
@@ -128,7 +128,7 @@ aurora-lifeline/
 
 ## Commands (create these Make targets early)
 
-- `make setup`: install Python and Node dependencies and pre-commit hooks. Check for system tools and fail with a clear message if any is missing: tippecanoe, GDAL, eccodes, Java 21+ (for the Firebase emulators; check the requirement of the installed firebase-tools), firebase-tools, the Google Cloud SDK, Playwright browsers, and optionally osmium-tool. On macOS: `brew install tippecanoe gdal eccodes openjdk@21 osmium-tool`.
+- `make setup`: install Python and Node dependencies and pre-commit hooks. Check for system tools and fail with a clear message if any is missing: uv, pnpm, Node 22+, tippecanoe, Java 21+ (for the Firebase emulators), the Google Cloud SDK and gitleaks; optionally osmium-tool. GDAL and ecCodes come bundled in the rasterio/pyogrio and eccodeslib wheels, and firebase-tools is a pinned dev dependency; `make setup` verifies them after install, and warns if Playwright browsers are missing. On macOS: `brew install tippecanoe gitleaks openjdk@21` (plus `osmium-tool` if wanted).
 - `make schemas`: generate Pydantic v2 and TypeScript types from `schemas/`.
 - `make test`: run ruff, mypy, pytest, eslint, vitest and the Firestore rules tests.
 - `make graph STATE=andhra_pradesh`: build the lifeline graph for a state.

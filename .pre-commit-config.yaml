@@ -1,0 +1,29 @@
+# Local hooks only: they run the project's pinned tools and need no network.
+repos:
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks (secret scan of staged changes)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner
+        language: system
+        pass_filenames: false
+      - id: ruff-check
+        name: ruff check
+        entry: uv run --no-sync ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --no-sync ruff format
+        language: system
+        types: [python]
+      - id: prettier
+        name: prettier
+        entry: pnpm exec prettier --write --ignore-unknown
+        language: system
+        types_or: [javascript, ts, tsx, json, yaml, css, markdown]
+        exclude: ^(docs/|pnpm-lock\.yaml)
+      - id: large-files
+        name: block files over 2 MB
+        entry: scripts/check_large_files.sh
+        language: system
