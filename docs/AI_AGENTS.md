@@ -13,7 +13,7 @@ Model IDs and prices were verified on the Gemini Developer API docs (ai.google.d
 | Voice input | Audio parts sent to `gemini-3.7-flash` | Chirp 3 speech-to-text is Preview except for Hindi, and US/EU only |
 | Voice output (Google Cloud) | **Cloud Text-to-Speech Gemini-TTS**, e.g. `gemini-2.5-flash-tts` | te-IN and hi-IN GA; or-IN Preview; no India region. Billed on Google Cloud |
 | Voice output (optional, pre-rendered) | `gemini-3.8-flash-lite-tts` | Gemini Developer API and AI Studio only; Gemini Enterprise access is "coming soon" as of 23 Sep 2026. Covers Odia well. Use it only to **pre-render the demo audio once**, with a paid Developer API key under a spend cap and **with owner approval**. Cache the WAV files; never call it at request time or from the browser. Request shape per its docs: Interactions API, `response_format={"type":"audio"}`, `generation_config={"speech_config":[{"voice":"Kore"}]}`; output is WAV 24 kHz mono 16-bit |
-| Duplicate reports | `gemini-embedding-2` | 100+ languages; 768 dimensions; `task_type` is rejected, so state the task in the text. The models page may still list `gemini-embedding-2-preview` |
+| Duplicate reports | `gemini-embedding-2` | 100+ languages; 3,072 dimensions by default on Agent Platform (checked 29 Sep 2026), 768 requested with `output_dimensionality`; `task_type` is rejected, so state the task in the text. The models page may still list `gemini-embedding-2-preview` |
 | Agent framework (Demo Day) | `google-adk` (Apache-2.0) | Runs inside the API service |
 
 **Before Phase 3,** list the models on Agent Platform's global endpoint and record the result in `docs/HANDOFF.md`. If `gemini-3.7-flash` is missing there, use `gemini-3.8-flash`. If neither is available, ask the owner.

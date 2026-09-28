@@ -113,7 +113,7 @@ echo "===== SUMMARY (paste this back) ====="
 echo "project: $PROJECT ($PROJECT_NUMBER)"
 gcloud firestore databases describe --database="(default)" --format="value(locationId,type)" | sed 's/^/firestore: /'
 gcloud storage buckets list --format="value(name,location)" | sed 's/^/bucket: /'
-bq ls --format=csv 2>/dev/null | tail -n +2 | sed 's/^/bigquery: /'
+bq ls | tail -n +3 | awk '{print "bigquery: " $1}'
 gcloud iam service-accounts list --format="value(email)" | grep aurora- | sed 's/^/sa: /'
 grep -E '^(google-genai|gemini|earthengine)' /tmp/aurora-checks.txt
 echo "======================================"
