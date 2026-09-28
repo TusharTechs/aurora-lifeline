@@ -93,9 +93,12 @@ sandbox-reset: ## Reset the demo-officer sandbox storm
 	$(PY) python -m aurora_pipelines.sandbox_reset
 
 # ---------------------------------------------------------------- web and deploy
-.PHONY: web deploy-api deploy-web deploy-jobs
+.PHONY: web web-data deploy-api deploy-web deploy-jobs
 web: ## Run the web app locally
 	pnpm --dir apps/web dev
+
+web-data: ## Push generated tiles and run JSON to the web-data branch (Cloud Shell deploys from it)
+	scripts/push_web_data.sh
 
 deploy-web: ## Static export and deploy to Firebase Hosting
 	pnpm --dir apps/web build

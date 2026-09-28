@@ -205,7 +205,7 @@ def main() -> int:
                 "pop": round(float(pop)),
                 "p": round(float(sp[i]), 3),
                 "nr": bool(no_route[i]),
-                "dl": st["district_lgd"].iloc[i] or "",
+                "dl": str(dl) if pd.notna(dl := st["district_lgd"].iloc[i]) else "",
             }
             feat = {
                 "type": "Feature",
