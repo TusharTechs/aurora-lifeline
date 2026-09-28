@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RunManifest",
+  "description": "Everything needed to reproduce and audit one storm run (ARCHITECTURE §5).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "storm_id",
+    "created_at_utc",
+    "code_sha",
+    "imd_bulletin_no",
+    "mode",
+    "inputs",
+    "members",
+    "parameters",
+    "models",
+    "seed",
+    "outputs"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "storm_id": {
+      "type": "string"
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "code_sha": {
+      "type": "string"
+    },
+    "imd_bulletin_no": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["ensemble", "deterministic"]
+    },
+    "run_label": {
+      "type": ["string", "null"],
+      "description": "e.g. 'hindsight (perfect-track)'; such runs never enter skill scores"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["uri", "sha256", "source", "issued_at_utc"],
+        "properties": {
+          "uri": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "string"
+          },
+          "issued_at_utc": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "available_at_utc": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "member_no"],
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "member_no": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "value", "status", "source"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {},
+          "status": {
+            "type": "string",
+            "enum": ["PRIOR", "PRIOR (unconfirmed)", "CONFIRMED", "CALIBRATED"]
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "prompt_version"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prompt_version": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "bytes"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FactsPayload",
+  "description": "Engine-produced facts that drafting and answering agents may cite only by placeholder (ARCHITECTURE §5; AI_AGENTS §2).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "district_lgd", "audience", "langs", "facts"],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "district_lgd": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "langs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Fact"
+      }
+    }
+  },
+  "definitions": {
+    "Fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "value", "unit", "required", "text", "source"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["probability", "count", "time", "time_window", "place", "provenance", "text"]
+        },
+        "value": {
+          "type": ["number", "string", "null"]
+        },
+        "unit": {
+          "type": ["string", "null"]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "object",
+          "description": "Engine-rendered string per BCP-47 locale",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["table", "row_id"],
+          "properties": {
+            "table": {
+              "type": "string"
+            },
+            "row_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -33,6 +33,24 @@ jobs:
       - run: uv run --no-sync mypy -p aurora_engine -p aurora_agents -p aurora_api -p aurora_pipelines
       - run: uv run --no-sync pytest
 
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: uv sync --locked
+      - run: pnpm install --frozen-lockfile
+      - name: Generated types match schemas/
+        run: make schemas && git diff --exit-code -- engine/aurora_engine/contracts apps/web/src/contracts
+
   web:
     runs-on: ubuntu-latest
     steps:

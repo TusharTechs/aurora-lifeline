@@ -1,0 +1,453 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DistrictScenario",
+  "description": "Static per-district result of one storm run (ARCHITECTURE §5), at most 1 MB. Every number comes from the engine. In deterministic mode probabilities are null and only the IMD-track time is given.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "storm_id",
+    "storm_status",
+    "district_lgd",
+    "district_name",
+    "provenance",
+    "time_axis",
+    "headline",
+    "hourly",
+    "facilities",
+    "actions",
+    "completeness",
+    "tiles",
+    "flags"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "storm_id": {
+      "type": "string"
+    },
+    "storm_status": {
+      "type": "string",
+      "enum": ["replay", "live"]
+    },
+    "district_lgd": {
+      "type": "string"
+    },
+    "district_name": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "imd_bulletin_no",
+        "imd_issued_at_utc",
+        "members",
+        "mode",
+        "data_versions",
+        "code_sha",
+        "model_ids"
+      ],
+      "properties": {
+        "imd_bulletin_no": {
+          "type": "string"
+        },
+        "imd_issued_at_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "landfall_window_text": {
+          "type": ["string", "null"]
+        },
+        "members": {
+          "type": "object",
+          "description": "Member count per source, e.g. IMD, ECMWF, WNX, WNX_LARGE",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["ensemble", "deterministic"]
+        },
+        "data_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "code_sha": {
+          "type": "string"
+        },
+        "model_ids": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "time_axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["now_utc", "landfall_utc", "step_h", "n_steps"],
+      "properties": {
+        "now_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "landfall_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "step_h": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_steps": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "headline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pop_cut_hospital", "facilities_at_risk", "pop_served_by_substations_at_risk", "at"],
+      "properties": {
+        "pop_cut_hospital": {
+          "$ref": "#/definitions/Window"
+        },
+        "facilities_at_risk": {
+          "$ref": "#/definitions/Window"
+        },
+        "pop_served_by_substations_at_risk": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["p10", "p50", "p90", "class"],
+          "properties": {
+            "p10": {
+              "type": ["number", "null"]
+            },
+            "p50": {
+              "type": ["number", "null"]
+            },
+            "p90": {
+              "type": ["number", "null"]
+            },
+            "class": {
+              "type": ["string", "null"],
+              "enum": ["likely", "possible", "unlikely", null]
+            }
+          }
+        },
+        "at": {
+          "const": "landfall"
+        }
+      }
+    },
+    "hourly": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "t_utc",
+          "pop_cut_p10",
+          "pop_cut_p50",
+          "pop_cut_p90",
+          "pop_power_risk_p50",
+          "facilities_at_risk"
+        ],
+        "properties": {
+          "t_utc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pop_cut_p10": {
+            "type": ["number", "null"]
+          },
+          "pop_cut_p50": {
+            "type": ["number", "null"]
+          },
+          "pop_cut_p90": {
+            "type": ["number", "null"]
+          },
+          "pop_power_risk_p50": {
+            "type": ["number", "null"]
+          },
+          "facilities_at_risk": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "facilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Facility"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Action"
+      }
+    },
+    "completeness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["badge", "phc_ratio", "chc_ratio", "substations_mapped"],
+      "properties": {
+        "badge": {
+          "type": "string",
+          "enum": ["good", "partial", "poor"]
+        },
+        "phc_ratio": {
+          "type": ["number", "null"]
+        },
+        "chc_ratio": {
+          "type": ["number", "null"]
+        },
+        "substations_mapped": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "tiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url_template", "layers", "minzoom", "maxzoom"],
+      "properties": {
+        "url_template": {
+          "type": "string"
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["edges", "settlements", "facilities", "surge", "flood", "tracks"]
+          }
+        },
+        "minzoom": {
+          "type": "integer"
+        },
+        "maxzoom": {
+          "type": "integer"
+        }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["needs_review", "screening_surge", "prior_params"],
+      "properties": {
+        "needs_review": {
+          "type": "boolean"
+        },
+        "screening_surge": {
+          "type": "boolean"
+        },
+        "prior_params": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["p10", "p50", "p90"],
+      "properties": {
+        "p10": {
+          "type": ["number", "null"]
+        },
+        "p50": {
+          "type": ["number", "null"]
+        },
+        "p90": {
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "Facility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facility_id",
+        "type",
+        "name",
+        "lat",
+        "lon",
+        "is_simulated",
+        "p_isolated_by_landfall",
+        "t10",
+        "t50",
+        "t90",
+        "iso_deciles",
+        "referral_p_isolated",
+        "power",
+        "expected_births_window",
+        "badges"
+      ],
+      "properties": {
+        "facility_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "district_hospital",
+            "sdh_area_hospital",
+            "chc",
+            "phc",
+            "sub_centre",
+            "shelter",
+            "delivery_point",
+            "dialysis"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lon": {
+          "type": "number"
+        },
+        "is_simulated": {
+          "type": "boolean"
+        },
+        "p_isolated_by_landfall": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "p_isolated_by_source": {
+          "type": "object",
+          "description": "Per-source probability (D15)",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "t10": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "t50": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "t90": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "iso_deciles": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        },
+        "referral_p_isolated": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "power": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["p", "class"],
+          "properties": {
+            "p": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "class": {
+              "type": ["string", "null"],
+              "enum": ["likely", "possible", "unlikely", null]
+            }
+          }
+        },
+        "expected_births_window": {
+          "$ref": "#/definitions/Window"
+        },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "type",
+        "target_id",
+        "deadline_utc",
+        "deadline_basis",
+        "people_protected",
+        "p_event",
+        "rank",
+        "evidence_ref"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["stage_machine", "dg_set", "move_births", "evacuate"]
+        },
+        "target_id": {
+          "type": "string"
+        },
+        "deadline_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deadline_basis": {
+          "type": "string",
+          "description": "e.g. 'P10 closure - 6 h' or 'IMD-track closure - 6 h'"
+        },
+        "people_protected": {
+          "type": "number",
+          "minimum": 0
+        },
+        "p_event": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence_ref": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

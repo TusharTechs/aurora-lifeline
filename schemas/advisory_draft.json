@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AdvisoryDraft",
+  "description": "Advisory Writer output (AI_AGENTS §5). Text refers to numbers only via {{fact_id}} placeholders; a post-check rejects any digit outside a placeholder.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "language",
+    "audience",
+    "headline",
+    "sms_text",
+    "description",
+    "instruction",
+    "voice_script",
+    "placeholders_used",
+    "cap"
+  ],
+  "properties": {
+    "language": {
+      "type": "string",
+      "description": "BCP-47 tag, e.g. en-IN, te-IN"
+    },
+    "audience": {
+      "type": "string",
+      "enum": ["district_officer", "health", "power", "public_works", "field_team"]
+    },
+    "headline": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "sms_text": {
+      "type": "string",
+      "maxLength": 320
+    },
+    "description": {
+      "type": "string"
+    },
+    "instruction": {
+      "type": "string"
+    },
+    "voice_script": {
+      "type": "string",
+      "description": "At most 90 words (checked in code)."
+    },
+    "placeholders_used": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+$"
+      }
+    },
+    "cap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event", "urgency", "severity", "certainty", "category"],
+      "properties": {
+        "event": {
+          "type": "string"
+        },
+        "urgency": {
+          "type": "string",
+          "enum": ["Immediate", "Expected", "Future"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["Extreme", "Severe", "Moderate", "Minor"]
+        },
+        "certainty": {
+          "type": "string",
+          "enum": ["Observed", "Likely", "Possible"]
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Met", "Infra", "Health", "Safety"]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FieldObservation",
+  "description": "Field Verifier output for one photo, video or voice report (AI_AGENTS §4). Routing is deterministic; bridge reopenings always go to an officer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "asset_id",
+    "asset_type",
+    "passable",
+    "water_depth_band",
+    "damage_state",
+    "blockage",
+    "location_consistency",
+    "time_consistency",
+    "voice_language",
+    "voice_summary_en",
+    "evidence_notes",
+    "confidence"
+  ],
+  "properties": {
+    "asset_id": {
+      "type": ["string", "null"]
+    },
+    "asset_type": {
+      "type": "string",
+      "enum": ["road", "bridge", "culvert", "facility", "substation", "other"]
+    },
+    "passable": {
+      "type": "string",
+      "enum": ["yes", "no", "unknown"]
+    },
+    "water_depth_band": {
+      "type": "string",
+      "enum": ["none", "lt_15cm", "15_30cm", "30_60cm", "gt_60cm", "unknown"]
+    },
+    "damage_state": {
+      "type": "string",
+      "enum": ["none", "minor", "moderate", "severe", "destroyed", "unknown"]
+    },
+    "blockage": {
+      "type": "string",
+      "enum": ["none", "debris", "tree", "collapse", "water", "vehicle", "unknown"]
+    },
+    "location_consistency": {
+      "type": "string",
+      "enum": ["consistent", "inconsistent", "unknown"]
+    },
+    "time_consistency": {
+      "type": "string",
+      "enum": ["consistent", "inconsistent", "unknown"]
+    },
+    "voice_language": {
+      "type": ["string", "null"]
+    },
+    "voice_summary_en": {
+      "type": ["string", "null"]
+    },
+    "evidence_notes": {
+      "type": "string",
+      "maxLength": 600,
+      "description": "At most 60 words."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  }
+}

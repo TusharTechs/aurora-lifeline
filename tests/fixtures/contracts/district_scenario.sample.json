@@ -1,0 +1,147 @@
+{
+  "schema_version": "1",
+  "run_id": "fixture_run_b01",
+  "storm_id": "fixture_storm",
+  "storm_status": "replay",
+  "district_lgd": "0000",
+  "district_name": "Sample District (test fixture, not a real result)",
+  "provenance": {
+    "imd_bulletin_no": "01",
+    "imd_issued_at_utc": "2025-01-01T00:00:00Z",
+    "landfall_window_text": "fixture text",
+    "members": {
+      "IMD": 1,
+      "ECMWF": 2,
+      "WNX": 2
+    },
+    "mode": "ensemble",
+    "data_versions": {
+      "osm": "fixture"
+    },
+    "code_sha": "0000000000000000000000000000000000000000",
+    "model_ids": {
+      "bulletin_reader": "fixture"
+    }
+  },
+  "time_axis": {
+    "now_utc": "2025-01-01T00:00:00Z",
+    "landfall_utc": "2025-01-03T12:00:00Z",
+    "step_h": 1,
+    "n_steps": 85
+  },
+  "headline": {
+    "pop_cut_hospital": {
+      "p10": 100,
+      "p50": 250,
+      "p90": 400
+    },
+    "facilities_at_risk": {
+      "p10": 1,
+      "p50": 2,
+      "p90": 3
+    },
+    "pop_served_by_substations_at_risk": {
+      "p10": null,
+      "p50": null,
+      "p90": null,
+      "class": "possible"
+    },
+    "at": "landfall"
+  },
+  "hourly": [
+    {
+      "t_utc": "2025-01-01T00:00:00Z",
+      "pop_cut_p10": 0,
+      "pop_cut_p50": 0,
+      "pop_cut_p90": 0,
+      "pop_power_risk_p50": null,
+      "facilities_at_risk": 0
+    },
+    {
+      "t_utc": "2025-01-01T01:00:00Z",
+      "pop_cut_p10": 0,
+      "pop_cut_p50": 0,
+      "pop_cut_p90": 0,
+      "pop_power_risk_p50": null,
+      "facilities_at_risk": 0
+    },
+    {
+      "t_utc": "2025-01-01T02:00:00Z",
+      "pop_cut_p10": 0,
+      "pop_cut_p50": 0,
+      "pop_cut_p90": 0,
+      "pop_power_risk_p50": null,
+      "facilities_at_risk": 0
+    }
+  ],
+  "facilities": [
+    {
+      "facility_id": "f_001",
+      "type": "phc",
+      "name": "Sample PHC",
+      "lat": 16.9,
+      "lon": 82.2,
+      "is_simulated": false,
+      "p_isolated_by_landfall": 0.6,
+      "p_isolated_by_source": {
+        "ECMWF": 0.5,
+        "WNX": 0.7
+      },
+      "t10": "2025-01-02T06:00:00Z",
+      "t50": "2025-01-02T20:00:00Z",
+      "t90": "2025-01-03T10:00:00Z",
+      "iso_deciles": [
+        "2025-01-02T06:00:00Z",
+        "2025-01-02T10:00:00Z",
+        "2025-01-02T14:00:00Z",
+        "2025-01-02T17:00:00Z",
+        "2025-01-02T20:00:00Z",
+        "2025-01-02T23:00:00Z",
+        "2025-01-03T02:00:00Z",
+        "2025-01-03T07:00:00Z",
+        "2025-01-03T10:00:00Z"
+      ],
+      "referral_p_isolated": 0.4,
+      "power": {
+        "p": null,
+        "class": "possible"
+      },
+      "expected_births_window": {
+        "p10": 0.5,
+        "p50": 1.2,
+        "p90": 2.0
+      },
+      "badges": ["possible delivery point"]
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "a_001",
+      "type": "stage_machine",
+      "target_id": "e_123",
+      "deadline_utc": "2025-01-02T00:00:00Z",
+      "deadline_basis": "P10 closure - 6 h",
+      "people_protected": 250,
+      "p_event": 0.6,
+      "rank": 1,
+      "evidence_ref": "fixture"
+    }
+  ],
+  "completeness": {
+    "badge": "partial",
+    "phc_ratio": 0.7,
+    "chc_ratio": 0.9,
+    "substations_mapped": 3
+  },
+  "tiles": {
+    "url_template": "/tiles/fixture_run_b01/{layer}/{z}/{x}/{y}.pbf",
+    "layers": ["edges", "settlements", "facilities", "surge", "flood", "tracks"],
+    "minzoom": 6,
+    "maxzoom": 14
+  },
+  "flags": {
+    "needs_review": false,
+    "screening_surge": true,
+    "prior_params": ["rain_k", "surge_a"]
+  }
+}

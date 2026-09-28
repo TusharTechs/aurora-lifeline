@@ -1,0 +1,294 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BulletinReading",
+  "description": "Structured reading of one IMD / RSMC New Delhi tropical-cyclone bulletin (AI_AGENTS §3). Numbers are copied from the bulletin with verbatim quotes; they are attributed to IMD, never shown as AURORA estimates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bulletin_no",
+    "issued_at_utc",
+    "issued_at_text",
+    "system_name",
+    "system_stage",
+    "current",
+    "forecast",
+    "landfall",
+    "surge",
+    "rainfall_warnings",
+    "wind_warnings",
+    "source_quotes",
+    "uncertain_fields"
+  ],
+  "properties": {
+    "bulletin_no": {
+      "type": "string"
+    },
+    "issued_at_utc": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "issued_at_text": {
+      "type": "string"
+    },
+    "system_name": {
+      "type": ["string", "null"]
+    },
+    "system_stage": {
+      "type": "string",
+      "enum": ["LPA", "WML", "D", "DD", "CS", "SCS", "VSCS", "ESCS", "SuCS"]
+    },
+    "current": {
+      "$ref": "#/definitions/CurrentFix"
+    },
+    "forecast": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ForecastPoint"
+      }
+    },
+    "landfall": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Landfall"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "surge": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SurgeGuidance"
+      }
+    },
+    "rainfall_warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RainfallWarning"
+      }
+    },
+    "wind_warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/WindWarning"
+      }
+    },
+    "source_quotes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SourceQuote"
+      }
+    },
+    "uncertain_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_note": {
+      "type": ["string", "null"],
+      "description": "Provenance of the reading, e.g. 'hand-entered' before the Bulletin Reader exists."
+    }
+  },
+  "definitions": {
+    "CurrentFix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lat",
+        "lon",
+        "msw_min",
+        "msw_max",
+        "gust_value",
+        "wind_unit",
+        "pressure_hpa",
+        "movement_text"
+      ],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 360
+        },
+        "msw_min": {
+          "type": ["number", "null"]
+        },
+        "msw_max": {
+          "type": ["number", "null"]
+        },
+        "gust_value": {
+          "type": ["number", "null"]
+        },
+        "wind_unit": {
+          "type": "string",
+          "enum": ["kt", "kmph"]
+        },
+        "pressure_hpa": {
+          "type": ["number", "null"]
+        },
+        "movement_text": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "ForecastPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lead_h",
+        "valid_at_utc",
+        "valid_at_text",
+        "lat",
+        "lon",
+        "msw_min",
+        "msw_max",
+        "gust_value",
+        "wind_unit",
+        "category"
+      ],
+      "properties": {
+        "lead_h": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "valid_at_utc": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "valid_at_text": {
+          "type": ["string", "null"]
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 360
+        },
+        "msw_min": {
+          "type": ["number", "null"]
+        },
+        "msw_max": {
+          "type": ["number", "null"]
+        },
+        "gust_value": {
+          "type": ["number", "null"]
+        },
+        "wind_unit": {
+          "type": "string",
+          "enum": ["kt", "kmph"]
+        },
+        "category": {
+          "type": "string"
+        }
+      }
+    },
+    "Landfall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["window_text", "start_utc", "end_utc", "location_text", "lat", "lon"],
+      "properties": {
+        "window_text": {
+          "type": "string"
+        },
+        "start_utc": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "end_utc": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "location_text": {
+          "type": "string"
+        },
+        "lat": {
+          "type": ["number", "null"]
+        },
+        "lon": {
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "SurgeGuidance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["area_text", "height_m_min", "height_m_max"],
+      "properties": {
+        "area_text": {
+          "type": "string"
+        },
+        "height_m_min": {
+          "type": ["number", "null"]
+        },
+        "height_m_max": {
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "RainfallWarning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["area_text", "date_text", "category"],
+      "properties": {
+        "area_text": {
+          "type": "string"
+        },
+        "date_text": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["heavy", "heavy_to_very_heavy", "very_heavy", "extremely_heavy", "other"]
+        }
+      }
+    },
+    "WindWarning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["area_text", "speed_min", "speed_max", "gust", "unit"],
+      "properties": {
+        "area_text": {
+          "type": "string"
+        },
+        "speed_min": {
+          "type": ["number", "null"]
+        },
+        "speed_max": {
+          "type": ["number", "null"]
+        },
+        "gust": {
+          "type": ["number", "null"]
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["kt", "kmph"]
+        }
+      }
+    },
+    "SourceQuote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "quote"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "JSON path of the field the quote supports"
+        },
+        "quote": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    }
+  }
+}
