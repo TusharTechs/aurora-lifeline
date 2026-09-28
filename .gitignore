@@ -48,3 +48,6 @@ firestore-debug.log
 # Generated web data (built by aurora_pipelines.tiles)
 /apps/web/public/tiles/
 /apps/web/public/runs/
+
+# Local editor and agent settings
+/.claude/
