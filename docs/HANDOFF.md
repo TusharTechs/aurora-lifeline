@@ -10,7 +10,7 @@ Last updated 28 Sep 2026. Update this file at the end of every working session.
 | Idea selection | Done. Track 05, AURORA Lifeline, chosen unanimously by a four-judge panel (4.33 of 5) |
 | Spec, architecture, algorithms, agent specs, data bundle, build plan, costs, demo plan | Done (this handoff). Reviewed by three independent agents on 28 Sep, with all findings applied |
 | Cost approval | Owner approved a **US$150** budget on their Google Cloud account on 28 Sep. The owner has also offered to fund extra costs if needed; the per-item approval rules in `docs/COSTS.md` still apply |
-| Code | Phase 1 in progress: scaffold (1.1) done locally; schemas (1.3) next; raw track, OSM and reference downloads (1.4a) done |
+| Code | Phase 1 done (1.1 scaffold, 1.3 schemas, 1.4a downloads). Phase 2: 2.1 tracks done; 2.3 graph for the landfall region done (**C1 met 28 Sep 19:45**); isolation algorithm (2.5 core) done and tested. Next: hazards (2.2 wind, 2.4 surge/rain/closures), then isolation on the real graph |
 | Google Cloud project, billing link, APIs | Not created yet (owner actions below) |
 | Access requests (WeatherNext, Flood Hub, Earth Engine) | Not submitted yet (owner actions below) |
 
@@ -90,6 +90,8 @@ Verified from the official page and its data feed on 27 Sep 2026.
 | D16 | Google AI first: use a Google product wherever it does load-bearing work (WeatherNext, Gemini, ADK, Gemini Live and TTS, Earth Engine incl. AlphaEarth embeddings, Open Buildings, Flood Hub, Gemini embeddings). Publish "Open in AI Studio" links for each agent prompt on public data; the app's own calls stay on Agent Platform. No decorative uses | Owner direction, 28 Sep; the 25% criterion asks whether Google AI does meaningful work |
 | D17 | Toolchain: GDAL and ecCodes from wheels rather than Homebrew; gitleaks for secret scanning (pre-commit and CI); local, network-free pre-commit hooks; Cloud deploys from GitHub Actions via Workload Identity Federation | Smaller local footprint; no stored keys |
 | D18 | Two Montha runs: `montha_2025_b19` (SPEC §3 rule; ECMWF only) and `montha_2025_b21` (first bulletin with every ensemble source; 1,068 members). Judge mode opens on b21; the proof page scores both | Weather Lab's first Montha run started after bulletin 19 was issued, so b19 cannot carry WeatherNext without hindsight. b21 was chosen on availability at issue time, before any skill was computed |
+| D19 | "Cut off from any hospital" counts **public tiers only** (district hospital, SDH/area hospital, CHC, PHC), as SPEC §3 defines. OSM's 1,713 other `amenity=hospital` points in the landfall region are classed `hospital_other` and shown for context only | Many are small private clinics; counting them would overstate access |
+| D20 | Demo district **Kakinada** (member 0's forecast coast crossing at 17.157°N 82.423°E for both b19 and b21). The first build covers the landfall region: Kakinada, Konaseema, East Godavari, West Godavari, Eluru and Krishna, plus 30 km | The storm actually crossed near Narsapur (West Godavari); a single-district build would miss where the impacts were |
 
 ## Owner actions (only a human can do these)
 
@@ -127,6 +129,12 @@ Verified from the official page and its data feed on 27 Sep 2026.
 - An IMD API account.
 - An SMS/IVR provider trial (Demo Day).
 - Written permission from OSDMA to use its shelter list.
+
+## Data caveats found so far
+
+- **District set.** OSM (27 Sep 2026) has 28 AP districts. Markapuram and Polavaram are marked `in_oct_2025_set = no` in `config/states/andhra_pradesh_districts.csv`; this is inferred (absent from IMD's Oct 2025 district lists; very recent Wikidata items), not confirmed against LGD.
+- **Shelters.** OSM has only 28 shelters in the landfall region; Andhra Pradesh has many more cyclone shelters. The completeness badge must say so, and evacuation actions are limited to mapped shelters.
+- **WorldPop** (data.worldpop.org) ignores HTTP range requests, so the 1.84 GB India raster is downloaded once, clipped to AP and Odisha, and deleted.
 
 ## Open questions
 
@@ -167,3 +175,4 @@ Verified from the official page and its data feed on 27 Sep 2026.
 | 28 Sep 2026 | Research session | Second-pass review (61/70 earlier findings fully addressed, 9 partly). Those 9 and 5 new issues fixed: the replay selection rule, the demo-officer sandbox, the Holland V_mg test, no-sign-in rasters, owner actions for LGD, MERIT and healthsites, IMD area-to-district mapping, the surge fallback, catchments and referral tiers, per-layer tiles, local-first storage, a 30 km district buffer, App Check monitor-only, the warm-instance cost, Java 21 |
 | 28 Sep 2026, 18:00– | Build session 1 | Hackathon page re-checked (unchanged). C0 done: Montha is in ECMWF ENS (`03B`, 52 tracks) and Weather Lab (`IO942025`, 50 FNV3 + 1,000 large-ensemble members). Repo initialised locally with the handoff docs; `pipelines/downloads/fetch_raw.sh` started (ECMWF tf, Weather Lab, IBTrACS NI, CAP XSD, Geofabrik southern-zone) |
 | 28 Sep 2026, 19:00– | Build session 1 (cont.) | 1.1 scaffold and 1.3 schemas committed. IMD Montha archive downloaded (57 national + 58 RSMC bulletins, tracks, surge, rainfall, press releases). Replay rule applied (No. 19); member 0 hand-entered. Track module (ECMWF BUFR, Weather Lab CSV, 300 km matching, hourly interpolation, IMD alignment) with 10 tests. Found that Weather Lab is unavailable at No. 19; proposed D18 (two runs, b19 and b21) |
+| 28 Sep 2026, 19:45 | Build session 1 (cont.) | D18 confirmed (two runs). Member 0 for b21 entered. Demo district Kakinada (D20). OSM extraction (pyosmium, C++ key filter: 2 min per zone). Graph for Kakinada, Konaseema, East/West Godavari, Eluru, Krishna + 30 km: 419,246 nodes, 542,133 edges, 7,901 bridges, 1,124 culverts, 119 fords; 205 PHCs, 35 CHCs, 25 hospitals, 121 sub-centres, 28 shelters, 189 substations. Bottleneck-reachability algorithm (numba) with the ENGINE §7 tests. WorldPop settlements pending the 1.84 GB download (the server ignores range requests) |

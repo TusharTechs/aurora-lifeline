@@ -86,3 +86,19 @@ if [[ "$WITH_OSM" == 1 ]]; then
 fi
 
 echo "DONE $(date -u +%FT%TZ)"
+
+# ---- Terrain and water for a bounding box (no sign-in). Set DEM_LAT and DEM_LON ranges as needed.
+DEM_LATS="${DEM_LATS:-15 16 17}"
+DEM_LONS="${DEM_LONS:-80 81 82}"
+DEM_DIR="$RAW/copernicus_dem/glo30"
+for lat in $DEM_LATS; do
+  for lon in $DEM_LONS; do
+    name=$(printf "Copernicus_DSM_COG_10_N%02d_00_E%03d_00_DEM" "$lat" "$lon")
+    fetch "https://copernicus-dem-30m.s3.amazonaws.com/$name/$name.tif" "$DEM_DIR"
+  done
+done
+checksum "$DEM_DIR"
+# JRC Global Surface Water occurrence v1.4 (2021), 10x10 degree tile covering 80-90 E, 10-20 N.
+fetch "https://storage.googleapis.com/global-surface-water/downloads2021/occurrence/occurrence_80E_20Nv1_4_2021.tif" "$RAW/jrc_gsw/v1_4_2021"
+checksum "$RAW/jrc_gsw/v1_4_2021"
+echo "DONE terrain/water $(date -u +%FT%TZ)"

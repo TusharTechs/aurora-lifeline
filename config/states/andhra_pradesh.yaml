@@ -1,0 +1,15 @@
+# State configuration (ARCHITECTURE §3). Geography is configuration: a new state is a new file.
+state_lgd: null # fill from the LGD directory
+name: Andhra Pradesh
+osm_extract: southern-zone # Geofabrik India sub-extract that contains the state
+aoi: config/aoi/andhra_pradesh.geojson # 120 km coastal buffer intersected with the state polygon
+districts_csv: config/states/andhra_pradesh_districts.csv
+# District set: OSM (27 Sep 2026) has 28 districts. Markapuram and Polavaram are marked
+# in_oct_2025_set = no (inferred: absent from IMD's Oct 2025 bulletins; recent Wikidata items).
+# Results are reported by current OSM polygons until LGD boundaries for Oct 2025 are available.
+crude_birth_rate_per_1000: null # from the SRS Statistical Report; cite the year
+district_buffer_km: 30 # PRIOR: graphs include roads and targets within 30 km of the district
+# Landfall region built first for the Montha replay (BUILD_PLAN 2.3).
+build_regions:
+  godavari_krishna:
+    districts: [Kakinada, Konaseema, East Godavari, West Godavari, Eluru, Krishna district]
