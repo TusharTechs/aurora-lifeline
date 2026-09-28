@@ -51,6 +51,7 @@ Simulated named accounts, if needed, use email and password on a placeholder dom
   - **Demo district:** the Andhra Pradesh district (using the district set in force in Oct 2025) that contains member 0's forecast coast-crossing point. The observed landfall district is recorded separately in the manifest.
   - A member whose track ends before landfall contributes no hazard after its last point.
   - Runs for later bulletins are Demo Day work.
+  - **Amended 28 Sep 2026 (HANDOFF D18).** Montha publishes two runs: the run chosen by the rule above (`montha_2025_b19`) and the first bulletin at whose issue time every ensemble source was available (`montha_2025_b21`). Judge mode opens on the latter. Both appear on the proof page. `config/storms/<storm>.yaml` lists the runs and `default_run`.
 - **Lifeline graph:** road nodes and edges (bridges, culverts and fords as explicit edges), facilities, settlements, substations and service areas, per state.
 - **Isolation time `b(v)`:** the latest time at which node `v` can still reach any functioning target of a class (hospital, referral or shelter), per member.
   - **P(isolated before landfall)** is the fraction of members with `b(v)` before landfall.

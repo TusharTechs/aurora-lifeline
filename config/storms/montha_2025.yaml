@@ -22,19 +22,36 @@ observed_landfall:
   lon: 81.70
 replay_start_utc: "2025-10-25T18:30:00Z" # observed landfall minus 72 h
 
-# Last bulletin issued at or before replay_start_utc that contains a landfall forecast.
-demo_bulletin:
-  product: national_bulletin
-  bulletin_no: "19"
-  issued_at_utc: "2025-10-25T16:00:00Z" # "TIME OF ISSUE: 2130 HOURS IST DATED: 25.10.2025"
-  source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_461197_19.National_Bulletin_No_19-25_Oct_2025_1730IST.pdf
-  sha256: f822ba6cad4f06b44633b0cf68ea759a422f4b96577f00dfa796b3f1d685cc8d
-  reading: config/storms/montha_2025/bulletins/national_19.reading.json
-run_id: montha_2025_b19
+# Runs published for this storm (D18). Judge mode opens on default_run.
+#  - b19: the SPEC §3 rule (last bulletin at or before replay_start_utc with a landfall forecast).
+#         No Weather Lab run existed yet at its issue time, so its ensemble is ECMWF only.
+#  - b21: the first bulletin at whose issue time every ensemble source was available.
+# b21 was chosen on data availability at issue time only, before any skill was computed.
+default_run: montha_2025_b21
+runs:
+  - run_id: montha_2025_b19
+    rule: spec_72h
+    bulletin:
+      product: national_bulletin
+      bulletin_no: "19"
+      issued_at_utc: "2025-10-25T16:00:00Z" # TIME OF ISSUE: 2130 HOURS IST DATED: 25.10.2025
+      source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_461197_19.National_Bulletin_No_19-25_Oct_2025_1730IST.pdf
+      sha256: f822ba6cad4f06b44633b0cf68ea759a422f4b96577f00dfa796b3f1d685cc8d
+      reading: config/storms/montha_2025/bulletins/national_19.reading.json
+  - run_id: montha_2025_b21
+    rule: first_full_ensemble
+    bulletin:
+      product: national_bulletin
+      bulletin_no: "21"
+      issued_at_utc: "2025-10-26T04:15:00Z" # TIME OF ISSUE: 0945 HOURS IST DATED: 26.10.2025
+      source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_c46ca7_21.National_Bulletin_No_21-26_Oct_2025_0530IST.pdf
+      sha256: 8f32d3065a0a9e569cf67138867036f26c77bb81a480128944a18d5a589c56e2
+      reading: config/storms/montha_2025/bulletins/national_21.reading.json
 
 # Filled by the pipeline.
-landfall_utc: null # member 0's first hourly crossing of the OSM coastline (a model input)
-demo_district_lgd: null # AP district containing member 0's forecast coast crossing
+# Per run: landfall_utc (member 0's first hourly OSM-coastline crossing, a model input) and the
+# demo district (the AP district containing that crossing) are written to the run manifest.
+demo_district_lgd: null
 
 states: [andhra_pradesh, odisha]
 
