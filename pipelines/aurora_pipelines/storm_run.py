@@ -59,6 +59,7 @@ from aurora_engine.tracks import (
     read_weatherlab_csv,
 )
 from aurora_engine.units import wind_to_ms
+from aurora_engine.weights import member_weights
 from aurora_engine.wind import willoughby_rmax_km
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -266,6 +267,8 @@ def _member(k: int) -> dict[str, Any]:
             site_rain[j] = first_hour_reaching(cum[pp], np.array([thr]))[0]
     # Surge.
     surge_peak, s_peak = 0.0, np.nan
+    empty_i, empty_f = np.zeros(0, dtype=np.int32), np.zeros(0, dtype=np.float32)
+    surge_out = (empty_i, empty_f, empty_f)
     site_surge = np.full(len(G["fac_node_pos"]), np.inf)
     if m["landfall"] is not None:
         _, s_lf, sign = m["landfall"]
@@ -286,6 +289,12 @@ def _member(k: int) -> dict[str, Any]:
             ms.depth_m[fc[ok]] > SITE_FLOOD_DEPTH_M, onset_cell[fc[ok]], np.inf
         )
         surge_peak, s_peak = ms.peak_m, ms.s_peak_km
+        wet_cells = np.nonzero(ms.depth_m > SITE_FLOOD_DEPTH_M)[0]
+        surge_out = (
+            wet_cells.astype(np.int32),
+            ms.depth_m[wet_cells].astype(np.float32),
+            onset_cell[wet_cells].astype(np.float32),
+        )
     avail = np.minimum(site_rain, site_surge)
     csr = G["csr"]
     # Settlements and facilities -> any public hospital.
@@ -300,6 +309,8 @@ def _member(k: int) -> dict[str, Any]:
         "closed_hours": close[np.isfinite(close)].astype(np.float32),
         "surge_peak_m": surge_peak,
         "s_peak_km": s_peak,
+        "surge": surge_out,
+        "rain_lf": cum[:, G["landfall_idx"]].astype(np.float32),
     }
     # Referral tiers.
     for tier, targets in REFERRAL_TIERS.items():
@@ -360,6 +371,8 @@ def main() -> int:
     tracks = tracks[tracks["valid_utc"] >= now]
     tracks.to_parquet(out / "tracks.parquet", index=False)
     counts = tracks.groupby("source")["member_no"].nunique().to_dict()
+    # Record only runs that contributed members (a run can exist yet hold no track of this storm).
+    used = {k: v for k, v in used.items() if counts.get(k, 0) > 0}
     print(f"members: {counts}; runs used: {used}; {time.time() - t0:.0f} s")
 
     # Reference data.
@@ -528,6 +541,7 @@ def main() -> int:
             np.inf,
         ),
         set_node_pos=node_pos.get_indexer(settle["node_id"]).astype(np.int64),
+        landfall_idx=int(np.clip(round(landfall_h), 0, horizon_h)),
     )
 
     # Run members in parallel (fork shares G read-only).
@@ -559,6 +573,33 @@ def main() -> int:
     )
     ch = np.concatenate([r["closed_hours"] for r in results])
     np.savez_compressed(out / "edge_closures.npz", member_edge=ce.astype(np.int32), hour=ch)
+    # Rain at landfall per patch (for the flood-probability overlay) and weighted surge per cell.
+    weights = member_weights(meta)
+    np.save(out / "rain_at_landfall.npy", np.stack([r["rain_lf"] for r in results]))
+    pd.DataFrame(
+        {
+            "patch": range(len(uniq)),
+            "district_lgd": [k[0] for k in uniq],
+            "h3": [k[1] for k in uniq],
+        }
+    ).to_parquet(out / "patches.parquet", index=False)
+    n_cand = len(sg.index.cell_rc)
+    p_surge, depth_max, onset_w = np.zeros(n_cand), np.zeros(n_cand), np.zeros(n_cand)
+    for r, wt in zip(results, weights, strict=True):
+        cells, depth, onset = r["surge"]
+        p_surge[cells] += wt
+        depth_max[cells] = np.maximum(depth_max[cells], depth)
+        onset_w[cells] += wt * np.where(np.isfinite(onset), onset, 0.0)
+    hit = np.nonzero(p_surge > 0)[0]
+    pd.DataFrame(
+        {
+            "row": sg.index.cell_rc[hit, 0],
+            "col": sg.index.cell_rc[hit, 1],
+            "p": p_surge[hit],
+            "depth_max_m": depth_max[hit],
+            "onset_h_mean": onset_w[hit] / p_surge[hit],
+        }
+    ).to_parquet(out / "surge_cells.parquet", index=False)
     fac.drop(columns=[c for c in fac.columns if c == "hull"]).to_parquet(out / "facilities.parquet")
     settle[
         ["settlement_id", "population", "node_id", "district_lgd", "unsnapped", "geometry"]
@@ -589,6 +630,9 @@ def main() -> int:
         "alignment": align_report.per_source if align_report else {},
         "facility_isolation_definition": "cut off from the referral tier (ENGINE §7 referral runs)",
         "max_members": args.max_members,
+        "grid_transform": list(sg.transform)[:6],
+        "grid_shape": list(sg.shape),
+        "patch_h3_res": PATCH_H3_RES,
     }
     (out / "run_meta.json").write_text(json.dumps(run_meta, indent=2, default=str))
     digest = hashlib.sha256((out / "b_settle.npy").read_bytes()).hexdigest()[:16]

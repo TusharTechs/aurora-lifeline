@@ -44,3 +44,7 @@ firestore-debug.log
 
 # Machine-specific make settings
 /.local.mk
+
+# Generated web data (built by aurora_pipelines.tiles)
+/apps/web/public/tiles/
+/apps/web/public/runs/

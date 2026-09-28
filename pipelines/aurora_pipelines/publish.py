@@ -27,6 +27,7 @@ from jsonschema import Draft7Validator, FormatChecker
 
 from aurora_engine.facilities import HOSPITAL_TYPES
 from aurora_engine.reach import weighted_quantiles
+from aurora_engine.weights import member_weights
 
 ROOT = Path(__file__).resolve().parents[2]
 DECILES = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
@@ -49,17 +50,6 @@ PRIOR_PARAMS = [
     "publication_delays",
     "source_balanced_weights",
 ]
-
-
-def member_weights(members: pd.DataFrame) -> np.ndarray:
-    """Equal weight per ensemble source, split equally among its members; IMD gets 0."""
-    w = np.zeros(len(members))
-    ens = members["source"] != "IMD"
-    sources = members.loc[ens, "source"].unique()
-    for s in sources:
-        sel = (members["source"] == s).to_numpy()
-        w[sel] = 1.0 / len(sources) / sel.sum()
-    return w
 
 
 def iso(now: pd.Timestamp, h: float) -> str | None:
