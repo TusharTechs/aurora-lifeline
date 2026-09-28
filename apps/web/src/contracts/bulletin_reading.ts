@@ -88,6 +88,7 @@ export interface RainfallWarning {
  */
 export interface WindWarning {
   area_text: string;
+  date_text: string | null;
   speed_min: number | null;
   speed_max: number | null;
   gust: number | null;

@@ -255,10 +255,13 @@
     "WindWarning": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["area_text", "speed_min", "speed_max", "gust", "unit"],
+      "required": ["area_text", "date_text", "speed_min", "speed_max", "gust", "unit"],
       "properties": {
         "area_text": {
           "type": "string"
+        },
+        "date_text": {
+          "type": ["string", "null"]
         },
         "speed_min": {
           "type": ["number", "null"]

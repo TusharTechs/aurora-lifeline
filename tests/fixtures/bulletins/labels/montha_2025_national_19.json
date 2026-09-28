@@ -1,0 +1,331 @@
+{
+  "bulletin_id": "montha_2025/national_19",
+  "source_url": "https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_461197_19.National_Bulletin_No_19-25_Oct_2025_1730IST.pdf",
+  "sha256": "f822ba6cad4f06b44633b0cf68ea759a422f4b96577f00dfa796b3f1d685cc8d",
+  "labelled_by": "draft",
+  "expected": {
+    "bulletin_no": "19",
+    "issued_at_utc": "2025-10-25T16:00:00Z",
+    "issued_at_text": "TIME OF ISSUE: 2130 HOURS IST DATED: 25.10.2025",
+    "system_name": null,
+    "system_stage": "D",
+    "current": {
+      "lat": 10.9,
+      "lon": 88.1,
+      "msw_min": 40,
+      "msw_max": 50,
+      "gust_value": 60,
+      "wind_unit": "kmph",
+      "pressure_hpa": null,
+      "movement_text": "moved nearly west-northwestwards with a speed of 10 kmph during past 6 hours"
+    },
+    "forecast": [
+      {
+        "lead_h": 0,
+        "valid_at_utc": "2025-10-25T12:00:00Z",
+        "valid_at_text": "25.10.25/1730 IST",
+        "lat": 10.9,
+        "lon": 88.1,
+        "msw_min": 40,
+        "msw_max": 50,
+        "gust_value": 60,
+        "wind_unit": "kmph",
+        "category": "Depression"
+      },
+      {
+        "lead_h": 6,
+        "valid_at_utc": "2025-10-25T18:00:00Z",
+        "valid_at_text": "25.10.25/2330 IST",
+        "lat": 11.0,
+        "lon": 87.7,
+        "msw_min": 45,
+        "msw_max": 55,
+        "gust_value": 65,
+        "wind_unit": "kmph",
+        "category": "Depression"
+      },
+      {
+        "lead_h": 12,
+        "valid_at_utc": "2025-10-26T00:00:00Z",
+        "valid_at_text": "26.10.25/0530 IST",
+        "lat": 11.2,
+        "lon": 87.1,
+        "msw_min": 50,
+        "msw_max": 60,
+        "gust_value": 70,
+        "wind_unit": "kmph",
+        "category": "Deep Depression"
+      },
+      {
+        "lead_h": 18,
+        "valid_at_utc": "2025-10-26T06:00:00Z",
+        "valid_at_text": "26.10.25/1130 IST",
+        "lat": 11.4,
+        "lon": 86.5,
+        "msw_min": 55,
+        "msw_max": 65,
+        "gust_value": 75,
+        "wind_unit": "kmph",
+        "category": "Deep Depression"
+      },
+      {
+        "lead_h": 24,
+        "valid_at_utc": "2025-10-26T12:00:00Z",
+        "valid_at_text": "26.10.25/1730 IST",
+        "lat": 11.7,
+        "lon": 85.9,
+        "msw_min": 60,
+        "msw_max": 70,
+        "gust_value": 80,
+        "wind_unit": "kmph",
+        "category": "Cyclonic Storm"
+      },
+      {
+        "lead_h": 36,
+        "valid_at_utc": "2025-10-27T00:00:00Z",
+        "valid_at_text": "27.10.25/0530 IST",
+        "lat": 12.5,
+        "lon": 85.1,
+        "msw_min": 70,
+        "msw_max": 80,
+        "gust_value": 90,
+        "wind_unit": "kmph",
+        "category": "Cyclonic Storm"
+      },
+      {
+        "lead_h": 48,
+        "valid_at_utc": "2025-10-27T12:00:00Z",
+        "valid_at_text": "27.10.25/1730 IST",
+        "lat": 13.5,
+        "lon": 84.3,
+        "msw_min": 85,
+        "msw_max": 95,
+        "gust_value": 105,
+        "wind_unit": "kmph",
+        "category": "Cyclonic Storm"
+      },
+      {
+        "lead_h": 60,
+        "valid_at_utc": "2025-10-28T00:00:00Z",
+        "valid_at_text": "28.10.25/0530 IST",
+        "lat": 14.9,
+        "lon": 83.2,
+        "msw_min": 90,
+        "msw_max": 100,
+        "gust_value": 110,
+        "wind_unit": "kmph",
+        "category": "Severe Cyclonic Storm"
+      },
+      {
+        "lead_h": 72,
+        "valid_at_utc": "2025-10-28T12:00:00Z",
+        "valid_at_text": "28.10.25/1730 IST",
+        "lat": 16.5,
+        "lon": 82.5,
+        "msw_min": 90,
+        "msw_max": 100,
+        "gust_value": 110,
+        "wind_unit": "kmph",
+        "category": "Severe Cyclonic Storm"
+      },
+      {
+        "lead_h": 84,
+        "valid_at_utc": "2025-10-29T00:00:00Z",
+        "valid_at_text": "29.10.25/0530 IST",
+        "lat": 18.2,
+        "lon": 82.3,
+        "msw_min": 70,
+        "msw_max": 80,
+        "gust_value": 90,
+        "wind_unit": "kmph",
+        "category": "Cyclonic Storm"
+      }
+    ],
+    "landfall": {
+      "window_text": "evening/night of 28th October",
+      "start_utc": null,
+      "end_utc": null,
+      "location_text": "Andhra Pradesh coast between Machilipatnam and Kalingapatnam around Kakinada",
+      "lat": null,
+      "lon": null
+    },
+    "surge": [
+      {
+        "area_text": "low-lying areas of coastal Andhra Pradesh & Yanam (of Puducherry)",
+        "height_m_min": 1,
+        "height_m_max": 1
+      }
+    ],
+    "rainfall_warnings": [
+      {
+        "area_text": "Andhra Pradesh & Yanam of Puducherry",
+        "date_text": "26th to 29th October",
+        "category": "heavy_to_very_heavy"
+      },
+      {
+        "area_text": "south Coastal Andhra Pradesh & Yanam",
+        "date_text": "27th October",
+        "category": "extremely_heavy"
+      },
+      {
+        "area_text": "coastal Andhra Pradesh & Yanam",
+        "date_text": "28th & 29th October",
+        "category": "extremely_heavy"
+      },
+      {
+        "area_text": "Rayalaseema",
+        "date_text": "27th & 28th October",
+        "category": "extremely_heavy"
+      },
+      {
+        "area_text": "Telangana",
+        "date_text": "27th & 28th October",
+        "category": "heavy"
+      },
+      {
+        "area_text": "Odisha",
+        "date_text": "26th October",
+        "category": "heavy"
+      },
+      {
+        "area_text": "Odisha",
+        "date_text": "27th to 29th October",
+        "category": "heavy_to_very_heavy"
+      },
+      {
+        "area_text": "south Odisha",
+        "date_text": "28th & 29th October",
+        "category": "extremely_heavy"
+      }
+    ],
+    "wind_warnings": [
+      {
+        "area_text": "along & off Andhra Pradesh & Yanam (of Puducherry) coasts",
+        "date_text": "from 25th October",
+        "speed_min": 35,
+        "speed_max": 45,
+        "gust": 55,
+        "unit": "kmph"
+      },
+      {
+        "area_text": "along & off Andhra Pradesh & Yanam (of Puducherry) coasts",
+        "date_text": "from 27th morning",
+        "speed_min": 45,
+        "speed_max": 55,
+        "gust": 65,
+        "unit": "kmph"
+      },
+      {
+        "area_text": "along & off Andhra Pradesh & Yanam (of Puducherry) coasts",
+        "date_text": "from 28th morning",
+        "speed_min": 60,
+        "speed_max": 70,
+        "gust": 80,
+        "unit": "kmph"
+      },
+      {
+        "area_text": "along & off Andhra Pradesh & Yanam (of Puducherry) coasts",
+        "date_text": "from 28th evening to early hours of 29th October",
+        "speed_min": 90,
+        "speed_max": 100,
+        "gust": 110,
+        "unit": "kmph"
+      }
+    ],
+    "source_quotes": [
+      {
+        "path": "bulletin_no",
+        "quote": "National Bulletin No. 19"
+      },
+      {
+        "path": "issued_at_text",
+        "quote": "TIME OF ISSUE: 2130 HOURS IST DATED: 25.10.2025"
+      },
+      {
+        "path": "current",
+        "quote": "near latitude 10.9°N & longitude 88.1°E"
+      },
+      {
+        "path": "forecast[0]",
+        "quote": "25.10.25/1730 10.9/88.1 40-50 gusting to 60 Depression"
+      },
+      {
+        "path": "forecast[1]",
+        "quote": "25.10.25/2330 11.0/87.7 45-55 gusting to 65 Depression"
+      },
+      {
+        "path": "forecast[2]",
+        "quote": "26.10.25/0530 11.2/87.1 50-60 gusting to 70 Deep Depression"
+      },
+      {
+        "path": "forecast[3]",
+        "quote": "26.10.25/1130 11.4/86.5 55-65 gusting to 75 Deep Depression"
+      },
+      {
+        "path": "forecast[4]",
+        "quote": "26.10.25/1730 11.7/85.9 60-70 gusting to 80 Cyclonic Storm"
+      },
+      {
+        "path": "forecast[5]",
+        "quote": "27.10.25/0530 12.5/85.1 70-80 gusting to 90 Cyclonic Storm"
+      },
+      {
+        "path": "forecast[6]",
+        "quote": "27.10.25/1730 13.5/84.3 85-95 gusting to 105 Cyclonic Storm"
+      },
+      {
+        "path": "forecast[7]",
+        "quote": "28.10.25/0530 14.9/83.2 90-100 gusting to 110 Severe Cyclonic Storm"
+      },
+      {
+        "path": "forecast[8]",
+        "quote": "28.10.25/1730 16.5/82.5 90-100 gusting to 110 Severe Cyclonic Storm"
+      },
+      {
+        "path": "forecast[9]",
+        "quote": "29.10.25/0530 18.2/82.3 70-80 gusting to 90 Cyclonic Storm"
+      },
+      {
+        "path": "landfall",
+        "quote": "very likely to cross Andhra Pradesh coast between Machilipatnam and Kalingapatnam around Kakinada during evening/night of 28th October"
+      },
+      {
+        "path": "surge[0]",
+        "quote": "Strom surge of height about 1 m above astronomical tide"
+      },
+      {
+        "path": "rainfall_warnings[0]",
+        "quote": "heavy to very heavy rainfall over Andhra Pradesh & Yanam of Puducherry during 26th to 29th October"
+      },
+      {
+        "path": "rainfall_warnings[1]",
+        "quote": "extremely heavy rainfall at isolated places"
+      },
+      {
+        "path": "rainfall_warnings[2]",
+        "quote": "coastal Andhra Pradesh & Yanam on 28th & 29th October"
+      },
+      {
+        "path": "rainfall_warnings[3]",
+        "quote": "over Rayalaseema on 27th & 28th October"
+      },
+      {
+        "path": "wind_warnings[2]",
+        "quote": "gale wind speed reaching 60-70 kmph gusting to 80 kmph from 28th morning"
+      },
+      {
+        "path": "wind_warnings[3]",
+        "quote": "becoming 90-100 kmph gusting to 110kmph from 28th evening to early hours of 29th October"
+      }
+    ],
+    "uncertain_fields": [
+      "current.pressure_hpa",
+      "landfall.start_utc",
+      "landfall.end_utc",
+      "landfall.lat",
+      "landfall.lon",
+      "rainfall_warnings: clauses qualified 'at isolated places' are kept as stated; the ENGINE §5 rule decides"
+    ],
+    "source_note": "hand-entered from the PDF text layer on 2026-09-28; pending human confirmation"
+  }
+}

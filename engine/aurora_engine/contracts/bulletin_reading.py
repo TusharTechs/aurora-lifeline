@@ -74,6 +74,7 @@ class WindWarning(BaseModel):
         extra="forbid",
     )
     area_text: str
+    date_text: str | None
     speed_min: float | None
     speed_max: float | None
     gust: float | None

@@ -1,0 +1,57 @@
+# Judge replay definition for Severe Cyclonic Storm Montha (SPEC §3).
+storm_id: montha_2025
+name: Severe Cyclonic Storm "Montha"
+status: replay
+basin: NI
+ids:
+  imd: BOB/07/2025
+  weatherlab_track_id: IO942025
+  # ECMWF labels it 03B from the 27 Oct 00 UTC run; earlier runs use provisional 7xB IDs that change
+  # between runs, so members are matched to IMD by the 300 km rule, never by ID.
+  ecmwf: 03B
+  ibtracs_sid: null # verification labels only
+
+# Used ONLY to choose the replay bulletin (SPEC §3). Never a model input.
+observed_landfall:
+  source: IMD press release dated 29 Oct 2025
+  source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/21/21_225b59_PRESS_RELEASE_dated_29th_Oct_2025.pdf
+  window_text: during same midnight (2330 hrs IST of 28th and 0030 hrs IST of 29th October 2025)
+  utc: "2025-10-28T18:30:00Z" # midpoint of the stated window
+  location_text: between Machilipatnam and Kalingapatnam, to the south of Kakinada, close to Narsapur
+  lat: 16.35
+  lon: 81.70
+replay_start_utc: "2025-10-25T18:30:00Z" # observed landfall minus 72 h
+
+# Last bulletin issued at or before replay_start_utc that contains a landfall forecast.
+demo_bulletin:
+  product: national_bulletin
+  bulletin_no: "19"
+  issued_at_utc: "2025-10-25T16:00:00Z" # "TIME OF ISSUE: 2130 HOURS IST DATED: 25.10.2025"
+  source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_461197_19.National_Bulletin_No_19-25_Oct_2025_1730IST.pdf
+  sha256: f822ba6cad4f06b44633b0cf68ea759a422f4b96577f00dfa796b3f1d685cc8d
+  reading: config/storms/montha_2025/bulletins/national_19.reading.json
+run_id: montha_2025_b19
+
+# Filled by the pipeline.
+landfall_utc: null # member 0's first hourly crossing of the OSM coastline (a model input)
+demo_district_lgd: null # AP district containing member 0's forecast coast crossing
+
+states: [andhra_pradesh, odisha]
+
+# Ensemble sources. A run counts as available at init + publication_delay_h (PRIOR); only runs
+# available at the bulletin's issue time are used.
+sources:
+  ECMWF:
+    kind: ecmwf_tc_bufr
+    path: data/raw/ecmwf/ifs_enfo_tf
+    publication_delay_h: 8 # PRIOR: ECMWF open-data ENS dissemination is roughly 7-9 h after base time
+  WNX_LARGE:
+    kind: weatherlab_csv
+    model: FNV3_LARGE_ENSEMBLE
+    path: data/raw/weatherlab/FNV3_LARGE_ENSEMBLE/ensemble
+    publication_delay_h: 6 # PRIOR (unconfirmed): Weather Lab publication delay is undocumented
+  WNX:
+    kind: weatherlab_csv
+    model: FNV3P2
+    path: data/raw/weatherlab/FNV3P2/ensemble
+    publication_delay_h: 6 # PRIOR (unconfirmed)

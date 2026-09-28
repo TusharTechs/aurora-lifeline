@@ -1,0 +1,5 @@
+# Demo-officer sandbox (SPEC §2): same run_id and static files as montha_2025; a separate
+# Firestore subtree that `make sandbox-reset` restores nightly. The public replay never changes.
+storm_id: montha_2025_demo
+status: replay
+sandbox_of: montha_2025
