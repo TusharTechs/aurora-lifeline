@@ -1,0 +1,43 @@
+# Local data cache and outputs (never committed)
+/data/
+/tiles/
+*.osm.pbf
+*.tif
+*.bufr
+
+# Handoff archive (its contents are already in the tree)
+/aurora-lifeline-handoff.zip
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*-key.json
+service-account*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Firebase
+.firebase/
+firebase-debug*.log
+firestore-debug.log
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
