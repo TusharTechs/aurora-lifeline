@@ -1,21 +1,29 @@
 """Rain flooding from IMD rainfall categories and height above nearest drainage (ENGINE §5).
 
-Slice rule (all PRIOR, recorded in the manifest):
+Slice rule (PRIOR; recorded in the manifest; amended 28 Sep 2026, HANDOFF D22):
 
-1. For each district and IMD day (08:30 IST to 08:30 IST), take the bulletin's category. A warning
-   for a subdivision or region applies to all its districts; a warning naming a district overrides
-   it. Clauses whose coverage is "isolated" are add-ons and are ignored; the highest remaining
-   category wins. No warning means 0 mm. Unmatched text sets ``needs_review``.
-2. Member m's daily total = lower + q_m (upper - lower), where q_m in [0, 1] ranks members by
-   closest approach to the district centroid (closest = 1). IMD member 0 uses the midpoint.
-3. Each daily total is spread evenly over its 24 hours; R(t) is the total since "now".
-4. A location floods when HAND < h*(R) = clamp(k (R - R0), 0, h_max); depth = h* - HAND.
-   A road closes when that depth exceeds 0.3 m, i.e. when R(t) >= R0 + (HAND + 0.3) / k
-   (and HAND + 0.3 < h_max).
+1. For each district and IMD day (08:30 IST to 08:30 IST), collect the bulletin's categories. A
+   warning for a subdivision or region applies to all its districts; a warning naming a district
+   overrides it.
+2. IMD's spatial-distribution terms set how much of the district receives each category (IMD RSMC
+   terminology): isolated < 25% of the area, scattered ("a few places") 26-50%, fairly
+   widespread ("many places") 51-75%, widespread ("most places") 76-100%. The fraction used is
+   the middle of each range. A district is split into patches (H3 resolution 6, about 36 km^2)
+   and, per member and day, a deterministic seeded draw decides which patches get which category.
+   Categories nest: a higher category's patches are a subset of a lower one's. Patches outside
+   every category get no warned rain (0 mm, PRIOR).
+3. In a wet patch, member m's daily total = lower + q_m (upper - lower), where q_m in [0, 1]
+   ranks members by closest approach to the district centroid (closest = 1; IMD member 0 = 0.5).
+4. Each daily total is spread evenly over its 24 hours; R(t) is the total since "now".
+5. A location floods when HAND < h*(R) = clamp(k (R - R0), 0, h_max); depth = h* - HAND.
+   A road closes when water over its surface exceeds 0.3 m. Roads are raised above the ground
+   around them by a formation allowance per road class (PRIOR), so the road closes when
+   R(t) >= R0 + (HAND + allowance + 0.3) / k, and HAND + allowance + 0.3 < h_max.
 
 Riverine inflow from upstream districts is not modelled in the slice.
 """
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -33,10 +41,19 @@ CATEGORY_MM: dict[str, tuple[float, float]] = {
     "very_heavy": (115.6, 204.4),
     "extremely_heavy": (204.5, 300.0),
 }
+# Share of the area receiving the stated category: middle of IMD's ranges (PRIOR).
+COVERAGE_FRACTION: dict[str, float] = {
+    "isolated": 0.125,
+    "a_few": 0.38,
+    "many": 0.63,
+    "most": 0.88,
+    "unspecified": 1.0,
+}
 K_M_PER_MM = 0.02  # PRIOR
 R0_MM = 50.0  # PRIOR
 H_MAX_M = 5.0  # PRIOR
 CLOSE_DEPTH_M = 0.3  # Pregnolato et al. (2017); PRIOR for flowing water
+PATCH_H3_RES = 6  # about 36 km^2 (PRIOR)
 
 MONTHS = {m: i for i, m in enumerate(
     ["january", "february", "march", "april", "may", "june", "july", "august", "september",
@@ -50,10 +67,9 @@ def parse_days(date_text: str, year: int, default_month: int) -> list[date]:
     nums = [int(x) for x in re.findall(r"(\d{1,2})(?:st|nd|rd|th)?", text)]
     if not nums:
         return []
-    if re.search(r"\bto\b|-|\u2013", text) and len(nums) >= 2:
-        days = list(range(nums[0], nums[1] + 1))
-    else:
-        days = nums
+    # A range is written with "to", a hyphen or an en dash.
+    is_range = re.search(r"\bto\b|-", text) is not None or "\u2013" in text
+    days = list(range(nums[0], nums[1] + 1)) if is_range and len(nums) >= 2 else nums
     return [date(year, month, d) for d in days]
 
 
@@ -93,9 +109,9 @@ def match_districts(area_text: str, districts: pd.DataFrame, state_name: str) ->
 
 @dataclass
 class DailyRain:
-    """Daily (lower, upper) mm per district and IMD day, plus review flags."""
+    """Warned categories per district and IMD day, with coverage fractions and review flags."""
 
-    table: pd.DataFrame  # district, day (date), category, lo_mm, hi_mm
+    table: pd.DataFrame  # district, day, category, coverage_frac, lo_mm, hi_mm
     needs_review: bool = False
     phrases_used: list[str] = field(default_factory=list)
 
@@ -103,15 +119,14 @@ class DailyRain:
 def daily_rain(
     warnings: list[dict[str, str]], districts: pd.DataFrame, state_name: str, year: int, month: int
 ) -> DailyRain:
-    """Applies the slice rule (step 1) to a bulletin's rainfall warnings for one state."""
-    best: dict[tuple[str, date], str] = {}
+    """Applies rule steps 1-2 to a bulletin's rainfall warnings for one state."""
+    cover: dict[tuple[str, date, str], float] = {}
     needs_review = False
     used = []
     other_states = {"telangana", "odisha", "tamil nadu", "west bengal", "karnataka", "kerala"}
     for w in warnings:
-        if w.get("coverage") == "isolated":
-            continue
         cat = w["category"]
+        frac = COVERAGE_FRACTION.get(w.get("coverage", "unspecified"), 1.0)
         if cat not in CATEGORY_MM:
             needs_review = True
             continue
@@ -120,24 +135,17 @@ def daily_rain(
             if not any(o in _norm(w["area_text"]) for o in other_states):
                 needs_review = True
             continue
-        used.append(f"{w['area_text']} | {w['date_text']} | {cat}")
+        used.append(f"{w['area_text']} | {w['date_text']} | {cat} | {w.get('coverage')}")
         for day in parse_days(w["date_text"], year, month):
             for d in covered:
-                cur = best.get((d, day))
-                # Highest upper bound wins; on a tie, the higher lower bound (more specific).
-                if cur is None or CATEGORY_MM[cat][::-1] > CATEGORY_MM[cur][::-1]:
-                    best[(d, day)] = cat
+                key = (d, day, cat)
+                cover[key] = max(cover.get(key, 0.0), frac)
     rows = [
-        {
-            "district": d,
-            "day": day,
-            "category": c,
-            "lo_mm": CATEGORY_MM[c][0],
-            "hi_mm": CATEGORY_MM[c][1],
-        }
-        for (d, day), c in sorted(best.items())
-    ]
-    cols = ["district", "day", "category", "lo_mm", "hi_mm"]
+        {"district": d, "day": day, "category": c, "coverage_frac": f,
+         "lo_mm": CATEGORY_MM[c][0], "hi_mm": CATEGORY_MM[c][1]}
+        for (d, day, c), f in sorted(cover.items())
+    ]  # fmt: skip
+    cols = ["district", "day", "category", "coverage_frac", "lo_mm", "hi_mm"]
     return DailyRain(pd.DataFrame(rows, columns=cols), needs_review, used)
 
 
@@ -150,29 +158,65 @@ def closest_approach_rank(dist_km: NDArray[np.float64]) -> NDArray[np.float64]:
     return np.asarray(1.0 - ranks / (n - 1))
 
 
-def hourly_cumulative_mm(
-    daily: pd.DataFrame, district: str, q: float, now_utc: datetime, n_hours: int
+def stable_seed(*parts: object) -> int:
+    """A deterministic 64-bit seed from arbitrary parts (independent of Python's hash salt)."""
+    digest = hashlib.sha256("|".join(str(p) for p in parts).encode()).digest()
+    return int.from_bytes(digest[:8], "little")
+
+
+def patch_daily_totals(
+    district_rows: pd.DataFrame, days: list[date], n_patches: int, q: float, seed_key: str
 ) -> NDArray[np.float64]:
-    """R(t) at hours 0..n_hours after now for one district and member quantile q."""
-    rate = np.zeros(n_hours + 1)
-    sub = daily[daily["district"] == district]
-    hours_utc = [now_utc + timedelta(hours=h) for h in range(n_hours + 1)]
-    for rec in sub.to_dict("records"):
-        day: date = rec["day"]
-        lo, hi = float(rec["lo_mm"]), float(rec["hi_mm"])
-        start = datetime(day.year, day.month, day.day, 8, 30, tzinfo=IST)
+    """Daily warned rain (mm) per patch for one district and member: shape (len(days), n_patches).
+
+    Categories nest by severity: a patch drawn inside a higher category's share gets that
+    category; the shares are made cumulative so higher categories sit inside lower ones.
+    """
+    out = np.zeros((len(days), n_patches))
+    for i, day in enumerate(days):
+        rows = district_rows[district_rows["day"] == day]
+        if rows.empty or n_patches == 0:
+            continue
+        recs = sorted(
+            rows.to_dict("records"),
+            key=lambda r: CATEGORY_MM[str(r["category"])][::-1],
+            reverse=True,
+        )
+        u = np.random.default_rng(stable_seed(seed_key, day.isoformat())).random(n_patches)
+        assigned = np.zeros(n_patches, dtype=bool)
+        cum_frac = 0.0
+        for r in recs:
+            cum_frac = max(cum_frac, float(r["coverage_frac"]))
+            hit = (u < cum_frac) & ~assigned
+            lo, hi = float(r["lo_mm"]), float(r["hi_mm"])
+            out[i, hit] = lo + q * (hi - lo)
+            assigned |= hit
+    return out
+
+
+def cumulative_from_daily(
+    totals: NDArray[np.float64], days: list[date], now_utc: datetime, n_hours: int
+) -> NDArray[np.float64]:
+    """R(t) at hours 0..n_hours after now, per patch: shape (n_patches, n_hours + 1).
+
+    Each IMD day runs 08:30 IST to 08:30 IST; its total falls evenly over its 24 hours.
+    """
+    hour_end = [now_utc + timedelta(hours=h) for h in range(n_hours + 1)]
+    weights = np.zeros((len(days), n_hours + 1))
+    for i, d in enumerate(days):
+        start = datetime(d.year, d.month, d.day, 8, 30, tzinfo=IST)
         end = start + timedelta(days=1)
-        total = lo + q * (hi - lo)
-        for i, t in enumerate(hours_utc[1:], start=1):
-            # rain falling during hour (t-1, t]
-            if start < t <= end:
-                rate[i] += total / 24.0
-    return np.cumsum(rate)
+        for h in range(1, n_hours + 1):
+            if start < hour_end[h] <= end:
+                weights[i, h] = 1.0 / 24.0
+    return np.asarray(np.cumsum(totals.T @ weights, axis=1))
 
 
-def rain_threshold_mm(hand_m: NDArray[np.float64]) -> NDArray[np.float64]:
-    """Cumulative rain at which a point with this HAND floods deeper than 0.3 m (inf if never)."""
-    need = hand_m + CLOSE_DEPTH_M
+def rain_threshold_mm(
+    hand_m: NDArray[np.float64], allowance_m: NDArray[np.float64] | float = 0.0
+) -> NDArray[np.float64]:
+    """Cumulative rain at which water stands over 0.3 m above the surface (inf if never)."""
+    need = hand_m + allowance_m + CLOSE_DEPTH_M
     r = R0_MM + need / K_M_PER_MM
     return np.where(np.isfinite(hand_m) & (need < H_MAX_M), r, np.inf)
 

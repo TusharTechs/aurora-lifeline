@@ -82,6 +82,8 @@ V_g(r) = \sqrt{\frac{B}{\rho}\left(\frac{R_m}{r}\right)^{B} \Delta p \, e^{-(R_m
 
 **Slice rain rule** (PRIOR; recorded in the manifest):
 
+> Amended 28 Sep 2026 (HANDOFF D22): coverage terms set the wet share of each district on H3 res-6 patches, isolated clauses are kept at 12.5% instead of being ignored, and a per-class road formation allowance is added before the 0.3 m test. `engine/aurora_engine/rain.py` and `closures.py` hold the current rule.
+
 1. For each district and IST calendar day, take the category from the run's bulletin. Bounds in mm/day:
    - heavy 64.5–115.5;
    - heavy_to_very_heavy 64.5–204.4;

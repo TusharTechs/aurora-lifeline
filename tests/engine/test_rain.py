@@ -6,11 +6,12 @@ import pytest
 
 from aurora_engine.rain import (
     closest_approach_rank,
+    cumulative_from_daily,
     daily_rain,
     first_hour_reaching,
-    hourly_cumulative_mm,
     match_districts,
     parse_days,
+    patch_daily_totals,
     rain_threshold_mm,
 )
 
@@ -28,6 +29,11 @@ DISTRICTS = pd.DataFrame(
     ],
     columns=["name", "name_variants", "imd_subdivision", "imd_region"],
 )
+STATE = "Andhra Pradesh"
+
+
+def w(area: str, day: str, cat: str, cov: str) -> dict[str, str]:
+    return {"area_text": area, "date_text": day, "category": cat, "coverage": cov}
 
 
 def test_parse_days() -> None:
@@ -39,79 +45,86 @@ def test_parse_days() -> None:
 
 
 def test_match_districts_regions_and_names() -> None:
-    assert match_districts(
-        "Andhra Pradesh & Yanam of Puducherry", DISTRICTS, "Andhra Pradesh"
-    ) == set(DISTRICTS.name)
-    assert match_districts("coastal Andhra Pradesh & Yanam", DISTRICTS, "Andhra Pradesh") == {
-        "Kakinada", "Krishna district", "East Godavari"}  # fmt: skip
-    assert match_districts("north coastal Andhra Pradesh", DISTRICTS, "Andhra Pradesh") == {
+    assert match_districts("Andhra Pradesh & Yanam of Puducherry", DISTRICTS, STATE) == set(
+        DISTRICTS.name
+    )
+    assert match_districts("coastal Andhra Pradesh & Yanam", DISTRICTS, STATE) == {
+        "Kakinada",
+        "Krishna district",
+        "East Godavari",
+    }
+    assert match_districts("north coastal Andhra Pradesh", DISTRICTS, STATE) == {
         "Kakinada",
         "East Godavari",
     }
-    assert match_districts("Rayalaseema", DISTRICTS, "Andhra Pradesh") == {"Tirupati"}
-    assert match_districts("Kakinada and Krishna", DISTRICTS, "Andhra Pradesh") == {
+    assert match_districts("Rayalaseema", DISTRICTS, STATE) == {"Tirupati"}
+    assert match_districts("Kakinada and Krishna", DISTRICTS, STATE) == {
         "Kakinada",
         "Krishna district",
     }
-    assert match_districts("Telangana", DISTRICTS, "Andhra Pradesh") is None
+    assert match_districts("Telangana", DISTRICTS, STATE) is None
 
 
-def test_isolated_addons_are_ignored_and_highest_category_wins() -> None:
-    w = [
-        {
-            "area_text": "Andhra Pradesh",
-            "date_text": "28th",
-            "category": "heavy_to_very_heavy",
-            "coverage": "a_few",
-        },
-        {
-            "area_text": "Andhra Pradesh",
-            "date_text": "28th",
-            "category": "extremely_heavy",
-            "coverage": "isolated",
-        },
-        {
-            "area_text": "north coastal Andhra Pradesh",
-            "date_text": "28th",
-            "category": "very_heavy",
-            "coverage": "many",
-        },
-        {"area_text": "Telangana", "date_text": "28th", "category": "heavy", "coverage": "many"},
-    ]
-    d = daily_rain(w, DISTRICTS, "Andhra Pradesh", 2025, 10)
-    t = d.table.set_index("district")
-    assert (
-        t.loc["Kakinada", "category"] == "very_heavy"
-    )  # same upper bound; region clause is not lower
-    assert t.loc["Tirupati", "category"] == "heavy_to_very_heavy"
-    assert not d.needs_review  # Telangana is another state, not an unmatched phrase
+def test_daily_rain_keeps_coverage_fractions() -> None:
+    d = daily_rain(
+        [
+            w(STATE, "28th", "heavy_to_very_heavy", "a_few"),
+            w(STATE, "28th", "extremely_heavy", "isolated"),
+            w("Telangana", "28th", "heavy", "many"),
+        ],
+        DISTRICTS,
+        STATE,
+        2025,
+        10,
+    )
+    k = d.table[d.table.district == "Kakinada"].set_index("category")["coverage_frac"]
+    assert k["heavy_to_very_heavy"] == pytest.approx(0.38)
+    assert k["extremely_heavy"] == pytest.approx(0.125)
+    assert not d.needs_review
 
 
 def test_unmatched_area_sets_needs_review() -> None:
-    w = [
-        {
-            "area_text": "somewhere vague",
-            "date_text": "28th",
-            "category": "heavy",
-            "coverage": "many",
-        }
-    ]
-    assert daily_rain(w, DISTRICTS, "Andhra Pradesh", 2025, 10).needs_review
+    assert daily_rain(
+        [w("somewhere vague", "28th", "heavy", "many")], DISTRICTS, STATE, 2025, 10
+    ).needs_review
+
+
+def test_patch_totals_follow_coverage_and_nest() -> None:
+    d = daily_rain(
+        [
+            w(STATE, "28th", "heavy_to_very_heavy", "a_few"),
+            w(STATE, "28th", "extremely_heavy", "isolated"),
+        ],
+        DISTRICTS,
+        STATE,
+        2025,
+        10,
+    )
+    rows = d.table[d.table.district == "Kakinada"]
+    tot = patch_daily_totals(rows, [date(2025, 10, 28)], 20_000, q=1.0, seed_key="m1")[0]
+    # One seed; tolerance about 4 sigma for 20,000 patches (sampling is unbiased across seeds).
+    assert (tot == 300.0).mean() == pytest.approx(0.125, abs=0.012)  # extremely heavy, q = 1
+    assert (tot == 204.4).mean() == pytest.approx(0.38 - 0.125, abs=0.015)  # the rest of the 38%
+    assert (tot == 0).mean() == pytest.approx(0.62, abs=0.015)
+    again = patch_daily_totals(rows, [date(2025, 10, 28)], 20_000, q=1.0, seed_key="m1")[0]
+    assert np.array_equal(tot, again)  # deterministic
+    other = patch_daily_totals(rows, [date(2025, 10, 28)], 20_000, q=1.0, seed_key="m2")[0]
+    assert not np.array_equal(tot, other)  # members differ
 
 
 def test_member_rank_and_cumulative_rain() -> None:
     q = closest_approach_rank(np.array([10.0, 50.0, 30.0]))
     assert q.tolist() == [1.0, 0.0, 0.5]
-    daily = pd.DataFrame([{"district": "Kakinada", "day": date(2025, 10, 28), "category": "heavy",
-                           "lo_mm": 64.5, "hi_mm": 115.5}])  # fmt: skip
     now = datetime(
         2025, 10, 28, 0, 0, tzinfo=UTC
     )  # 05:30 IST; the IMD day starts 08:30 IST = 03:00 UTC
-    r = hourly_cumulative_mm(daily, "Kakinada", 1.0, now, 30)
-    assert r[3] == 0.0
-    assert r[4] == pytest.approx(115.5 / 24)
-    assert r[27] == pytest.approx(115.5)
-    assert np.all(np.diff(r) >= 0)
+    r = cumulative_from_daily(np.array([[115.5, 0.0]]), [date(2025, 10, 28)], now, 30)
+    assert r.shape == (2, 31)
+    assert r[0, 3] == 0.0
+    assert r[0, 4] == pytest.approx(115.5 / 24)
+    assert r[0, 27] == pytest.approx(115.5)
+    assert np.all(np.diff(r[0]) >= 0)
+    assert np.all(r[1] == 0)
 
 
 def test_rain_threshold_and_closure_hour() -> None:
@@ -119,6 +132,7 @@ def test_rain_threshold_and_closure_hour() -> None:
     assert thr[0] == pytest.approx(65.0)  # 50 + 0.3 / 0.02
     assert thr[1] == pytest.approx(115.0)
     assert np.isinf(thr[2]) and np.isinf(thr[3])  # 4.8 + 0.3 >= h_max
+    assert rain_threshold_mm(np.array([0.0]), 0.6)[0] == pytest.approx(95.0)
     hours = first_hour_reaching(np.array([0.0, 40.0, 80.0, 120.0]), thr)
     assert hours.tolist()[:2] == [2.0, 3.0]
     assert np.isinf(hours[2])

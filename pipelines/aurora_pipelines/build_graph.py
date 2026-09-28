@@ -198,9 +198,9 @@ def main() -> int:
 
     # Settlements (need the WorldPop raster; skipped with a clear message if not yet downloaded).
     settlements = gpd.GeoDataFrame()
-    wp = ROOT / "data/raw/worldpop/2020" / "ind_ppp_2020_ap_od.tif"
-    wp_full = ROOT / "data/raw/worldpop/2020" / "ind_ppp_2020.tif"
-    worldpop = wp if wp.exists() else wp_full if wp_full.exists() else None
+    # WorldPop 2020 constrained (BSGM), clipped to AP + Odisha by aurora_pipelines.worldpop_clip.
+    wp = ROOT / "data/raw/worldpop/2020" / "worldpop_2020_constrained_ap_od.tif"
+    worldpop = wp if wp.exists() else None
     if worldpop is not None:
         pop = population_by_cell(worldpop, buffered)
         settlements = settlements_from_population(pop, buffered)

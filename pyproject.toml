@@ -52,7 +52,7 @@ known-first-party = ["aurora_engine", "aurora_agents", "aurora_api", "aurora_pip
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR", "N802", "N806"]
-"pipelines/**" = ["PLR0915", "PLR0914"]
+"pipelines/**" = ["PLR0912", "PLR0914", "PLR0915"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -67,7 +67,7 @@ module = [
     "geopandas.*", "shapely.*", "pyogrio.*", "rasterio.*", "h3.*", "rustworkx.*",
     "numba.*", "scipy.*", "eccodes.*", "pdbufr.*", "osmium.*", "osmnx.*", "networkx.*",
     "pdfplumber.*", "xmlschema.*", "ee.*", "google.cloud.*", "firebase_admin.*", "pyproj.*",
-    "xarray.*",
+    "xarray.*", "jsonschema.*",
 ]
 ignore_missing_imports = true
 

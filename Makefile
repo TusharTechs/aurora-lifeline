@@ -6,7 +6,8 @@ SHELL := /bin/bash
 
 STATE ?= andhra_pradesh
 STORM ?= montha_2025
-RUN ?=
+REGION ?= godavari_krishna
+RUN ?= montha_2025_b21
 
 PY := uv run --no-sync
 PY_PACKAGES := -p aurora_engine -p aurora_agents -p aurora_api -p aurora_pipelines
@@ -67,11 +68,13 @@ secrets: ## Scan the working tree and history for secrets
 download: ## Approval-free raw downloads (task 1.4a)
 	pipelines/downloads/fetch_raw.sh
 
-graph: ## Build the lifeline graph for STATE
-	$(PY) python -m aurora_pipelines.build_graph --state $(STATE)
+graph: ## Build HAND and the lifeline graph for STATE and REGION
+	$(PY) python -m aurora_pipelines.hand_build --state $(STATE) --region $(REGION)
+	$(PY) python -m aurora_pipelines.build_graph --state $(STATE) --region $(REGION)
 
-replay: ## Run the storm pipeline for STORM
-	$(PY) python -m aurora_pipelines.storm_run --storm $(STORM)
+replay: ## Run the storm pipeline for STORM and RUN (default montha_2025_b21), then publish district JSON
+	$(PY) python -m aurora_pipelines.storm_run --storm $(STORM) --run $(RUN) --state $(STATE) --region $(REGION)
+	$(PY) python -m aurora_pipelines.publish --storm $(STORM) --run $(RUN)
 
 tiles: ## Build MVT tiles and scenario JSON for STORM
 	$(PY) python -m aurora_pipelines.tiles --storm $(STORM)
