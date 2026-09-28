@@ -10,7 +10,7 @@ git pull --ff-only
 
 echo "== Generated map data (web-data branch)"
 git fetch --depth 1 origin web-data
-rm -rf apps/web/public/tiles apps/web/public/runs
+rm -rf apps/web/public/tiles apps/web/public/runs && mkdir -p apps/web/public
 git archive --format=tar FETCH_HEAD | tar -xf - -C apps/web/public
 ls apps/web/public/runs
 
