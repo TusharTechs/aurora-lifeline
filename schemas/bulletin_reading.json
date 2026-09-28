@@ -238,7 +238,7 @@
     "RainfallWarning": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["area_text", "date_text", "category"],
+      "required": ["area_text", "date_text", "category", "coverage"],
       "properties": {
         "area_text": {
           "type": "string"
@@ -249,6 +249,11 @@
         "category": {
           "type": "string",
           "enum": ["heavy", "heavy_to_very_heavy", "very_heavy", "extremely_heavy", "other"]
+        },
+        "coverage": {
+          "type": "string",
+          "enum": ["isolated", "a_few", "many", "most", "unspecified"],
+          "description": "Spatial coverage IMD states for this category (e.g. 'at isolated places' -> isolated)."
         }
       }
     },

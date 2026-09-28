@@ -26,6 +26,7 @@ from shapely.ops import unary_union
 
 from aurora_engine.facilities import classify_pois, summary
 from aurora_engine.graph import METRIC_CRS, build_graph, snap
+from aurora_engine.hand import edge_hand, sample_raster
 from aurora_engine.settlements import population_by_cell, settlements_from_population
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -150,6 +151,22 @@ def main() -> int:
         f"with elevation); {time.time() - t0:.0f} s"
     )
 
+    # Height above nearest drainage: MERIT Hydro if present, else our own 90 m HAND (hand_build).
+    hand_path = next(iter(sorted((ROOT / "data/raw/merit_hydro").glob("**/*hnd*.tif"))), None)
+    if hand_path is None and (out / "hand_90m.tif").exists():
+        hand_path = out / "hand_90m.tif"
+    if hand_path is not None:
+        h = edge_hand(edges.to_crs(METRIC_CRS), hand_path)
+        for k, v in h.items():
+            edges[k] = v
+        graph.nodes["hand_m"] = sample_raster(
+            hand_path, graph.nodes.geometry.x.to_numpy(), graph.nodes.geometry.y.to_numpy()
+        )
+        print(f"HAND from {hand_path.relative_to(ROOT)}: edge min HAND P50 "
+              f"{np.nanmedian(edges['min_hand_m']):.1f} m; {time.time() - t0:.0f} s")  # fmt: skip
+    else:
+        print("HAND: SKIPPED (run aurora_pipelines.hand_build first)")
+
     # Facilities, shelters and substations.
     pois = gpd.read_parquet(net / "pois.parquet")
     pois = pois[pois.within(buffered)]
@@ -168,6 +185,11 @@ def main() -> int:
             predicate="within",
         )
         tbl["district_lgd"] = j.groupby(level=0)["osm_relation_id"].first()
+    if hand_path is not None:
+        for tbl in (facilities, substations):
+            tbl["hand_m"] = sample_raster(
+                hand_path, tbl.geometry.x.to_numpy(), tbl.geometry.y.to_numpy()
+            )
     print("facilities:\n" + summary(facilities).to_string())
     print(
         f"substations: {len(substations)}; "
@@ -222,6 +244,7 @@ def main() -> int:
         "inputs": {
             "osm_extract_dir": str(osm_dir.relative_to(ROOT)),
             "worldpop": str(worldpop.relative_to(ROOT)) if worldpop else None,
+            "hand": str(hand_path.relative_to(ROOT)) if hand_path else None,
         },
         "counts": {
             "nodes": len(graph.nodes),

@@ -81,6 +81,10 @@ export interface RainfallWarning {
   area_text: string;
   date_text: string;
   category: "heavy" | "heavy_to_very_heavy" | "very_heavy" | "extremely_heavy" | "other";
+  /**
+   * Spatial coverage IMD states for this category (e.g. 'at isolated places' -> isolated).
+   */
+  coverage: "isolated" | "a_few" | "many" | "most" | "unspecified";
 }
 /**
  * This interface was referenced by `BulletinReading`'s JSON-Schema

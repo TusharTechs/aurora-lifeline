@@ -155,52 +155,62 @@
     {
       "area_text": "Andhra Pradesh & Yanam of Puducherry",
       "date_text": "26th",
-      "category": "heavy"
+      "category": "heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Andhra Pradesh & Yanam of Puducherry",
       "date_text": "27th",
-      "category": "heavy_to_very_heavy"
+      "category": "heavy_to_very_heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Andhra Pradesh & Yanam of Puducherry",
       "date_text": "28th",
-      "category": "heavy_to_very_heavy"
+      "category": "heavy_to_very_heavy",
+      "coverage": "a_few"
     },
     {
       "area_text": "Andhra Pradesh & Yanam of Puducherry",
       "date_text": "28th",
-      "category": "extremely_heavy"
+      "category": "extremely_heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "north coastal Andhra Pradesh",
       "date_text": "29th October",
-      "category": "heavy_to_very_heavy"
+      "category": "heavy_to_very_heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Telangana",
       "date_text": "27th",
-      "category": "heavy"
+      "category": "heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Telangana",
       "date_text": "28th October",
-      "category": "heavy_to_very_heavy"
+      "category": "heavy_to_very_heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Odisha",
       "date_text": "26th",
-      "category": "heavy"
+      "category": "heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "Odisha",
       "date_text": "27th",
-      "category": "heavy_to_very_heavy"
+      "category": "heavy_to_very_heavy",
+      "coverage": "isolated"
     },
     {
       "area_text": "south Odisha",
       "date_text": "28th & 29th October",
-      "category": "extremely_heavy"
+      "category": "extremely_heavy",
+      "coverage": "isolated"
     }
   ],
   "wind_warnings": [

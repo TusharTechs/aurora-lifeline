@@ -67,6 +67,12 @@ class RainfallWarning(BaseModel):
     category: Literal[
         "heavy", "heavy_to_very_heavy", "very_heavy", "extremely_heavy", "other"
     ]
+    coverage: Annotated[
+        Literal["isolated", "a_few", "many", "most", "unspecified"],
+        Field(
+            description="Spatial coverage IMD states for this category (e.g. 'at isolated places' -> isolated)."
+        ),
+    ]
 
 
 class WindWarning(BaseModel):
