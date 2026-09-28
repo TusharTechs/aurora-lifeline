@@ -30,8 +30,8 @@ describe("iso deciles", () => {
 });
 
 describe("rampRed", () => {
-  it("is grey at zero and dark red at one", () => {
-    expect(rampRed(0)[3]).toBe(70);
+  it("is transparent at zero and dark red at one", () => {
+    expect(rampRed(0)[3]).toBe(0);
     expect(rampRed(1).slice(0, 3)).toEqual([127, 29, 29]);
   });
 });

@@ -40,7 +40,7 @@ export function probAtHours(hours: ReadonlyArray<number | null>, t: number): num
 
 /** A sequential colour ramp (pale amber -> deep red), colour-blind safe as a single hue family. */
 export function rampRed(p: number, alpha = 230): [number, number, number, number] {
-  if (p <= 0) return [120, 128, 140, 70];
+  if (p <= 0) return [0, 0, 0, 0]; // not at risk yet: leave the road to the basemap
   const stops: Array<[number, number, number]> = [
     [253, 224, 71],
     [249, 115, 22],

@@ -30,6 +30,7 @@ import h3
 import numpy as np
 import pandas as pd
 import rasterio
+import shapely
 from numpy.typing import NDArray
 from rasterio.features import rasterize
 
@@ -162,17 +163,16 @@ def main() -> int:
     ce = np.load(run / "edge_closures.npz")
     me = ce["member_edge"]
     dec, p = decile_hours(me[:, 0], me[:, 1], ce["hour"].astype(np.float64), w, len(edges))
+    geom_json = [json.loads(g) for g in shapely.to_geojson(edges.geometry.to_numpy())]
     path = tmp / "edges.geojsonl"
     with path.open("w") as fh:
-        for i, (rc, ct, geom) in enumerate(
-            zip(edges["road_class"], edges["crossing_type"], edges.geometry, strict=True)
-        ):
+        for i, (rc, ct) in enumerate(zip(edges["road_class"], edges["crossing_type"], strict=True)):
             base: dict[str, object] = {"id": i, "rc": rc, "ct": ct, "p": round(float(p[i]), 3)}
             major = rc in MAJOR or ct != "none" or p[i] > 0.05
             feat = {
                 "type": "Feature",
                 "properties": props_with_deciles(base, dec[i]),
-                "geometry": json.loads(gpd.GeoSeries([geom]).to_json())["features"][0]["geometry"],
+                "geometry": geom_json[i],
                 "tippecanoe": {"minzoom": 6 if major else 11},
             }
             fh.write(json.dumps(feat, separators=(",", ":")) + "\n")
