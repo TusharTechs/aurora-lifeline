@@ -7,8 +7,9 @@ cd "$(git rev-parse --show-toplevel)"
 src=apps/web/public
 test -d "$src/tiles" && test -d "$src/runs" || { echo "no $src/tiles or $src/runs; run make tiles first" >&2; exit 1; }
 runs=$(ls "$src/runs" | tr '\n' ' ')
-index=$(mktemp)
-trap 'rm -f "$index"' EXIT
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
+index="$tmpdir/index"
 export GIT_INDEX_FILE="$index"
 git --work-tree="$src" add --force -- tiles runs
 tree=$(git write-tree)
