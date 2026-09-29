@@ -77,7 +77,7 @@ No sign-in. Every Gemini answer on this path is cached, so it is instant and ide
 ### From an IMD bulletin to a district plan
 
 ```mermaid
-flowchart LR
+flowchart TB
   classDef imd fill:#fff4e0,stroke:#d9901a,color:#3b2a00
   classDef ai fill:#efe9ff,stroke:#7c5cf0,color:#24124f
   classDef eng fill:#e3f4ff,stroke:#0b8fd6,color:#06283d
@@ -124,48 +124,31 @@ flowchart TB
   end
   MAPS["Google Maps Platform<br/>vector basemap under deck.gl"]:::g
 
-  subgraph CR["Cloud Run · asia-south1 · FastAPI"]
-    ADV["Advisory Writer<br/>+ CAP 1.2 schema check"]:::ai
-    ASK["Ask AURORA<br/>Agent Development Kit"]:::ai
-    BRD["Bulletin Reader<br/>+ season watch"]:::ai
-    FLD["Field Verifier"]:::ai
-    TTS["Voice<br/>Cloud TTS Gemini-TTS"]:::ai
-  end
+  API["<b>Cloud Run · asia-south1 · FastAPI</b><br/>Advisory Writer + CAP 1.2 check<br/>Ask AURORA on the Agent Development Kit<br/>Bulletin Reader + season watch<br/>Field Verifier · voice"]:::ai
 
-  subgraph GEM["Gemini on Agent Platform"]
-    F37["Gemini 3.7 Flash"]:::ai
-    FL["Gemini 3.5 Flash-Lite<br/>back-translation"]:::ai
-    EMB["gemini-embedding-2<br/>similarity"]:::ai
-  end
-
-  GCS[("Cloud Storage<br/>response cache by input hash")]:::g
-  FS[("Firestore<br/>daily model-call cap")]:::g
+  GEM["<b>Gemini on Agent Platform</b><br/>Gemini 3.7 Flash<br/>Gemini 3.5 Flash-Lite<br/>gemini-embedding-2"]:::ai
+  TTS["Cloud Text-to-Speech<br/>Gemini-TTS"]:::ai
+  GCS[("Cloud Storage<br/>response cache")]:::g
+  FS[("Firestore<br/>daily call cap")]:::g
   IMD["IMD RSMC archive<br/>bulletins fetched live"]:::ext
 
-  subgraph OFF["Offline pipelines · Python 3.12"]
-    PIPE["OSM graph · HAND · storm run<br/>publish · tippecanoe tiles"]:::g
-    EE["Earth Engine<br/>Sentinel-1 flood mask"]:::g
-  end
-
-  subgraph GH["GitHub Actions"]
-    CI["CI: ruff · mypy · pytest<br/>eslint · vitest · gitleaks"]:::g
-    DEP["Deploy with Workload<br/>Identity Federation, keyless"]:::g
-  end
+  PIPE["<b>Offline pipelines · Python 3.12</b><br/>OSM graph · HAND · storm run<br/>publish · tippecanoe tiles"]:::g
+  EE["Earth Engine<br/>Sentinel-1 flood mask"]:::g
+  GH["<b>GitHub Actions</b><br/>CI: ruff · mypy · pytest · eslint · vitest · gitleaks<br/>then keyless deploy via Workload Identity Federation"]:::g
 
   U --> WEB
   WEB --> TILES
   WEB --> MAPS
-  WEB -- "/api" --> CR
-  ADV & ASK & BRD & FLD --> F37
-  ADV --> FL & EMB
-  BRD --> IMD
-  CR --> GCS
-  CR --> FS
-  PIPE --> TILES
+  WEB -- "/api" --> API
+  API --> GEM
+  API --> TTS
+  API --> GCS
+  API --> FS
+  API --> IMD
   EE -- "validation" --> PIPE
-  CI --> DEP
-  DEP --> CR
-  DEP --> FH
+  PIPE --> TILES
+  GH -. deploys .-> API
+  GH -. deploys .-> FH
 ```
 
 **Static first.** Viewers read immutable tiles and JSON from the CDN; they never call Earth Engine or run the engine. Only the Gemini features and the season watch reach Cloud Run, which scales to zero. Those calls are cached by input hash, rate-limited per IP and capped per day.
