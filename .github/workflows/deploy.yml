@@ -86,5 +86,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --dir apps/web build
+        env:
+          NEXT_PUBLIC_BUILD_SHA: ${{ github.event.workflow_run.head_sha }}
       - name: deploy Hosting
         run: pnpm exec firebase deploy --only hosting --project "$PROJECT_ID" --non-interactive

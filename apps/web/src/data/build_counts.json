@@ -1,0 +1,15 @@
+{
+  "source": "data/ref/andhra_pradesh/20260928/godavari_krishna/build_manifest.json",
+  "build_id": "20260928",
+  "region": "Kakinada, Konaseema, East and West Godavari, Eluru and Krishna districts plus 30 km",
+  "road_segments": 542133,
+  "road_nodes": 419246,
+  "bridges": 7190,
+  "culverts": 1245,
+  "fords": 75,
+  "phc": 205,
+  "chc": 35,
+  "hospitals": 25,
+  "shelters": 28,
+  "settlements": 18053
+}

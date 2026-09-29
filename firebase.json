@@ -39,6 +39,15 @@
             "value": "public, max-age=60"
           }
         ]
+      },
+      {
+        "source": "/opengraph-image",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "image/png"
+          }
+        ]
       }
     ],
     "rewrites": [

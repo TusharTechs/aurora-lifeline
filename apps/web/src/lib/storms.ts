@@ -8,7 +8,7 @@ export type StormInfo = {
   defaultRun: string;
   runs: RunInfo[];
   demoDistrict: string; // OSM relation id until LGD codes are loaded
-  observedLandfall: { text: string; lat: number; lon: number };
+  observedLandfall: { text: string; utc: string; lat: number; lon: number };
 };
 
 export const STORMS: StormInfo[] = [
@@ -32,6 +32,7 @@ export const STORMS: StormInfo[] = [
     demoDistrict: "13999862",
     observedLandfall: {
       text: "Crossed the coast near Narsapur, 23:30 IST 28 Oct to 00:30 IST 29 Oct 2025 (IMD)",
+      utc: "2025-10-28T18:30:00Z",
       lat: 16.35,
       lon: 81.7,
     },

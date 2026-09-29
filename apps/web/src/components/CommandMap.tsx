@@ -11,6 +11,7 @@ import type { DistrictScenario } from "@/contracts";
 import { isoDecilesToHours, probAt, probAtHours, rampPurple, rampRed, type DecileProps } from "@/lib/prob";
 import { istAfter } from "@/lib/time";
 import type { StormInfo } from "@/lib/storms";
+import { AuroraLoader, Logo } from "./brand/Logo";
 import { AdvisoryPanel } from "./AdvisoryPanel";
 import { AskPanel } from "./AskPanel";
 
@@ -71,7 +72,17 @@ function fmtPeople(n: number | null | undefined): string {
   return Math.round(n).toLocaleString("en-IN");
 }
 
-export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: string; lgd: string }) {
+export function CommandMap({
+  storm,
+  runId: initialRun,
+  lgd,
+}: {
+  storm: StormInfo;
+  runId: string;
+  lgd: string;
+}) {
+  const [activeRun, setActiveRun] = useState(initialRun);
+  const runId = activeRun;
   const [scenario, setScenario] = useState<DistrictScenario | null>(null);
   const [overlays, setOverlays] = useState<Overlays | null>(null);
   const [t, setT] = useState(0);
@@ -269,7 +280,12 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
     }
   };
 
-  if (!scenario) return <div className="p-8 text-slate-400">Loading district scenario…</div>;
+  if (!scenario)
+    return (
+      <div className="grid h-screen place-items-center bg-bg">
+        <AuroraLoader label="Loading the district forecast" />
+      </div>
+    );
   const hourly = scenario.hourly[Math.min(t, scenario.hourly.length - 1)];
   const hToLandfall = landfallH - t;
   const facilities = [...scenario.facilities]
@@ -281,19 +297,43 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
     .join(" · ");
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-slate-100">
-      <header className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-slate-800 px-4 py-2 text-sm">
-        <Link href="/" className="font-semibold tracking-wide text-sky-300">
-          AURORA Lifeline
+    <div className="flex h-screen flex-col bg-bg text-fg">
+      <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border px-4 py-2.5 text-sm">
+        <Link href="/" aria-label="AURORA Lifeline home" className="shrink-0">
+          <Logo size={26} />
         </Link>
-        <span className="text-slate-300">{storm.name}</span>
-        <span className="font-medium">{scenario.district_name}</span>
-        <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs text-amber-300">
-          historical replay, not a forecast
-        </span>
-        {prov.mode === "deterministic" && (
-          <span className="rounded bg-slate-700 px-2 py-0.5 text-xs">deterministic: IMD track only</span>
+        <span className="hidden text-muted md:inline">{storm.name}</span>
+        <span className="font-display font-semibold">{scenario.district_name}</span>
+        {storm.runs.length > 1 && (
+          <div
+            className="flex rounded-full border border-border p-0.5"
+            role="group"
+            aria-label="IMD bulletin"
+          >
+            {storm.runs.map((r) => (
+              <button
+                key={r.runId}
+                type="button"
+                aria-pressed={activeRun === r.runId}
+                title={r.label}
+                onClick={() => setActiveRun(r.runId)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  activeRun === r.runId ? "bg-cyan text-primary-ink" : "text-muted hover:text-fg"
+                }`}
+              >
+                Bulletin {r.bulletinNo}
+              </button>
+            ))}
+          </div>
         )}
+        <span
+          className="chip border-warning/40 text-warning"
+          title="Archived storm: asset-level results are public only for past storms"
+        >
+          Replay · IMD Bulletin {prov.imd_bulletin_no}, {istAfter(prov.imd_issued_at_utc, 0)} · past storm,
+          not a live forecast
+        </span>
+        {prov.mode === "deterministic" && <span className="chip">deterministic: IMD track only</span>}
       </header>
 
       <div className="flex min-h-0 flex-1">
@@ -315,19 +355,50 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
               </Map>
             </APIProvider>
           ) : (
-            <div className="p-8 text-slate-400">Set NEXT_PUBLIC_MAPS_API_KEY to show the map.</div>
+            <div className="p-8 text-muted">Set NEXT_PUBLIC_MAPS_API_KEY to show the map.</div>
           )}
           {hover && (
-            <div className="pointer-events-none absolute left-3 top-3 max-w-md rounded bg-slate-900/90 px-3 py-2 text-xs shadow">
+            <div className="pointer-events-none absolute left-3 top-3 max-w-md rounded bg-surface/90 px-3 py-2 text-xs shadow">
               {hover}
             </div>
           )}
+          <div className="card absolute right-3 top-3 hidden bg-surface/85 p-3 text-[11px] backdrop-blur md:block">
+            <p className="mb-1.5 font-semibold text-fg">Chance by the selected hour</p>
+            <div className="h-1.5 w-44 rounded-full bg-[linear-gradient(90deg,#fde047,#f59e0b,#dc2626,#7f1d1d)]" />
+            <div className="mt-1 flex justify-between text-subtle">
+              <span>10%</span>
+              <span>90%</span>
+            </div>
+            <ul className="mt-2 space-y-1 text-muted">
+              <li>
+                <span className="mr-2 inline-block h-0.5 w-4 bg-risk-2 align-middle" />
+                road closed
+              </li>
+              <li>
+                <span className="mr-2 inline-block size-2.5 rounded-sm bg-violet/70 align-middle" />
+                village cut off from hospitals
+              </li>
+              <li>
+                <span className="mr-2 inline-block size-2.5 rounded-full bg-safe align-middle" />
+                facility reachable ·{" "}
+                <span className="inline-block size-2.5 rounded-full bg-risk-3 align-middle" /> at risk
+              </li>
+              <li>
+                <span className="mr-2 inline-block size-2.5 rounded-full border-2 border-risk-1 align-middle" />
+                stage machinery here
+              </li>
+              <li>
+                <span className="mr-2 inline-block h-0.5 w-4 bg-fg align-middle" />
+                IMD official track
+              </li>
+            </ul>
+          </div>
           <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 text-xs">
             {(Object.keys(show) as Array<keyof typeof show>).map((k) => (
               <button
                 key={k}
                 onClick={() => setShow((s) => ({ ...s, [k]: !s[k] }))}
-                className={`rounded px-2 py-1 ${show[k] ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300"}`}
+                className={`rounded px-2 py-1 ${show[k] ? "bg-cyan text-primary-ink" : "bg-surface-2 text-muted"}`}
               >
                 {k === "surge" ? "surge (screening model)" : k === "flood" ? "rain flooding (prior)" : k}
               </button>
@@ -335,7 +406,7 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
           </div>
         </div>
 
-        <aside className="w-[400px] shrink-0 overflow-y-auto border-l border-slate-800 p-4 text-sm">
+        <aside className="w-[400px] shrink-0 overflow-y-auto border-l border-border p-4 text-sm">
           <div className="mb-3 flex gap-1" role="tablist">
             {(
               [
@@ -349,7 +420,7 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
                 role="tab"
                 aria-selected={tab === k}
                 onClick={() => setTab(k)}
-                className={`flex-1 rounded px-2 py-1.5 text-xs font-medium ${tab === k ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300"}`}
+                className={`flex-1 rounded px-2 py-1.5 text-xs font-medium ${tab === k ? "bg-cyan text-primary-ink" : "bg-surface-2 text-muted"}`}
               >
                 {label}
               </button>
@@ -359,35 +430,33 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
           {tab === "ask" && <AskPanel runId={runId} />}
           {tab === "forecast" && (
             <>
-              <div className="text-xs uppercase tracking-wider text-slate-400">
+              <div className="text-xs uppercase tracking-wider text-muted">
                 {istAfter(scenario.time_axis.now_utc, t)} ·{" "}
                 {hToLandfall > 0
                   ? `T−${Math.round(hToLandfall)} h to forecast landfall`
                   : `T+${Math.round(-hToLandfall)} h after landfall`}
               </div>
-              <div className="mt-3 rounded bg-slate-900 p-3">
-                <div className="text-slate-400">People cut off from any public hospital</div>
+              <div className="mt-3 rounded bg-surface p-3">
+                <div className="text-muted">People cut off from any public hospital</div>
                 <div className="mt-1 text-3xl font-semibold">{fmtPeople(hourly?.pop_cut_p50)}</div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-muted">
                   P10–P90: {fmtPeople(hourly?.pop_cut_p10)} – {fmtPeople(hourly?.pop_cut_p90)} · across{" "}
                   {members}
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <div className="rounded bg-slate-900 p-3">
-                  <div className="text-xs text-slate-400">
-                    Health facilities cut off from referral (median)
-                  </div>
+                <div className="rounded bg-surface p-3">
+                  <div className="text-xs text-muted">Health facilities cut off from referral (median)</div>
                   <div className="text-xl font-semibold">{hourly?.facilities_at_risk ?? "–"}</div>
                 </div>
-                <div className="rounded bg-slate-900 p-3">
-                  <div className="text-xs text-slate-400">By landfall (P10–P90)</div>
+                <div className="rounded bg-surface p-3">
+                  <div className="text-xs text-muted">By landfall (P10–P90)</div>
                   <div className="text-xl font-semibold">
                     {scenario.headline.pop_cut_hospital.p50 === null
                       ? "–"
                       : fmtPeople(scenario.headline.pop_cut_hospital.p50)}
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-muted">
                     {fmtPeople(scenario.headline.pop_cut_hospital.p10)} –{" "}
                     {fmtPeople(scenario.headline.pop_cut_hospital.p90)}
                   </div>
@@ -395,18 +464,18 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
               </div>
 
               <h3 className="mt-5 font-semibold">Health facilities most at risk</h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted">
                 Chance of losing road access to referral care before landfall, with the likely window
                 (P10–P90).
               </p>
               <ul className="mt-2 space-y-2">
                 {facilities.slice(0, 12).map((f) => (
-                  <li key={f.facility_id} className="rounded bg-slate-900 p-2">
+                  <li key={f.facility_id} className="rounded bg-surface p-2">
                     <div className="flex justify-between gap-2">
                       <span className="truncate">{f.name}</span>
                       <span className="font-semibold text-orange-300">{pct(f.p_isolated_by_landfall)}</span>
                     </div>
-                    <div className="text-xs text-slate-400">
+                    <div className="text-xs text-muted">
                       {TYPE_LABEL[f.type] ?? f.type}
                       {f.t10 && f.t90 ? ` · ${istAfter(f.t10, 0)} → ${istAfter(f.t90, 0)}` : ""}
                     </div>
@@ -417,21 +486,21 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
               <h3 className="mt-5 font-semibold">Actions before the roads close</h3>
               <ul className="mt-2 space-y-2">
                 {scenario.actions.slice(0, 8).map((a) => (
-                  <li key={a.action_id} className="rounded bg-slate-900 p-2">
+                  <li key={a.action_id} className="rounded bg-surface p-2">
                     <div>
                       <span className="mr-1 rounded bg-yellow-400/20 px-1 text-xs text-yellow-300">
                         {a.rank}
                       </span>
                       Stage an earthmover at the {siteLabel(a)}
                     </div>
-                    <div className="text-xs text-slate-300">
+                    <div className="text-xs text-muted">
                       by {istAfter(a.deadline_utc, 0)} ({a.deadline_basis}) · ~{fmtPeople(a.people_protected)}{" "}
                       people · closure {pct(a.p_event)}
                     </div>
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs text-subtle">
                 Parameters marked prior are uncalibrated. Surge is a screening upper bound, not a hydrodynamic
                 model; IMD surge guidance takes precedence.
               </p>
@@ -440,11 +509,11 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
         </aside>
       </div>
 
-      <footer className="border-t border-slate-800 px-4 py-2">
+      <footer className="border-t border-border px-4 py-2">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPlaying((p) => !p)}
-            className="rounded bg-sky-600 px-3 py-1 text-sm"
+            className="rounded bg-cyan text-primary-ink px-3 py-1 text-sm"
             aria-label={playing ? "Pause" : "Play"}
           >
             {playing ? "Pause" : "Play"}
@@ -458,11 +527,11 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
             className="flex-1"
             aria-label="Hours after the bulletin"
           />
-          <span className="w-44 text-right text-xs text-slate-300">
+          <span className="w-44 text-right text-xs text-muted">
             {istAfter(scenario.time_axis.now_utc, t)}
           </span>
         </div>
-        <div className="mt-1 text-[11px] text-slate-500">
+        <div className="mt-1 text-[11px] text-subtle">
           Derived from IMD National Bulletin No. {prov.imd_bulletin_no} issued{" "}
           {istAfter(prov.imd_issued_at_utc, 0)} · members: {members} · ensemble aligned to the IMD official
           forecast · WeatherNext and ECMWF are a non-official uncertainty envelope ·{" "}

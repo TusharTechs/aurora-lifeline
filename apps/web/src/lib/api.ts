@@ -75,3 +75,39 @@ export const draftAdvisory = (runId: string, lgd: string, language: Lang, audien
 
 export const askAurora = (runId: string, question: string, language: Lang) =>
   post<AskResult>("ask", { run_id: runId, question, language });
+
+export type BulletinCheck = { id: string; label: string; status: "pass" | "fail" | "na"; detail: string };
+export type BulletinResult = {
+  sha256: string;
+  pages: number;
+  reading: import("@/contracts").BulletinReading;
+  checks: BulletinCheck[];
+  needs_review: boolean;
+  confirmation: { required: boolean; state: string };
+  detected_bulletin_no: string | null;
+  labels: { agree: number; total: number; differs: string[]; labels_status: string } | null;
+  model: string;
+  cached: boolean;
+  prompt_version: string;
+  known: { storm_id: string; bulletin_no: string; run_id: string; source_url: string } | null;
+};
+
+export const readKnownBulletin = (stormId: string, bulletinNo: string) =>
+  post<BulletinResult>("bulletins/read-known", { storm_id: stormId, bulletin_no: bulletinNo });
+
+export async function readUploadedBulletin(file: File): Promise<BulletinResult> {
+  const form = new FormData();
+  form.append("file", file);
+  const r = await fetch(`${BASE}/api/v1/bulletins/read`, { method: "POST", body: form });
+  if (!r.ok) {
+    let msg = `${r.status}`;
+    try {
+      const j = (await r.json()) as { detail?: unknown };
+      if (typeof j.detail === "string") msg = j.detail;
+    } catch {
+      /* not JSON */
+    }
+    throw new Error(msg);
+  }
+  return (await r.json()) as BulletinResult;
+}

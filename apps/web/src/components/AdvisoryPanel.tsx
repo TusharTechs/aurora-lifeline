@@ -58,7 +58,7 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-muted">
         Gemini drafts the wording; every number, name and time is inserted by the engine from cited facts. A
         draft is never sent: an officer must approve it, and CAP output is for the SDMA originator.
       </p>
@@ -67,7 +67,7 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
           <button
             key={k}
             onClick={() => setLang(k)}
-            className={`rounded px-2 py-1 text-xs ${lang === k ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300"}`}
+            className={`rounded px-2 py-1 text-xs ${lang === k ? "bg-cyan text-primary-ink" : "bg-surface-2 text-muted"}`}
           >
             {label}
           </button>
@@ -76,7 +76,7 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
       <select
         value={audience}
         onChange={(e) => setAudience(e.target.value as Audience)}
-        className="w-full rounded bg-slate-900 px-2 py-1 text-xs"
+        className="w-full rounded bg-surface px-2 py-1 text-xs"
         aria-label="Audience"
       >
         {AUDIENCES.map(([k, label]) => (
@@ -88,7 +88,7 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
       <button
         onClick={run}
         disabled={busy}
-        className="w-full rounded bg-sky-600 px-3 py-2 text-sm font-medium disabled:opacity-50"
+        className="w-full rounded bg-cyan text-primary-ink px-3 py-2 text-sm font-medium disabled:opacity-50"
       >
         {busy ? "Gemini is drafting… (checks run after)" : "Draft advisory with Gemini"}
       </button>
@@ -112,17 +112,17 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
               number check passed
             </span>
             {result.badges.map((b) => (
-              <span key={b} className="rounded bg-slate-700 px-1.5 py-0.5">
+              <span key={b} className="rounded bg-surface-3 px-1.5 py-0.5">
                 {b}
               </span>
             ))}
             {result.cached && (
-              <span className="rounded bg-slate-800 px-1.5 py-0.5">cached replay output</span>
+              <span className="rounded bg-surface-2 px-1.5 py-0.5">cached replay output</span>
             )}
           </div>
           {FIELDS.map(([k, label]) => (
-            <div key={k} className="rounded bg-slate-900 p-2">
-              <div className="text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
+            <div key={k} className="rounded bg-surface p-2">
+              <div className="text-[10px] uppercase tracking-wider text-subtle">{label}</div>
               <div className="whitespace-pre-wrap text-sm" lang={result.language}>
                 {shown[k]}
               </div>
@@ -130,19 +130,19 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
           ))}
           {bt && (
             <div
-              className={`rounded p-2 text-xs ${bt.flag ? "bg-red-900/40 text-red-200" : "bg-slate-900 text-slate-300"}`}
+              className={`rounded p-2 text-xs ${bt.flag ? "bg-red-900/40 text-red-200" : "bg-surface text-muted"}`}
             >
               Back-translation similarity to the English draft {bt.similarity.toFixed(2)} (flag below{" "}
               {bt.threshold}, {bt.threshold_status.toLowerCase()}){bt.flag ? ": review the translation" : ""}
             </div>
           )}
-          <button onClick={() => setShowTemplate((s) => !s)} className="text-xs text-sky-300 underline">
+          <button onClick={() => setShowTemplate((s) => !s)} className="text-xs text-cyan underline">
             {showTemplate ? "Hide" : "Show"} what Gemini wrote (placeholders) and the cited facts
           </button>
           {showTemplate && template && (
-            <div className="space-y-2 rounded bg-slate-900 p-2 text-xs">
-              <pre className="whitespace-pre-wrap text-slate-300">{template.description}</pre>
-              <pre className="whitespace-pre-wrap text-slate-300">{template.instruction}</pre>
+            <div className="space-y-2 rounded bg-surface p-2 text-xs">
+              <pre className="whitespace-pre-wrap text-muted">{template.description}</pre>
+              <pre className="whitespace-pre-wrap text-muted">{template.instruction}</pre>
               <table className="w-full text-left">
                 <tbody>
                   {result.facts
@@ -153,10 +153,10 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
                         template.instruction.includes(`{{${f.id}}}`),
                     )
                     .map((f) => (
-                      <tr key={f.id} className="border-t border-slate-800 align-top">
-                        <td className="py-1 pr-2 font-mono text-sky-300">{f.id}</td>
+                      <tr key={f.id} className="border-t border-border align-top">
+                        <td className="py-1 pr-2 font-mono text-cyan">{f.id}</td>
                         <td className="py-1 pr-2">{f.text[result.language] ?? f.text["en-IN"]}</td>
-                        <td className="py-1 text-slate-500">
+                        <td className="py-1 text-subtle">
                           {f.source.table} · {f.source.row_id}
                         </td>
                       </tr>
@@ -176,13 +176,13 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
             {result.cap_xml && (
               <button
                 onClick={() => download(`aurora-cap-${lgd}-${result.language}.xml`, result.cap_xml ?? "")}
-                className="flex-1 rounded bg-slate-700 px-2 py-1.5 text-xs"
+                className="flex-1 rounded bg-surface-3 px-2 py-1.5 text-xs"
               >
                 Download CAP 1.2 (Exercise)
               </button>
             )}
           </div>
-          <div className="text-[10px] text-slate-500">
+          <div className="text-[10px] text-subtle">
             CAP: status Exercise, scope Restricted, for the SDMA originator to review in Sachet; XSD check{" "}
             {result.cap_problems && result.cap_problems.length === 0
               ? "passed"
