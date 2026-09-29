@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ListenButton } from "./ListenButton";
 import { draftAdvisory, type AdvisoryFields, type AdvisoryResult, type Audience, type Lang } from "@/lib/api";
 
 const LANGS: Array<[Lang, string]> = [
@@ -165,6 +166,7 @@ export function AdvisoryPanel({ runId, lgd }: { runId: string; lgd: string }) {
               </table>
             </div>
           )}
+          <ListenButton runId={runId} lgd={lgd} language={result.language} audience={audience} />
           <div className="flex gap-2">
             <button
               onClick={() => setApproved(true)}

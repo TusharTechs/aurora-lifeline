@@ -144,3 +144,15 @@ export const readLatestBulletin = () =>
     {},
     DIRECT,
   );
+
+export type VoiceResult = {
+  audio_b64: string;
+  mime: string;
+  model: string;
+  voice: string;
+  language: Lang;
+  cached: boolean;
+};
+
+export const advisoryVoice = (runId: string, lgd: string, language: Lang, audience: Audience) =>
+  post<VoiceResult>("advisories/voice", { run_id: runId, district_lgd: lgd, language, audience });

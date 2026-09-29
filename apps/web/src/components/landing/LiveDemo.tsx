@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { ListenButton } from "@/components/ListenButton";
 import { askAurora, draftAdvisory, type AdvisoryResult, type AskResult, type Lang } from "@/lib/api";
 
 export type DemoFacility = { name: string; type: string; hours: Array<number | null>; p: number };
@@ -270,6 +271,12 @@ export function LiveDemo({
                     </div>
                     <p className="font-display text-lg font-semibold">{shown.headline}</p>
                     <p className="text-sm leading-relaxed text-muted">{shown.sms_text}</p>
+                    <ListenButton
+                      runId={runId}
+                      lgd={lgd}
+                      language={draft.language}
+                      audience="district_officer"
+                    />
                   </div>
                 )}
               </>

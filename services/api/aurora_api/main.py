@@ -27,7 +27,7 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from aurora_agents import advisory, bulletin_reader
+from aurora_agents import advisory, bulletin_reader, voice
 from aurora_agents.ask import PROMPT_VERSION as ASK_PROMPT_VERSION
 from aurora_agents.ask import RunData, ask
 from aurora_agents.gemini import Gemini, default_cache
@@ -194,6 +194,28 @@ def draft_advisory(req: AdvisoryRequest, request: Request) -> dict[str, Any]:
     if out["status"] == "draft":
         g.cache.put(key, {"output": out})
     return {**out, "cached": False}
+
+
+@app.post("/api/v1/advisories/voice")
+def advisory_voice(req: AdvisoryRequest, request: Request) -> dict[str, Any]:
+    """The advisory's voice script, read aloud (Gemini-TTS). Uses the cached draft when present."""
+    draft = draft_advisory(req, request)
+    if draft.get("status") != "draft":
+        raise HTTPException(409, "The advisory draft did not pass its checks; nothing to read.")
+    text = draft["rendered"][req.language]["voice_script"]
+    g = gem()
+    key = _response_cache_key("voice", {**req.model_dump(), "text": text})
+    if (hit := g.cache.get(key)) is not None:
+        return {**hit["output"], "cached": True}
+    _rate_limit(request)
+    try:
+        out = voice.speak(text, req.language, g.cache)
+    except Exception as e:
+        log.exception("voice failed")
+        raise HTTPException(502, f"The voice service did not answer ({type(e).__name__}).") from e
+    out["text"] = text
+    g.cache.put(key, {"output": out})
+    return out
 
 
 class AskRequest(BaseModel):
