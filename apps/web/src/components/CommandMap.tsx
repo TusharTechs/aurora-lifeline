@@ -16,7 +16,7 @@ import { AdvisoryPanel } from "./AdvisoryPanel";
 import { AskPanel } from "./AskPanel";
 
 type Overlay = { url: string; bounds: [number, number, number, number]; label: string };
-type Overlays = { flood: Overlay; surge: Overlay };
+type Overlays = { extent?: [number, number, number, number]; flood: Overlay; surge: Overlay };
 type Facility = DistrictScenario["facilities"][number];
 type Action = DistrictScenario["actions"][number];
 type Tab = "forecast" | "advisory" | "ask";
@@ -32,7 +32,8 @@ const TYPE_LABEL: Record<string, string> = {
   shelter: "Shelter",
   sub_centre: "Sub-centre",
 };
-// Data extent of the landfall-region build; tiles outside it do not exist (tippecanoe skips empty tiles).
+// Fallback data extent (Godavari region); runs publish their own in overlays.json. Tiles outside the
+// extent do not exist (tippecanoe skips empty tiles).
 const TILE_EXTENT: [number, number, number, number] = [80.3, 15.4, 82.95, 17.95];
 const quietTileError = () => {};
 
@@ -160,7 +161,7 @@ export function CommandMap({
         new MVTLayer({
           id: "settlements",
           data: `/tiles/${runId}/settlements/{z}/{x}/{y}.pbf`,
-          extent: TILE_EXTENT,
+          extent: overlays?.extent ?? TILE_EXTENT,
           onTileError: quietTileError,
           minZoom: 6,
           maxZoom: 12,
@@ -175,7 +176,7 @@ export function CommandMap({
         new MVTLayer({
           id: "edges",
           data: `/tiles/${runId}/edges/{z}/{x}/{y}.pbf`,
-          extent: TILE_EXTENT,
+          extent: overlays?.extent ?? TILE_EXTENT,
           onTileError: quietTileError,
           minZoom: 6,
           maxZoom: 13,

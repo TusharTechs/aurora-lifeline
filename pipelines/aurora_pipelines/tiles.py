@@ -314,13 +314,15 @@ def main() -> int:
     psurge[sc["row"].to_numpy(), sc["col"].to_numpy()] = sc["p"].to_numpy()
     gt = meta["grid_transform"]
     g_aff = rasterio.Affine(*gt)
-    g_bounds = rasterio.transform.array_bounds(gshape[0], gshape[1], g_aff)
-    write_png(
-        web_run / "surge.png",
-        ramp(psurge, (8, 145, 178)),
-        (g_bounds[1], g_bounds[0], g_bounds[3], g_bounds[2]),
-    )
+    g_bounds = rasterio.transform.array_bounds(gshape[0], gshape[1], g_aff)  # (W, S, E, N)
+    write_png(web_run / "surge.png", ramp(psurge, (8, 145, 178)), g_bounds)
     overlays = {
+        "extent": [
+            bounds[0],
+            bounds[1],
+            bounds[2],
+            bounds[3],
+        ],  # the tiles' data extent (W, S, E, N)
         "flood": {
             "url": f"/runs/{args.run}/flood.png",
             "bounds": [bounds[0], bounds[1], bounds[2], bounds[3]],
@@ -329,7 +331,7 @@ def main() -> int:
         },
         "surge": {
             "url": f"/runs/{args.run}/surge.png",
-            "bounds": [g_bounds[1], g_bounds[0], g_bounds[3], g_bounds[2]],
+            "bounds": [g_bounds[0], g_bounds[1], g_bounds[2], g_bounds[3]],
             "label": "Storm surge over 0.3 m by landfall (probability; screening model)",
         },
     }

@@ -44,17 +44,21 @@ jobs:
           service_account: ${{ env.DEPLOY_SA }}
       - uses: google-github-actions/setup-gcloud@v3
       - name: build and push image
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
-          docker build -f services/api/Dockerfile -t "$IMAGE:$GITHUB_SHA" .
-          docker push "$IMAGE:$GITHUB_SHA"
+          docker build -f services/api/Dockerfile -t "$IMAGE:$HEAD_SHA" .
+          docker push "$IMAGE:$HEAD_SHA"
       - name: deploy Cloud Run service
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          gcloud run deploy aurora-api --image "$IMAGE:$GITHUB_SHA" --region "$REGION" \
+          gcloud run deploy aurora-api --image "$IMAGE:$HEAD_SHA" --region "$REGION" \
             --service-account "aurora-api@$PROJECT_ID.iam.gserviceaccount.com" \
             --allow-unauthenticated --memory 1Gi --cpu 1 --concurrency 20 \
             --min-instances 0 --max-instances 3 --timeout 300 \
-            --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GOOGLE_GENAI_USE_ENTERPRISE=true,GCS_BUCKET_DATA=$PROJECT_ID-data,AURORA_VERSION=${GITHUB_SHA::7}" \
+            --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GOOGLE_GENAI_USE_ENTERPRISE=true,GCS_BUCKET_DATA=$PROJECT_ID-data,AURORA_VERSION=${HEAD_SHA::7}" \
             --quiet
 
   web:
