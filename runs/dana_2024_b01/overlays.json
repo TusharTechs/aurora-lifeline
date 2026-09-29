@@ -1,0 +1,29 @@
+{
+ "extent": [
+  84.3099428,
+  19.55569296666667,
+  87.9374428,
+  22.3890263
+ ],
+ "flood": {
+  "url": "/runs/dana_2024_b01/flood.png",
+  "bounds": [
+   84.3099428,
+   19.55569296666667,
+   87.9374428,
+   22.3890263
+  ],
+  "label": "Rain flooding over 0.3 m by landfall (probability)",
+  "crs": "EPSG:4326"
+ },
+ "surge": {
+  "url": "/runs/dana_2024_b01/surge.png",
+  "bounds": [
+   84.49263400000001,
+   19.778048966666667,
+   87.91180066666668,
+   22.3688823
+  ],
+  "label": "Storm surge over 0.3 m by landfall (probability; screening model)"
+ }
+}

@@ -1,0 +1,402 @@
+{
+ "run_id": "montha_2025_b19",
+ "storm_id": "montha_2025",
+ "created_at_utc": "2026-09-29T02:47:55Z",
+ "code_sha": "0d16aa3f20692430f865c93ee7c4a4d8a13d6664",
+ "imd_bulletin_no": "19",
+ "mode": "ensemble",
+ "run_label": null,
+ "inputs": [
+  {
+   "uri": "https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_461197_19.National_Bulletin_No_19-25_Oct_2025_1730IST.pdf",
+   "sha256": "f822ba6cad4f06b44633b0cf68ea759a422f4b96577f00dfa796b3f1d685cc8d",
+   "source": "IMD",
+   "issued_at_utc": "2025-10-25T16:00:00Z"
+  },
+  {
+   "uri": "data/raw/ecmwf/ifs_enfo_tf/20251025060000-144h-enfo-tf.bufr",
+   "sha256": "e3faa41b00f5781dfc2b8bd2465ad3e69e9993a2f5b8f4179e02c5b45431d7be",
+   "source": "ECMWF",
+   "issued_at_utc": "2025-10-25T06:00:00Z",
+   "available_at_utc": "2025-10-25T14:00:00Z"
+  }
+ ],
+ "members": [
+  {
+   "source": "ECMWF",
+   "member_no": 1,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 2,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 3,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 5,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 6,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 8,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 9,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 10,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 11,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 12,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 13,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 15,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 16,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 17,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 18,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 19,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 20,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 21,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 22,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 23,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 24,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 25,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 26,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 27,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 28,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 29,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 30,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 31,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 32,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 33,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 34,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 35,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 36,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 37,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 38,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 39,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 40,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 41,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 42,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 43,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 44,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 45,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 46,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 47,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 48,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 49,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 50,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 51,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "ECMWF",
+   "member_no": 52,
+   "weight": 0.02040816326530612
+  },
+  {
+   "source": "IMD",
+   "member_no": 0,
+   "weight": 0.0
+  }
+ ],
+ "parameters": [
+  {
+   "name": "rain_k_m_per_mm",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "rain_r0_mm",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "rain_h_max_m",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "rain_coverage_fractions",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "rain_patch_h3_res6",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "road_formation_allowance",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "close_depth_0.3m",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "surge_decay_0.083m_per_km",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "surge_sigma_2rm",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "surge_timing_rm_plus_50km",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "holland_b_1.5",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "district_buffer_30km",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "settlement_min_pop_25",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "publication_delays",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  },
+  {
+   "name": "source_balanced_weights",
+   "value": null,
+   "status": "PRIOR",
+   "source": "docs/ENGINE.md; HANDOFF D15, D22"
+  }
+ ],
+ "models": [],
+ "seed": 0,
+ "outputs": [
+  {
+   "path": "districts/13999862.json",
+   "sha256": "ac7d02efc926bbe29501475e19278eaa9975332ba854b7d791dd4c74e126f974",
+   "bytes": 46084
+  },
+  {
+   "path": "districts/13999603.json",
+   "sha256": "1f7ae7f2492caf97ca5b3230d15408cf218694bd330b96855f285681e8adf1ec",
+   "bytes": 43008
+  },
+  {
+   "path": "districts/2022127.json",
+   "sha256": "cc369547ed6697370d41338ae3023329e2a75505ee3d4345d0f33d53ee393a94",
+   "bytes": 40208
+  },
+  {
+   "path": "districts/2022126.json",
+   "sha256": "8a140f43b68147eb43e4b53079b117e3b7ab96af2cf4f7ccd9210aa97c0cc791",
+   "bytes": 54355
+  },
+  {
+   "path": "districts/13999189.json",
+   "sha256": "d24c87896fb4106f3b2cb307951be3e02e0d967b2e4790616cabf0481286473a",
+   "bytes": 45378
+  },
+  {
+   "path": "districts/2022135.json",
+   "sha256": "8ee57135270cac2df4110410d0d3d4286ff9daa7cd30414787d9bf98a4bfdecf",
+   "bytes": 52162
+  }
+ ]
+}

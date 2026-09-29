@@ -1,0 +1,29 @@
+{
+ "extent": [
+  80.2641724,
+  15.712786466666667,
+  82.97083906666667,
+  18.0636198
+ ],
+ "flood": {
+  "url": "/runs/montha_2025_b19/flood.png",
+  "bounds": [
+   80.2641724,
+   15.712786466666667,
+   82.97083906666667,
+   18.0636198
+  ],
+  "label": "Rain flooding over 0.3 m by landfall (probability)",
+  "crs": "EPSG:4326"
+ },
+ "surge": {
+  "url": "/runs/montha_2025_b19/surge.png",
+  "bounds": [
+   80.2987076,
+   15.729144233333333,
+   82.94704093333334,
+   17.9783109
+  ],
+  "label": "Storm surge over 0.3 m by landfall (probability; screening model)"
+ }
+}
