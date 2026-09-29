@@ -1,0 +1,49 @@
+# Replay definition for Severe Cyclonic Storm Dana, Oct 2024, Odisha (HANDOFF D14 second replay).
+storm_id: dana_2024
+name: Severe Cyclonic Storm "Dana"
+status: replay
+basin: NI
+ids:
+  imd: BOB/xx/2024 # confirm from the bulletin header
+  ibtracs_sid: null # verification labels only
+
+# Used ONLY to choose the replay bulletin (SPEC §3). Never a model input.
+observed_landfall:
+  source: IMD press release 6 dated 25 Oct 2024 (1330 IST)
+  source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/21/21_e60241_PRESS%20RELEASE%206%20dated%2025th%20October%202024.pdf
+  window_text: during 0130 hrs IST to 0330 hrs IST of 25th October
+  utc: "2024-10-24T21:00:00Z" # midpoint of the stated window (02:30 IST, 25 Oct)
+  location_text: north Odisha coast close to Habalikhati Nature Camp (Bhitarkanika) and Dhamara
+  lat: 20.8
+  lon: 86.95
+replay_start_utc: "2024-10-21T21:00:00Z" # observed landfall minus 72 h
+
+# No national bulletin with a landfall forecast exists before replay_start (Dana was a low on 21
+# Oct), so the replay uses the first national bulletin with one: No. 1, issued 0930 IST 22 Oct,
+# about 65 h before the observed crossing. Chosen before any skill was computed.
+default_run: dana_2024_b01
+runs:
+  - run_id: dana_2024_b01
+    rule: first_landfall_forecast
+    bulletin:
+      product: national_bulletin
+      bulletin_no: "1"
+      issued_at_utc: "2024-10-22T04:00:00Z" # TIME OF ISSUE: 0930 HOURS IST DATED: 22.10.2024
+      source_url: https://rsmcnewdelhi.imd.gov.in/uploads/archive/1/1_3537f0_1.National%20Bulletin%20No%201-22Oct2024_0530IST.pdf
+      sha256: 297deb6e3a0f32d7cc95a9fd97afa3dd6a018fb1cc4121bb7522e6fdbf97d344
+      reading: config/storms/dana_2024/bulletins/national_01.reading.json
+
+demo_district_lgd: null
+states: [odisha]
+
+# Weather Lab's large ensemble has no October 2024 runs; FNV3 (WNX) and ECMWF do.
+sources:
+  ECMWF:
+    kind: ecmwf_tc_bufr
+    path: data/raw/ecmwf/ifs_enfo_tf
+    publication_delay_h: 8 # PRIOR
+  WNX:
+    kind: weatherlab_csv
+    model: FNV3P2
+    path: data/raw/weatherlab/FNV3P2/ensemble
+    publication_delay_h: 6 # PRIOR (unconfirmed)
