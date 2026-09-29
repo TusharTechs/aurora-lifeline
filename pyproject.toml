@@ -53,6 +53,7 @@ known-first-party = ["aurora_engine", "aurora_agents", "aurora_api", "aurora_pip
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR", "N802", "N806", "E501"]
 "pipelines/**" = ["PLR0912", "PLR0914", "PLR0915"]
+"pipelines/aurora_pipelines/validate_s1.py" = ["E501"]  # report field names and rule text
 # Prompt text and Telugu/Hindi strings are content, not code.
 "agents/aurora_agents/facts.py" = ["E501", "RUF001", "PLR0917"]
 "agents/aurora_agents/advisory.py" = ["E501"]
