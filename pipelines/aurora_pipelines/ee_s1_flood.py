@@ -35,8 +35,9 @@ FOCAL_M = 50
 SCALE_M = 30
 
 
-def flood_for_orbit(region: ee.Geometry, orbit: int, post: ee.Image, t: datetime) -> ee.Image:
-    pre = (
+def pre_event(region: ee.Geometry, orbit: int, t: datetime) -> ee.ImageCollection:
+    """Same relative orbit, IW VV, T-30 to T-3 days."""
+    return (
         ee.ImageCollection("COPERNICUS/S1_GRD")
         .filterBounds(region)
         .filter(ee.Filter.eq("instrumentMode", "IW"))
@@ -44,11 +45,13 @@ def flood_for_orbit(region: ee.Geometry, orbit: int, post: ee.Image, t: datetime
         .filter(ee.Filter.eq("relativeOrbitNumber_start", orbit))
         .filterDate((t - timedelta(days=30)).isoformat(), (t - timedelta(days=3)).isoformat())
         .select("VV")
-        .median()
-        .focal_median(FOCAL_M, "circle", "meters")
     )
+
+
+def flood_for_orbit(pre: ee.ImageCollection, post: ee.Image) -> ee.Image:
+    pre_vv = pre.median().focal_median(FOCAL_M, "circle", "meters")  # type: ignore[attr-defined]
     post_vv = post.select("VV").focal_median(FOCAL_M, "circle", "meters")
-    return post_vv.subtract(pre).lt(DIFF_DB).And(post_vv.lt(POST_MAX_DB))
+    return post_vv.subtract(pre_vv).lt(DIFF_DB).And(post_vv.lt(POST_MAX_DB))
 
 
 def main() -> int:
@@ -107,7 +110,21 @@ def main() -> int:
         post = same_pass.mosaic()
         footprint = same_pass.geometry()
         obs_h = max(0, min(254, round((day0 - t).total_seconds() / 3600)))
-        fl = flood_for_orbit(region, orb, post, t).And(valid)
+        pre = pre_event(region, orb, t)
+        n_pre = pre.size().getInfo()
+        if not n_pre:
+            # No reference image from this orbit in the month before: its footprint stays
+            # "not observed" rather than being compared with nothing.
+            orbits_meta.append(
+                {
+                    "relative_orbit": orb,
+                    "acquired_utc": day0.isoformat(),
+                    "hours_after_t": obs_h,
+                    "skipped": "no pre-event scene",
+                }
+            )
+            continue
+        fl = flood_for_orbit(pre, post).And(valid)
         observed = post.select("VV").mask().And(ee.Image.constant(1).clip(footprint).mask())
         layer = ee.Image.cat(
             fl.rename("flood").toUint8(), ee.Image.constant(obs_h).rename("obs_h").toUint8()
@@ -119,6 +136,7 @@ def main() -> int:
                 "acquired_utc": day0.isoformat(),
                 "hours_after_t": obs_h,
                 "scenes": same_pass.size().getInfo(),
+                "pre_event_scenes": n_pre,
             }
         )
     if not layers:
