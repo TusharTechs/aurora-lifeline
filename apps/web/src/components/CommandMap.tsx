@@ -14,12 +14,13 @@ import type { StormInfo } from "@/lib/storms";
 import { AuroraLoader, Logo } from "./brand/Logo";
 import { AdvisoryPanel } from "./AdvisoryPanel";
 import { AskPanel } from "./AskPanel";
+import { TriggerPanel } from "./TriggerPanel";
 
 type Overlay = { url: string; bounds: [number, number, number, number]; label: string };
 type Overlays = { extent?: [number, number, number, number]; flood: Overlay; surge: Overlay };
 type Facility = DistrictScenario["facilities"][number];
 type Action = DistrictScenario["actions"][number];
-type Tab = "forecast" | "advisory" | "ask";
+type Tab = "forecast" | "triggers" | "advisory" | "ask";
 
 const MAPS_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY ?? "";
 const MAP_ID = process.env.NEXT_PUBLIC_MAPS_MAP_ID ?? "";
@@ -412,7 +413,8 @@ export function CommandMap({
             {(
               [
                 ["forecast", "Forecast"],
-                ["advisory", "Advisory · Gemini"],
+                ["triggers", "Triggers"],
+                ["advisory", "Advisory"],
                 ["ask", "Ask AURORA"],
               ] as Array<[Tab, string]>
             ).map(([k, label]) => (
@@ -427,6 +429,7 @@ export function CommandMap({
               </button>
             ))}
           </div>
+          {tab === "triggers" && <TriggerPanel scenario={scenario} />}
           {tab === "advisory" && <AdvisoryPanel runId={runId} lgd={lgd} />}
           {tab === "ask" && <AskPanel runId={runId} />}
           {tab === "forecast" && (
