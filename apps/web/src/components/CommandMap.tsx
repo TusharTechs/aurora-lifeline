@@ -11,10 +11,14 @@ import type { DistrictScenario } from "@/contracts";
 import { isoDecilesToHours, probAt, probAtHours, rampPurple, rampRed, type DecileProps } from "@/lib/prob";
 import { istAfter } from "@/lib/time";
 import type { StormInfo } from "@/lib/storms";
+import { AdvisoryPanel } from "./AdvisoryPanel";
+import { AskPanel } from "./AskPanel";
 
 type Overlay = { url: string; bounds: [number, number, number, number]; label: string };
 type Overlays = { flood: Overlay; surge: Overlay };
 type Facility = DistrictScenario["facilities"][number];
+type Action = DistrictScenario["actions"][number];
+type Tab = "forecast" | "advisory" | "ask";
 
 const MAPS_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY ?? "";
 const MAP_ID = process.env.NEXT_PUBLIC_MAPS_MAP_ID ?? "";
@@ -32,6 +36,17 @@ const TILE_EXTENT: [number, number, number, number] = [80.3, 15.4, 82.95, 17.95]
 const quietTileError = () => {};
 
 const ROAD_WIDTH: Record<string, number> = { motorway: 4, trunk: 4, primary: 3.5, secondary: 3, tertiary: 2 };
+
+const CROSSING_LABEL: Record<string, string> = { bridge: "bridge", culvert: "culvert", ford: "causeway" };
+
+function siteLabel(a: Action): string {
+  const s = a.site;
+  if (!s) return a.target_id;
+  let label = CROSSING_LABEL[s.crossing_type ?? ""] ?? "road";
+  if (s.near_place) label += ` near ${s.near_place.name}`;
+  if (s.road_name) label += ` (${s.road_name})`;
+  return label;
+}
 
 function DeckOverlay({ layers }: { layers: Layer[] }) {
   const map = useMap();
@@ -69,6 +84,7 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
     surge: true,
   });
   const [hover, setHover] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("forecast");
   const base = `/runs/${runId}`;
 
   useEffect(() => {
@@ -206,6 +222,18 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
           updateTriggers: { getFillColor: [t] },
           pickable: true,
         }),
+        new ScatterplotLayer<Action>({
+          id: "actions",
+          data: scenario.actions.filter((a) => a.site).slice(0, 10),
+          getPosition: (a) => [a.site?.lon ?? 0, a.site?.lat ?? 0],
+          getRadius: 8,
+          radiusUnits: "pixels",
+          stroked: true,
+          getLineColor: [250, 204, 21, 255],
+          lineWidthMinPixels: 2.5,
+          getFillColor: [250, 204, 21, 60],
+          pickable: true,
+        }),
       );
     }
     return out;
@@ -219,7 +247,12 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
       facility_id?: string;
     } | null;
     if (!o) return setHover(null);
-    if (o.facility_id) {
+    if ((o as { action_id?: string }).action_id) {
+      const a = o as unknown as Action;
+      setHover(
+        `Action ${a.rank}: stage an earthmover at the ${siteLabel(a)} by ${istAfter(a.deadline_utc, 0)} (${a.deadline_basis}) · closure ${pct(a.p_event)}`,
+      );
+    } else if (o.facility_id) {
       const f = o as Facility;
       setHover(
         `${TYPE_LABEL[f.type] ?? f.type}: ${f.name} · cut off by now: ${pct(probAtHours(facHours[f.facility_id] ?? [], t))}`,
@@ -302,76 +335,108 @@ export function CommandMap({ storm, runId, lgd }: { storm: StormInfo; runId: str
           </div>
         </div>
 
-        <aside className="w-[380px] shrink-0 overflow-y-auto border-l border-slate-800 p-4 text-sm">
-          <div className="text-xs uppercase tracking-wider text-slate-400">
-            {istAfter(scenario.time_axis.now_utc, t)} ·{" "}
-            {hToLandfall > 0
-              ? `T−${Math.round(hToLandfall)} h to forecast landfall`
-              : `T+${Math.round(-hToLandfall)} h after landfall`}
+        <aside className="w-[400px] shrink-0 overflow-y-auto border-l border-slate-800 p-4 text-sm">
+          <div className="mb-3 flex gap-1" role="tablist">
+            {(
+              [
+                ["forecast", "Forecast"],
+                ["advisory", "Advisory · Gemini"],
+                ["ask", "Ask AURORA"],
+              ] as Array<[Tab, string]>
+            ).map(([k, label]) => (
+              <button
+                key={k}
+                role="tab"
+                aria-selected={tab === k}
+                onClick={() => setTab(k)}
+                className={`flex-1 rounded px-2 py-1.5 text-xs font-medium ${tab === k ? "bg-sky-600 text-white" : "bg-slate-800 text-slate-300"}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="mt-3 rounded bg-slate-900 p-3">
-            <div className="text-slate-400">People cut off from any public hospital</div>
-            <div className="mt-1 text-3xl font-semibold">{fmtPeople(hourly?.pop_cut_p50)}</div>
-            <div className="text-xs text-slate-400">
-              P10–P90: {fmtPeople(hourly?.pop_cut_p10)} – {fmtPeople(hourly?.pop_cut_p90)} · across {members}
-            </div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded bg-slate-900 p-3">
-              <div className="text-xs text-slate-400">Health facilities cut off from referral (median)</div>
-              <div className="text-xl font-semibold">{hourly?.facilities_at_risk ?? "–"}</div>
-            </div>
-            <div className="rounded bg-slate-900 p-3">
-              <div className="text-xs text-slate-400">By landfall (P10–P90)</div>
-              <div className="text-xl font-semibold">
-                {scenario.headline.pop_cut_hospital.p50 === null
-                  ? "–"
-                  : fmtPeople(scenario.headline.pop_cut_hospital.p50)}
+          {tab === "advisory" && <AdvisoryPanel runId={runId} lgd={lgd} />}
+          {tab === "ask" && <AskPanel runId={runId} />}
+          {tab === "forecast" && (
+            <>
+              <div className="text-xs uppercase tracking-wider text-slate-400">
+                {istAfter(scenario.time_axis.now_utc, t)} ·{" "}
+                {hToLandfall > 0
+                  ? `T−${Math.round(hToLandfall)} h to forecast landfall`
+                  : `T+${Math.round(-hToLandfall)} h after landfall`}
               </div>
-              <div className="text-xs text-slate-400">
-                {fmtPeople(scenario.headline.pop_cut_hospital.p10)} –{" "}
-                {fmtPeople(scenario.headline.pop_cut_hospital.p90)}
-              </div>
-            </div>
-          </div>
-
-          <h3 className="mt-5 font-semibold">Health facilities most at risk</h3>
-          <p className="text-xs text-slate-400">
-            Chance of losing road access to referral care before landfall, with the likely window (P10–P90).
-          </p>
-          <ul className="mt-2 space-y-2">
-            {facilities.slice(0, 12).map((f) => (
-              <li key={f.facility_id} className="rounded bg-slate-900 p-2">
-                <div className="flex justify-between gap-2">
-                  <span className="truncate">{f.name}</span>
-                  <span className="font-semibold text-orange-300">{pct(f.p_isolated_by_landfall)}</span>
-                </div>
+              <div className="mt-3 rounded bg-slate-900 p-3">
+                <div className="text-slate-400">People cut off from any public hospital</div>
+                <div className="mt-1 text-3xl font-semibold">{fmtPeople(hourly?.pop_cut_p50)}</div>
                 <div className="text-xs text-slate-400">
-                  {TYPE_LABEL[f.type] ?? f.type}
-                  {f.t10 && f.t90 ? ` · ${istAfter(f.t10, 0)} → ${istAfter(f.t90, 0)}` : ""}
+                  P10–P90: {fmtPeople(hourly?.pop_cut_p10)} – {fmtPeople(hourly?.pop_cut_p90)} · across{" "}
+                  {members}
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded bg-slate-900 p-3">
+                  <div className="text-xs text-slate-400">
+                    Health facilities cut off from referral (median)
+                  </div>
+                  <div className="text-xl font-semibold">{hourly?.facilities_at_risk ?? "–"}</div>
+                </div>
+                <div className="rounded bg-slate-900 p-3">
+                  <div className="text-xs text-slate-400">By landfall (P10–P90)</div>
+                  <div className="text-xl font-semibold">
+                    {scenario.headline.pop_cut_hospital.p50 === null
+                      ? "–"
+                      : fmtPeople(scenario.headline.pop_cut_hospital.p50)}
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    {fmtPeople(scenario.headline.pop_cut_hospital.p10)} –{" "}
+                    {fmtPeople(scenario.headline.pop_cut_hospital.p90)}
+                  </div>
+                </div>
+              </div>
 
-          <h3 className="mt-5 font-semibold">Actions before the roads close</h3>
-          <ul className="mt-2 space-y-2">
-            {scenario.actions.slice(0, 8).map((a) => (
-              <li key={a.action_id} className="rounded bg-slate-900 p-2">
-                <div>
-                  Stage an earthmover at crossing <span className="text-slate-400">{a.target_id}</span>
-                </div>
-                <div className="text-xs text-slate-300">
-                  by {istAfter(a.deadline_utc, 0)} ({a.deadline_basis}) · ~{fmtPeople(a.people_protected)}{" "}
-                  people · closure {pct(a.p_event)}
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-xs text-slate-500">
-            Parameters marked prior are uncalibrated. Surge is a screening upper bound, not a hydrodynamic
-            model; IMD surge guidance takes precedence.
-          </p>
+              <h3 className="mt-5 font-semibold">Health facilities most at risk</h3>
+              <p className="text-xs text-slate-400">
+                Chance of losing road access to referral care before landfall, with the likely window
+                (P10–P90).
+              </p>
+              <ul className="mt-2 space-y-2">
+                {facilities.slice(0, 12).map((f) => (
+                  <li key={f.facility_id} className="rounded bg-slate-900 p-2">
+                    <div className="flex justify-between gap-2">
+                      <span className="truncate">{f.name}</span>
+                      <span className="font-semibold text-orange-300">{pct(f.p_isolated_by_landfall)}</span>
+                    </div>
+                    <div className="text-xs text-slate-400">
+                      {TYPE_LABEL[f.type] ?? f.type}
+                      {f.t10 && f.t90 ? ` · ${istAfter(f.t10, 0)} → ${istAfter(f.t90, 0)}` : ""}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <h3 className="mt-5 font-semibold">Actions before the roads close</h3>
+              <ul className="mt-2 space-y-2">
+                {scenario.actions.slice(0, 8).map((a) => (
+                  <li key={a.action_id} className="rounded bg-slate-900 p-2">
+                    <div>
+                      <span className="mr-1 rounded bg-yellow-400/20 px-1 text-xs text-yellow-300">
+                        {a.rank}
+                      </span>
+                      Stage an earthmover at the {siteLabel(a)}
+                    </div>
+                    <div className="text-xs text-slate-300">
+                      by {istAfter(a.deadline_utc, 0)} ({a.deadline_basis}) · ~{fmtPeople(a.people_protected)}{" "}
+                      people · closure {pct(a.p_event)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-xs text-slate-500">
+                Parameters marked prior are uncalibrated. Surge is a screening upper bound, not a hydrodynamic
+                model; IMD surge guidance takes precedence.
+              </p>
+            </>
+          )}
         </aside>
       </div>
 

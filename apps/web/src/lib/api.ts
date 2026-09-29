@@ -1,0 +1,77 @@
+// Client for the AURORA API (Cloud Run behind Hosting at /api; NEXT_PUBLIC_API_BASE overrides in dev).
+
+const BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
+
+export type Lang = "en-IN" | "te-IN" | "hi-IN";
+export type Audience = "district_officer" | "health" | "public_works";
+
+export type AdvisoryFields = {
+  headline: string;
+  sms_text: string;
+  description: string;
+  instruction: string;
+  voice_script: string;
+};
+
+export type AdvisoryResult = {
+  status: "draft" | "rejected";
+  language: Lang;
+  audience: string;
+  district_name: string;
+  approval: { required: boolean; state: string };
+  badges: string[];
+  rendered?: Partial<Record<Lang, AdvisoryFields>>;
+  drafts?: Partial<Record<Lang, AdvisoryFields & { placeholders_used: string[] }>>;
+  facts: Array<{
+    id: string;
+    kind: string;
+    text: Record<string, string>;
+    source: { table: string; row_id: string };
+  }>;
+  checks?: {
+    numbers: string;
+    back_translation?: { similarity: number; threshold: number; threshold_status: string; flag: boolean };
+    warnings?: string[];
+  };
+  cap_xml?: string;
+  cap_problems?: string[];
+  problems?: string[];
+  cached: boolean;
+  prompt_version: string;
+};
+
+export type AskResult = {
+  status: "answer" | "table";
+  answer: string | null;
+  answer_template?: string;
+  citations?: Array<{ id: string; source: string; meaning: string }>;
+  table: Array<{ id: string; meaning: string; text: string; source: string }>;
+  problems?: string[];
+  tool_calls: number;
+  cached: boolean;
+};
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+  const r = await fetch(`${BASE}/api/v1/${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    let msg = `${r.status}`;
+    try {
+      const j = (await r.json()) as { detail?: unknown };
+      if (typeof j.detail === "string") msg = j.detail;
+    } catch {
+      /* not JSON */
+    }
+    throw new Error(msg);
+  }
+  return (await r.json()) as T;
+}
+
+export const draftAdvisory = (runId: string, lgd: string, language: Lang, audience: Audience) =>
+  post<AdvisoryResult>("advisories", { run_id: runId, district_lgd: lgd, language, audience });
+
+export const askAurora = (runId: string, question: string, language: Lang) =>
+  post<AskResult>("ask", { run_id: runId, question, language });
