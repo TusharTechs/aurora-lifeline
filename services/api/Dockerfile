@@ -4,7 +4,7 @@
 FROM python:3.12-slim
 COPY --from=ghcr.io/astral-sh/uv:0.12.5 /uv /usr/local/bin/uv
 ENV PYTHONUNBUFFERED=1 UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never \
-    AURORA_RUNS_DIR=/app/runs AURORA_SCHEMAS_DIR=/app/schemas
+    AURORA_RUNS_DIR=/app/runs AURORA_SCHEMAS_DIR=/app/schemas AURORA_CONFIG_DIR=/app/config
 WORKDIR /app
 # Workspace manifests first (dependency layer is cached until the lock changes).
 COPY pyproject.toml uv.lock ./
@@ -14,6 +14,7 @@ COPY agents/pyproject.toml agents/pyproject.toml
 COPY services/api/pyproject.toml services/api/pyproject.toml
 RUN uv sync --locked --no-dev --package aurora-api --no-install-workspace
 COPY schemas schemas
+COPY config/storms config/storms
 COPY agents agents
 COPY services/api services/api
 RUN uv sync --locked --no-dev --package aurora-api

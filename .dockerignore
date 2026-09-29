@@ -8,5 +8,6 @@
 !services/api/pyproject.toml
 !services/api/aurora_api/**
 !schemas/**
+!config/storms/**
 !runs/**
 **/__pycache__

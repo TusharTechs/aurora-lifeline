@@ -23,8 +23,9 @@ from .facts import LANGS, build_facts, schema_view
 from .gemini import MODEL_LITE, MODEL_MAIN, CallInfo, Gemini
 from .paths import SCHEMAS_DIR
 
-PROMPT_VERSION = "advisory-v1"
+PROMPT_VERSION = "advisory-v2"
 BACK_PROMPT_VERSION = "backtranslate-v1"
+SMS_MAX = 320
 SIMILARITY_FLAG_BELOW = 0.85  # PRIOR: not yet calibrated on the evaluation set
 SCHEMA_PATH = SCHEMAS_DIR / "advisory_draft.json"
 TEXT_FIELDS = ("headline", "sms_text", "description", "instruction", "voice_script")
@@ -36,7 +37,7 @@ Never write digits or numbers of any kind, in any script, and never write number
 Placeholders are replaced by code with text in the requested language, so write grammar that fits a name, a count, a percentage or a time appearing in that position.
 Do not order evacuations or use mandatory language unless allow_evacuation_language is true. Recommend preparedness actions for officials.
 Always state that the forecast is derived from the IMD bulletin named in {{provenance}}. Probabilities come from an ensemble of storm futures, not from IMD; say so when you give one.
-Keep sms_text short enough to stay within the character limit after substitution (about two hundred characters of your own words), and voice_script within ninety words.
+sms_text must stay within the character limit after substitution: use at most four facts, prefer the short forms ({{provenance_short}}, deadlines ending in _short), and keep your own words brief. Keep voice_script within ninety words.
 List every placeholder you used in placeholders_used, without braces.
 Return JSON matching the schema exactly."""
 
@@ -80,7 +81,7 @@ def prompt_facts(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-def _problems(draft: dict[str, Any], payload: dict[str, Any]) -> list[str]:
+def _problems(draft: dict[str, Any], payload: dict[str, Any], language: str = "en-IN") -> list[str]:
     problems: list[str] = []
     try:
         AdvisoryDraft.model_validate(draft)
@@ -93,6 +94,13 @@ def _problems(draft: dict[str, Any], payload: dict[str, Any]) -> list[str]:
     problems += res.problems
     if len(draft["voice_script"].split()) > 90:
         problems.append("voice_script is over ninety words")
+    if res.ok:
+        strings = {f["id"]: f["text"].get(language) or f["text"]["en-IN"] for f in payload["facts"]}
+        n = len(numbers.render(draft["sms_text"], strings))
+        if n > SMS_MAX:
+            problems.append(
+                f"sms_text is {n} characters after substitution; the limit is {SMS_MAX}: use fewer facts and the short forms"
+            )
     return problems
 
 
@@ -111,7 +119,7 @@ def draft_advisory(
         "language": language,
         "language_name": LANG_NAMES[language],
         "allow_evacuation_language": allow_evacuation,
-        "sms_max_chars": 320,
+        "sms_max_chars": SMS_MAX,
         "glossary": GLOSSARY[language],
         "facts": prompt_facts(payload),
     }
@@ -129,7 +137,7 @@ def draft_advisory(
             prompt_version=PROMPT_VERSION, schema_version="advisory_draft.v1", thinking="medium",
         )  # fmt: skip
         calls.append(info)
-        feedback = _problems(draft, payload)
+        feedback = _problems(draft, payload, language)
         if not feedback:
             return draft, calls, []
     return draft, calls, feedback
@@ -220,7 +228,7 @@ def write_advisory(
         result["badges"].append("machine-translated, not reviewed")
     rendered = {lang: render_fields(d, payload, lang) for lang, d in drafts.items()}
     for lang, r in rendered.items():
-        if len(r["sms_text"]) > 320:
+        if len(r["sms_text"]) > SMS_MAX:
             checks.setdefault("warnings", []).append(
                 f"{lang} sms_text is {len(r['sms_text'])} characters after substitution"
             )

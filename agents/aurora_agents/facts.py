@@ -5,6 +5,7 @@ source row and a pre-formatted string per locale. Gemini only ever sees the fact
 each one means.
 """
 
+import re
 from datetime import UTC, datetime, timedelta, timezone
 from typing import Any
 
@@ -74,14 +75,14 @@ NEAR = {
 ON_ROAD = {"en-IN": " on {road}", "te-IN": " ({road})", "hi-IN": " ({road})"}
 BASIS = {
     "P10 closure - 6 h": {
-        "en-IN": "6 h before the earliest likely closure (P10)",
-        "te-IN": "అత్యంత ముందస్తు మూసివేత అంచనా (P10) కంటే 6 గంటల ముందు",
-        "hi-IN": "सबसे जल्दी संभावित बंद होने (P10) से 6 घंटे पहले",
+        "en-IN": "P10 closure − 6 h",
+        "te-IN": "P10 మూసివేత − 6 గంటలు",
+        "hi-IN": "P10 बंद होना − 6 घंटे",
     },
     "IMD-track closure - 6 h": {
-        "en-IN": "6 h before closure on the IMD track",
-        "te-IN": "IMD ట్రాక్ ప్రకారం మూసివేతకు 6 గంటల ముందు",
-        "hi-IN": "IMD ट्रैक के अनुसार बंद होने से 6 घंटे पहले",
+        "en-IN": "IMD-track closure − 6 h",
+        "te-IN": "IMD ట్రాక్ మూసివేత − 6 గంటలు",
+        "hi-IN": "IMD ट्रैक बंद होना − 6 घंटे",
     },
 }
 
@@ -162,9 +163,15 @@ def site_text(site: dict[str, Any] | None, lang: str) -> str:
     return what
 
 
+def clean_name(name: str) -> str:
+    """OSM names such as 'PHC,Rachapalli' -> 'PHC Rachapalli'."""
+    name = re.sub(r"^(U?PHC|CHC|SC)\s*,\s*", r"\1 ", name.strip())
+    return re.sub(r",(?=\S)", ", ", name)
+
+
 def facility_text(f: dict[str, Any], lang: str) -> str:
     label = FACILITY_TYPES.get(f["type"], {}).get(lang, f["type"])
-    name = f["name"] or label
+    name = clean_name(f["name"]) if f["name"] else label
     sim = " (SIMULATED)" if f.get("is_simulated") else ""
     return f"{name}{sim}" if lang == "en-IN" else f"{name} – {label}{sim}"
 
@@ -186,6 +193,12 @@ def build_facts(
          "hi-IN": f"IMD राष्ट्रीय बुलेटिन सं. {no} ({fmt_time(issued, 'hi-IN', True)})"},
         "district_scenario.provenance", "imd_bulletin_no", True,
         "the official IMD bulletin this forecast is derived from",
+    ))  # fmt: skip
+    facts.append(_fact(
+        "provenance_short", "provenance", f"IMD Bulletin {no}", None,
+        {"en-IN": f"IMD Bulletin {no}", "te-IN": f"IMD బులెటిన్ {no}", "hi-IN": f"IMD बुलेटिन {no}"},
+        "district_scenario.provenance", "imd_bulletin_no", False,
+        "short form of the IMD bulletin, for sms_text",
     ))  # fmt: skip
     name = scenario["district_name"]
     facts.append(_fact(
@@ -276,6 +289,12 @@ def build_facts(
             _per_lang(lambda lang, a=a, basis=basis: f"{fmt_time(a['deadline_utc'], lang)} ({basis[lang]})"),
             "district_scenario.actions", row, k == 1,
             f"deadline for the {ORD[k]} action, with its basis",
+        ))  # fmt: skip
+        facts.append(_fact(
+            f"{aid}_deadline_short", "time", a["deadline_utc"], None,
+            _per_lang(lambda lang, a=a: fmt_time(a["deadline_utc"], lang)),
+            "district_scenario.actions", row, False,
+            f"deadline for the {ORD[k]} action without its basis, for sms_text",
         ))  # fmt: skip
         facts.append(_fact(
             f"{aid}_people", "count", a["people_protected"], "people",
