@@ -191,15 +191,19 @@ class Gemini:
         return out, info
 
     def embed(self, texts: list[str], dims: int = 768) -> list[list[float]]:
-        """gemini-embedding-2 vectors, cached like generations."""
-        key = cache_key(MODEL_EMBED, "embed-v1", str(dims), list(texts))
+        """gemini-embedding-2 vectors, one request per text (Agent Platform returns one vector per
+        request), cached like generations."""
+        return [self._embed_one(t, dims) for t in texts]
+
+    def _embed_one(self, text: str, dims: int) -> list[float]:
+        key = cache_key(MODEL_EMBED, "embed-v2", str(dims), [text])
         if (hit := self.cache.get(key)) is not None:
             return hit["output"]  # type: ignore[no-any-return]
         for attempt in range(RETRIES + 1):
             try:
                 resp = self.client.models.embed_content(
                     model=MODEL_EMBED,
-                    contents=texts,  # type: ignore[arg-type]
+                    contents=text,
                     config=types.EmbedContentConfig(output_dimensionality=dims),
                 )
                 break
@@ -207,9 +211,12 @@ class Gemini:
                 if attempt == RETRIES or not _retryable(e):
                     raise
                 time.sleep(min(2**attempt, 20) + random.random())
-        vectors = [list(e.values or []) for e in resp.embeddings or []]
-        self.cache.put(key, {"output": vectors, "model": MODEL_EMBED})
-        return vectors
+        embeddings = resp.embeddings or []
+        if len(embeddings) != 1:
+            raise ValueError(f"expected one embedding, got {len(embeddings)}")
+        vector = list(embeddings[0].values or [])
+        self.cache.put(key, {"output": vector, "model": MODEL_EMBED})
+        return vector
 
     def _call(
         self, model: str, parts: list[types.Part | str], config: types.GenerateContentConfig
