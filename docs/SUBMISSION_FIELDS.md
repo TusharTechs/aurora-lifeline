@@ -1,6 +1,6 @@
 # Submission fields (Hack2Skill, Build with AI: Code for Communities, Second Edition)
 
-Paste-ready text. Every claim below describes something in the deployed build; numbers come from the published runs (Montha IMD Bulletin 21 unless stated). Update the link marked TODO before submitting.
+Paste-ready text. Every claim below describes something in the deployed build; numbers come from the published runs (Montha IMD Bulletin 21 unless stated). All links are filled in.
 
 ## Project name
 
@@ -22,7 +22,18 @@ Track 05: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster
 - Five-minute tour for judges: https://github.com/TusharTechs/aurora-lifeline#try-it-in-five-minutes
 - Deck (web version): https://aurora-lifeline.web.app/deck/
 - Video: https://youtu.be/sAHXhMi1_Vs
-- Deck (PDF): TODO
+- Deck (PDF): uploaded in the form (printed from https://aurora-lifeline.web.app/deck/, 11 slides, 2.8 MB)
+
+## Submission form (Hack2Skill)
+
+- Challenges: Track 05, Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster
+- GitHub repository: https://github.com/TusharTechs/aurora-lifeline
+- Demo video: https://youtu.be/sAHXhMi1_Vs
+- Deck: the PDF above
+- Working prototype: https://aurora-lifeline.web.app
+- Brief description of your solution (1007 of 1,024 characters):
+
+> AURORA Lifeline turns the official IMD cyclone bulletin into what a district control room must act on before landfall: which PHCs, hospitals, shelters and villages will lose road access to care, how likely, in what time window, and where to stage machinery first. Gemini 3.7 Flash reads the bulletin PDF with a verbatim quote for every value, checked in code. The engine aligns 1,062 Google DeepMind WeatherNext and ECMWF storm futures to IMD's track, puts wind, rain and surge on 5.4 lakh road segments hour by hour, and finds when each facility loses its last road to a public hospital. Gemini drafts advisories in English, Telugu and Hindi with every number inserted by code, read aloud by Gemini TTS and exported as CAP 1.2 for the SDMA after officer approval. An ADK agent answers officers from cited facts, Gemini checks field photos after landfall, and every forecast is scored against Sentinel 1 radar via Earth Engine, misses included. Replayed on Cyclone Montha (Andhra Pradesh) and Dana (Odisha).
 
 ## Brief description (2–3 lines)
 
