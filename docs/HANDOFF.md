@@ -1,6 +1,6 @@
 # Handoff: AURORA Lifeline
 
-Last updated 29 Sep 2026. Update this file at the end of every working session.
+Last updated 29 Sep 2026 (10:30 IST). Update this file at the end of every working session.
 
 ## Status
 
@@ -133,6 +133,10 @@ Verified from the official page and its data feed on 27 Sep 2026.
 
 **By 30 Sep:**
 
+- [ ] **Deck PDF:** open https://aurora-lifeline.web.app/deck/ in Chrome, Print → Save as PDF, landscape, margins none, background graphics on.
+- [ ] **Video:** record from the click path in `docs/DEMO_AND_SUBMISSION.md` §1 (4:45).
+- [ ] **Submit:** paste from `docs/SUBMISSION_FIELDS.md`; add the video and deck links.
+
 - [ ] **12:00 IST:** supply one staged bridge or road photo for the field-report demo, with no faces or number plates. Or approve an openly licensed image that Claude proposes, with credit.
 - [ ] **14:00 IST:** a native speaker reviews 5 Telugu (and, if shipped, 5 Odia) advisories. Otherwise they are labelled "machine-translated, not reviewed".
 - [ ] **Throughout:** confirm the hand-labelled fields of at least 5 Montha IMD bulletins. Claude pre-fills drafts; a human confirms (`docs/AI_AGENTS.md` §9).
@@ -195,3 +199,4 @@ Verified from the official page and its data feed on 27 Sep 2026.
 | 29 Sep 2026, 00:00– | Build session 2 | Pushed to GitHub; CI green. b19 run rebuilt and tiled; generated web data published as the single-commit `web-data` branch (`make web-data`), which CI and the Cloud Shell deploy unpack. Fixed NaN district ids in settlement tiles. Cloud Shell bootstrap: APIs, Firestore, buckets, service accounts; Gemini 3.7 Flash, 3.8 Flash, 3.5 Flash-Lite and embedding-2 verified on Agent Platform; Earth Engine verified |
 | 29 Sep 2026, 01:00–08:00 | Build session 2 (cont.) | Hosting live (aurora-lifeline.web.app). Advisory Writer (placeholders, digit/number-word post-check in any script, one retry, Telugu/Hindi back-translation with gemini-embedding-2, CAP 1.2 Exercise/Restricted validated against the XSD). Ask AURORA on ADK (five read-only tools, facts recorded in session state, after-model number guard, table fallback). FastAPI on Cloud Run with cost guards; auto-deploy via WIF (D23). Action sites labelled from OSM places (Telugu names where mapped); CAP district outlines in `areas.json`. **Fixed a map bug**: binary MVT decoding read missing deciles as hour 0, so most roads showed about 90% at every time step; tiles now carry all nine deciles with a 999 sentinel. 103 Python and 7 web tests pass |
 | 29 Sep 2026, 08:00– | Build session 2 (cont.) | Step 1 (reframe: "runs on every IMD bulletin", Montha as the proof), step 2 (Bulletin Reader live: Gemini reads the PDF, code checks schema, basin, speed, category, quotes verbatim against the text layer and the track against the deterministic table parser; known bulletins fetched from IMD and scored against hand labels) and step 3 (season watch, D28). UI transformation (D27): brand mark and assets, design tokens, landing page with the real ensemble as a canvas hero, four questions answered from the run, scroll-driven method, live Ask/draft demo, personas, guardrails with the placeholder view, Google AI roles; Bulletin reader and About pages; control room restyled with a bulletin 19/21 switch and legend. Fixes: ADK treated {{fact_id}} as a state template (callable instruction), ADK call limit now falls back to the facts table, 12-page bulletin limit raised to 40, facility deciles (D26) |
+| 29 Sep 2026, 08:30–10:30 | Build session 2 (cont.) | Dana 2024 replay (D29), Sentinel-1 validation (D31), triggers (D32), self-hosted fonts (D33). Advisories read aloud with Cloud TTS Gemini-TTS (te-IN, hi-IN, en-IN; cached). Proof page with a generated plain-language reading. Deck as a page (/deck/, print to PDF). AI Studio prompt cards on /about/ (scripts/export_prompts.py). Control room works on phones. Fixes: surge overlay bounds, per-run tile extent, embed one text per call, Hosting 60 s limit (bulletin reads go direct to Cloud Run), deploy version label, favicon links, logo spin and alignment. Cached for judges: Montha b19/b21 bulletin readings, English/Telugu/Hindi advisories and voices for Kakinada, the three suggested Ask questions |
