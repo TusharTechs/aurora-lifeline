@@ -10,6 +10,7 @@ const LINKS: Array<[string, string]> = [
   ["/#try", "Try it"],
   ["/#trust", "Why trust it"],
   ["/bulletin/", "Bulletin reader"],
+  ["/proof/", "Proof"],
 ];
 
 export function Nav({ controlRoomHref }: { controlRoomHref: string }) {

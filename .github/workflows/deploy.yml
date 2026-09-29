@@ -53,7 +53,7 @@ jobs:
           gcloud run deploy aurora-api --image "$IMAGE:$GITHUB_SHA" --region "$REGION" \
             --service-account "aurora-api@$PROJECT_ID.iam.gserviceaccount.com" \
             --allow-unauthenticated --memory 1Gi --cpu 1 --concurrency 20 \
-            --min-instances 0 --max-instances 3 --timeout 120 \
+            --min-instances 0 --max-instances 3 --timeout 300 \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=global,GOOGLE_GENAI_USE_ENTERPRISE=true,GCS_BUCKET_DATA=$PROJECT_ID-data,AURORA_VERSION=${GITHUB_SHA::7}" \
             --quiet
 
@@ -88,5 +88,6 @@ jobs:
       - run: pnpm --dir apps/web build
         env:
           NEXT_PUBLIC_BUILD_SHA: ${{ github.event.workflow_run.head_sha }}
+          NEXT_PUBLIC_API_DIRECT: https://aurora-api-503386868260.asia-south1.run.app
       - name: deploy Hosting
         run: pnpm exec firebase deploy --only hosting --project "$PROJECT_ID" --non-interactive

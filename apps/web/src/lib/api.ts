@@ -1,6 +1,8 @@
 // Client for the AURORA API (Cloud Run behind Hosting at /api; NEXT_PUBLIC_API_BASE overrides in dev).
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
+// Bulletin reading calls Cloud Run directly: a long PDF can outlast Hosting's 60 s proxy limit.
+const DIRECT = process.env.NEXT_PUBLIC_API_DIRECT ?? BASE;
 
 export type Lang = "en-IN" | "te-IN" | "hi-IN";
 export type Audience = "district_officer" | "health" | "public_works";
@@ -51,8 +53,8 @@ export type AskResult = {
   cached: boolean;
 };
 
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const r = await fetch(`${BASE}/api/v1/${path}`, {
+async function post<T>(path: string, body: unknown, base = BASE): Promise<T> {
+  const r = await fetch(`${base}/api/v1/${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -93,12 +95,12 @@ export type BulletinResult = {
 };
 
 export const readKnownBulletin = (stormId: string, bulletinNo: string) =>
-  post<BulletinResult>("bulletins/read-known", { storm_id: stormId, bulletin_no: bulletinNo });
+  post<BulletinResult>("bulletins/read-known", { storm_id: stormId, bulletin_no: bulletinNo }, DIRECT);
 
 export async function readUploadedBulletin(file: File): Promise<BulletinResult> {
   const form = new FormData();
   form.append("file", file);
-  const r = await fetch(`${BASE}/api/v1/bulletins/read`, { method: "POST", body: form });
+  const r = await fetch(`${DIRECT}/api/v1/bulletins/read`, { method: "POST", body: form });
   if (!r.ok) {
     let msg = `${r.status}`;
     try {
@@ -137,4 +139,8 @@ export async function getSeason(): Promise<Season | null> {
 }
 
 export const readLatestBulletin = () =>
-  post<BulletinResult & { live?: { based_on_ist: string; source_url: string } }>("bulletins/read-latest", {});
+  post<BulletinResult & { live?: { based_on_ist: string; source_url: string } }>(
+    "bulletins/read-latest",
+    {},
+    DIRECT,
+  );

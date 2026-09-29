@@ -54,10 +54,15 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
-# The site calls the API same-origin through Hosting; only the local dev server needs CORS.
+# The site calls the API same-origin through Hosting, except bulletin reading, which calls Cloud
+# Run directly because a long PDF can take longer than Hosting's 60 s proxy limit.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "https://aurora-lifeline.web.app",
+        "https://aurora-lifeline.firebaseapp.com",
+        "http://localhost:3000",
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )

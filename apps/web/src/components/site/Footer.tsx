@@ -27,6 +27,7 @@ export function Footer({ controlRoomHref }: { controlRoomHref: string }) {
           links={[
             [controlRoomHref, "Control room (Kakinada)"],
             ["/bulletin/", "Bulletin reader"],
+            ["/proof/", "Proof: scores and misses"],
             ["/#how", "How it works"],
             ["/#trust", "Why trust it"],
           ]}

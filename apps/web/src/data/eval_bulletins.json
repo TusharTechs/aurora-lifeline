@@ -1,0 +1,227 @@
+{
+ "generated_at_utc": "2026-09-29T03:16:51+00:00",
+ "method": "POST /api/v1/bulletins/read-known and read-latest on the deployed API (Gemini on Agent Platform); labels are hand-entered drafts pending human confirmation",
+ "bulletins": [
+  {
+   "label": "Montha \u00b7 National Bulletin No. 19",
+   "bulletin_no": "19",
+   "issued_at_utc": "2025-10-25T16:00:00Z",
+   "pages": 16,
+   "model": "gemini-3.7-flash",
+   "prompt_version": "bulletin-v2",
+   "needs_review": false,
+   "checks": [
+    {
+     "id": "schema",
+     "label": "Matches the reading schema",
+     "status": "pass",
+     "detail": "all required fields present"
+    },
+    {
+     "id": "basin",
+     "label": "Positions inside the North Indian Ocean",
+     "status": "pass",
+     "detail": "11 positions"
+    },
+    {
+     "id": "leads",
+     "label": "Lead times increase",
+     "status": "pass",
+     "detail": "0, 6, 12, 18, 24, 36, 48, 60, 72, 84"
+    },
+    {
+     "id": "speed",
+     "label": "Fix-to-fix speed at most 60 km/h",
+     "status": "pass",
+     "detail": "fastest 16 km/h"
+    },
+    {
+     "id": "category",
+     "label": "Winds consistent with the stated category",
+     "status": "pass",
+     "detail": "all rows consistent"
+    },
+    {
+     "id": "quote_coverage",
+     "label": "Every numeric element has a quote",
+     "status": "pass",
+     "detail": "33/33 covered"
+    },
+    {
+     "id": "quote_verbatim",
+     "label": "Quotes found verbatim in the PDF",
+     "status": "pass",
+     "detail": "78/78 found in the text layer"
+    },
+    {
+     "id": "table",
+     "label": "Track and winds match an independent table parser",
+     "status": "pass",
+     "detail": "10/10 table rows matched"
+    },
+    {
+     "id": "ensemble",
+     "label": "+24 h position within 150 km of the ensemble median",
+     "status": "na",
+     "detail": "checked when a storm run uses this reading"
+    }
+   ],
+   "labels": {
+    "agree": 48,
+    "total": 49,
+    "differs": [
+     "rainfall categories and coverage"
+    ],
+    "labels_status": "hand-entered from the PDF text layer on 2026-09-28; pending human confirmation"
+   },
+   "forecast_points": 10,
+   "rainfall_warnings": 27,
+   "quotes": 78
+  },
+  {
+   "label": "Montha \u00b7 National Bulletin No. 21",
+   "bulletin_no": "21",
+   "issued_at_utc": "2025-10-26T04:15:00Z",
+   "pages": 17,
+   "model": "gemini-3.7-flash",
+   "prompt_version": "bulletin-v2",
+   "needs_review": true,
+   "checks": [
+    {
+     "id": "schema",
+     "label": "Matches the reading schema",
+     "status": "pass",
+     "detail": "all required fields present"
+    },
+    {
+     "id": "basin",
+     "label": "Positions inside the North Indian Ocean",
+     "status": "pass",
+     "detail": "11 positions"
+    },
+    {
+     "id": "leads",
+     "label": "Lead times increase",
+     "status": "pass",
+     "detail": "0, 6, 12, 18, 24, 36, 48, 60, 72, 84"
+    },
+    {
+     "id": "speed",
+     "label": "Fix-to-fix speed at most 60 km/h",
+     "status": "pass",
+     "detail": "fastest 16 km/h"
+    },
+    {
+     "id": "category",
+     "label": "Winds consistent with the stated category",
+     "status": "pass",
+     "detail": "all rows consistent"
+    },
+    {
+     "id": "quote_coverage",
+     "label": "Every numeric element has a quote",
+     "status": "pass",
+     "detail": "35/35 covered"
+    },
+    {
+     "id": "quote_verbatim",
+     "label": "Quotes found verbatim in the PDF",
+     "status": "fail",
+     "detail": "76/79 found in the text layer"
+    },
+    {
+     "id": "table",
+     "label": "Track and winds match an independent table parser",
+     "status": "pass",
+     "detail": "10/10 table rows matched"
+    },
+    {
+     "id": "ensemble",
+     "label": "+24 h position within 150 km of the ensemble median",
+     "status": "na",
+     "detail": "checked when a storm run uses this reading"
+    }
+   ],
+   "labels": {
+    "agree": 48,
+    "total": 49,
+    "differs": [
+     "rainfall categories and coverage"
+    ],
+    "labels_status": "hand-entered (table via the deterministic parser, warnings by hand) from the PDF text layer on 2026-09-28; pending human confirmation"
+   },
+   "forecast_points": 10,
+   "rainfall_warnings": 25,
+   "quotes": 79
+  },
+  {
+   "label": "Live \u00b7 IMD National Bulletin No. 4 (2026, BOB/07/2026)",
+   "bulletin_no": "4",
+   "issued_at_utc": "2026-09-28T15:15:00Z",
+   "pages": 8,
+   "model": "gemini-3.7-flash",
+   "prompt_version": "bulletin-v2",
+   "needs_review": false,
+   "checks": [
+    {
+     "id": "schema",
+     "label": "Matches the reading schema",
+     "status": "pass",
+     "detail": "all required fields present"
+    },
+    {
+     "id": "basin",
+     "label": "Positions inside the North Indian Ocean",
+     "status": "pass",
+     "detail": "7 positions"
+    },
+    {
+     "id": "leads",
+     "label": "Lead times increase",
+     "status": "pass",
+     "detail": "0, 6, 12, 18, 24, 36"
+    },
+    {
+     "id": "speed",
+     "label": "Fix-to-fix speed at most 60 km/h",
+     "status": "pass",
+     "detail": "fastest 22 km/h"
+    },
+    {
+     "id": "category",
+     "label": "Winds consistent with the stated category",
+     "status": "pass",
+     "detail": "all rows consistent"
+    },
+    {
+     "id": "quote_coverage",
+     "label": "Every numeric element has a quote",
+     "status": "pass",
+     "detail": "13/13 covered"
+    },
+    {
+     "id": "quote_verbatim",
+     "label": "Quotes found verbatim in the PDF",
+     "status": "pass",
+     "detail": "41/41 found in the text layer"
+    },
+    {
+     "id": "table",
+     "label": "Track and winds match an independent table parser",
+     "status": "na",
+     "detail": "no national-bulletin table found"
+    },
+    {
+     "id": "ensemble",
+     "label": "+24 h position within 150 km of the ensemble median",
+     "status": "na",
+     "detail": "checked when a storm run uses this reading"
+    }
+   ],
+   "labels": null,
+   "forecast_points": 6,
+   "rainfall_warnings": 4,
+   "quotes": 41
+  }
+ ]
+}
