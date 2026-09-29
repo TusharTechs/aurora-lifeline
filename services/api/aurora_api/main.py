@@ -180,7 +180,7 @@ def draft_advisory(req: AdvisoryRequest, request: Request) -> dict[str, Any]:
         )  # fmt: skip
     except Exception as e:
         log.exception("advisory failed")
-        raise HTTPException(502, MODEL_DOWN) from e
+        raise HTTPException(502, f"{MODEL_DOWN} ({type(e).__name__}: {str(e)[:160]})") from e
     if out["status"] == "draft":
         g.cache.put(key, {"output": out})
     return {**out, "cached": False}
@@ -208,7 +208,7 @@ async def ask_aurora(req: AskRequest, request: Request) -> dict[str, Any]:
         out = await ask(RunData(req.run_id, run["scenarios"]), req.question, req.language)
     except Exception as e:
         log.exception("ask failed")
-        raise HTTPException(502, MODEL_DOWN) from e
+        raise HTTPException(502, f"{MODEL_DOWN} ({type(e).__name__}: {str(e)[:160]})") from e
     if out["status"] == "answer":
         g.cache.put(key, {"output": out})
     return {**out, "cached": False}
@@ -256,7 +256,7 @@ def _read_pdf(pdf: bytes, request: Request) -> dict[str, Any]:
         raise HTTPException(422, str(e)) from e
     except Exception as e:
         log.exception("bulletin read failed")
-        raise HTTPException(502, MODEL_DOWN) from e
+        raise HTTPException(502, f"{MODEL_DOWN} ({type(e).__name__}: {str(e)[:160]})") from e
     known = next((b for b in KNOWN if b["sha256"] == sha), None)
     out["known"] = known and {
         k: known[k] for k in ("storm_id", "bulletin_no", "run_id", "source_url")

@@ -37,7 +37,7 @@ from .paths import SCHEMAS_DIR
 
 PROMPT_VERSION = "bulletin-v1"
 MAX_PDF_BYTES = 5 * 1024 * 1024
-MAX_PAGES = 12
+MAX_PAGES = 40  # IMD national bulletins carry long district-wise warning tables
 KMPH_PER_KT = 1.852
 
 SYSTEM = """You extract structured data from official India Meteorological Department (IMD) / RSMC New Delhi tropical cyclone bulletins.
