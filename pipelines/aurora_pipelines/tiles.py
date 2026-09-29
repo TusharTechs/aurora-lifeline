@@ -70,11 +70,16 @@ def decile_hours(
     return dec, p
 
 
+# Hour written for a decile the ensemble never reaches. Every feature carries all nine deciles:
+# deck.gl decodes vector tiles in binary mode, where a missing numeric property reads as 0, which
+# would show "closed at hour 0" for every decile a feature lacks.
+NEVER_H = 999
+
+
 def props_with_deciles(base: dict[str, object], dec: NDArray[np.float64]) -> dict[str, object]:
     out = dict(base)
     for i, v in enumerate(dec, start=1):
-        if np.isfinite(v):
-            out[f"d{i}"] = round(float(v))
+        out[f"d{i}"] = round(float(v)) if np.isfinite(v) else NEVER_H
     return out
 
 
@@ -169,6 +174,8 @@ def main() -> int:
     path = tmp / "edges.geojsonl"
     with path.open("w") as fh:
         for i, (rc, ct) in enumerate(zip(edges["road_class"], edges["crossing_type"], strict=True)):
+            if p[i] <= 0:
+                continue  # never closes in any member: nothing to draw over the basemap
             base: dict[str, object] = {"id": i, "rc": rc, "ct": ct, "p": round(float(p[i]), 3)}
             major = rc in MAJOR or ct != "none" or p[i] > 0.05
             feat = {
@@ -200,6 +207,8 @@ def main() -> int:
     path = tmp / "settlements.geojsonl"
     with path.open("w") as fh:
         for i, (sid, pop) in enumerate(zip(st["settlement_id"], st["population"], strict=True)):
+            if sp[i] <= 0 and not no_route[i]:
+                continue  # never cut off in any member
             ring = [[lng, lat] for lat, lng in h3.cell_to_boundary(sid)]
             ring.append(ring[0])
             base = {

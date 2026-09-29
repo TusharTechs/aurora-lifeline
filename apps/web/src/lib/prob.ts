@@ -7,6 +7,12 @@ export type DecileProps = Partial<
 const KEYS = ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9"] as const;
 
 /**
+ * Hour written for a decile the ensemble never reaches. Tiles carry all nine deciles because
+ * deck.gl's binary tile decoding reads a missing numeric property as 0 ("closed at hour 0").
+ */
+export const NEVER_H = 999;
+
+/**
  * P(event by hour t) from deciles d1..d9 (hours since "now"; missing = not reached in that share
  * of members). The weighted share reaches k/10 at dk, so P(t) is the largest k/10 with dk <= t.
  * Resolution is 10 percentage points, which is honest for what the deciles carry.
@@ -15,7 +21,7 @@ export function probAt(props: DecileProps, t: number): number {
   let p = 0;
   KEYS.forEach((k, i) => {
     const v = props[k];
-    if (v !== undefined && v !== null && v <= t) p = (i + 1) / 10;
+    if (v !== undefined && v !== null && v < NEVER_H && v <= t) p = (i + 1) / 10;
   });
   return p;
 }

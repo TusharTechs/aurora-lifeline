@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isoDecilesToHours, probAt, probAtHours, rampRed } from "./prob";
+import { isoDecilesToHours, NEVER_H, probAt, probAtHours, rampRed } from "./prob";
 
 describe("probAt", () => {
   it("is the largest decile share reached by t", () => {
@@ -18,6 +18,22 @@ describe("probAt", () => {
       prev = p;
     }
     expect(prev).toBeCloseTo(0.9);
+  });
+  it("treats the never-reached sentinel as never, even at the end of the horizon", () => {
+    const d = {
+      d1: 21,
+      d2: 30,
+      d3: NEVER_H,
+      d4: NEVER_H,
+      d5: NEVER_H,
+      d6: NEVER_H,
+      d7: NEVER_H,
+      d8: NEVER_H,
+      d9: NEVER_H,
+    };
+    expect(probAt(d, 0)).toBe(0);
+    expect(probAt(d, 25)).toBeCloseTo(0.1);
+    expect(probAt(d, 5000)).toBeCloseTo(0.2);
   });
 });
 
