@@ -32,6 +32,47 @@ function hoursAfter(nowUtc: string, iso: string | null): number | null {
   return iso === null ? null : (Date.parse(iso) - Date.parse(nowUtc)) / 3_600_000;
 }
 
+export type StormSummary = {
+  storm: (typeof STORMS)[number];
+  bulletinNo: string;
+  members: number;
+  demo: { lgd: string; name: string; p50: number | null; p10: number | null; p90: number | null } | null;
+  districts: Array<{ lgd: string; name: string; p50: number | null }>;
+};
+
+/** Every published storm, for the replay list (the hero and story use the first). */
+export function stormSummaries(): StormSummary[] {
+  const out: StormSummary[] = [];
+  for (const storm of STORMS) {
+    const dir = path.join(RUNS, storm.defaultRun, "districts");
+    if (!fs.existsSync(dir)) continue;
+    const ds = fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => readJson<DistrictScenario>(storm.defaultRun, "districts", f)!);
+    if (!ds.length) continue;
+    const demo = ds.find((d) => d.district_lgd === storm.demoDistrict) ?? ds[0]!;
+    out.push({
+      storm,
+      bulletinNo: demo.provenance.imd_bulletin_no,
+      members: Object.entries(demo.provenance.members)
+        .filter(([k]) => k !== "IMD")
+        .reduce((a, [, v]) => a + v, 0),
+      demo: {
+        lgd: demo.district_lgd,
+        name: demo.district_name,
+        p50: demo.headline.pop_cut_hospital.p50,
+        p10: demo.headline.pop_cut_hospital.p10,
+        p90: demo.headline.pop_cut_hospital.p90,
+      },
+      districts: ds
+        .map((d) => ({ lgd: d.district_lgd, name: d.district_name, p50: d.headline.pop_cut_hospital.p50 }))
+        .sort((a, b) => (b.p50 ?? 0) - (a.p50 ?? 0)),
+    });
+  }
+  return out;
+}
+
 export function landingData(): LandingData | null {
   const storm = STORMS[0]!;
   const run = storm.defaultRun;

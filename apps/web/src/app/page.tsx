@@ -11,7 +11,7 @@ import { Nav } from "@/components/site/Nav";
 import { SeasonWatch } from "@/components/site/SeasonWatch";
 import counts from "@/data/build_counts.json";
 import { cleanName, ist, pct, people, siteLabel } from "@/lib/format";
-import { landingData } from "@/lib/landingData";
+import { landingData, stormSummaries } from "@/lib/landingData";
 
 const TYPE: Record<string, string> = {
   district_hospital: "District hospital",
@@ -217,22 +217,42 @@ export default function Home() {
         <GoogleAI />
 
         <section aria-labelledby="districts-title" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <h2 id="districts-title" className="font-display text-2xl font-semibold">
-            Every district in the Montha replay
+          <p className="eyebrow">Two storms, two states</p>
+          <h2 id="districts-title" className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+            Every district in the replays
           </h2>
-          <ul className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {d.districts.map((x) => (
-              <li key={x.lgd}>
-                <Link
-                  href={`/storm/${storm.stormId}/district/${x.lgd}/`}
-                  className="card card-hover flex items-baseline justify-between gap-3 px-5 py-4"
-                >
-                  <span className="font-medium">{x.name}</span>
-                  <span className="text-sm text-muted">{people(x.p50)} cut off at landfall</span>
-                </Link>
-              </li>
+          <p className="mt-3 max-w-3xl text-muted">
+            The same engine, configured per state: Montha in Andhra Pradesh and Dana in Odisha, each replayed
+            from the IMD bulletin named below with only the forecasts published by then.
+          </p>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            {stormSummaries().map((ss) => (
+              <article key={ss.storm.stormId} className="card p-6">
+                <h3 className="font-display text-xl font-semibold">{ss.storm.name}</h3>
+                <p className="mt-1 text-sm text-muted">
+                  IMD National Bulletin No. {ss.bulletinNo} · {ss.members.toLocaleString("en-IN")} storm
+                  futures · {ss.storm.observedLandfall.text}
+                </p>
+                <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+                  {ss.districts.map((x) => (
+                    <li key={x.lgd}>
+                      <Link
+                        href={`/storm/${ss.storm.stormId}/district/${x.lgd}/`}
+                        className="card card-hover flex items-baseline justify-between gap-3 px-4 py-3"
+                      >
+                        <span className="font-medium">{x.name}</span>
+                        <span className="text-sm text-muted">{people(x.p50)} cut off</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </article>
             ))}
-          </ul>
+          </div>
+          <p className="mt-4 text-xs text-subtle">
+            Median people cut off from every public hospital by landfall. Dana&apos;s first bulletin carried
+            no storm-surge guidance, so its run models rain flooding only.
+          </p>
         </section>
       </main>
       <Footer controlRoomHref={href} />

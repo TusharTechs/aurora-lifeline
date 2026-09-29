@@ -1,0 +1,580 @@
+{
+  "bulletin_no": "1",
+  "issued_at_utc": "2024-10-22T04:00:00Z",
+  "issued_at_text": "TIME OF ISSUE: 0930 HOURS IST DATED: 22.10.2024",
+  "system_name": null,
+  "system_stage": "D",
+  "current": {
+    "lat": 15.4,
+    "lon": 91.2,
+    "msw_min": 35,
+    "msw_max": 45,
+    "gust_value": 55,
+    "wind_unit": "kmph",
+    "pressure_hpa": null,
+    "movement_text": "moved west-northwestwards"
+  },
+  "forecast": [
+    {
+      "lead_h": 0,
+      "valid_at_utc": "2024-10-22T00:00:00Z",
+      "valid_at_text": "22.10.24/0530",
+      "lat": 15.4,
+      "lon": 91.2,
+      "msw_min": 35,
+      "msw_max": 45,
+      "gust_value": 55,
+      "wind_unit": "kmph",
+      "category": "Depression"
+    },
+    {
+      "lead_h": 6,
+      "valid_at_utc": "2024-10-22T06:00:00Z",
+      "valid_at_text": "22.10.24/1130",
+      "lat": 15.6,
+      "lon": 90.7,
+      "msw_min": 40,
+      "msw_max": 50,
+      "gust_value": 60,
+      "wind_unit": "kmph",
+      "category": "Depression"
+    },
+    {
+      "lead_h": 12,
+      "valid_at_utc": "2024-10-22T12:00:00Z",
+      "valid_at_text": "22.10.24/1730",
+      "lat": 15.8,
+      "lon": 90.2,
+      "msw_min": 45,
+      "msw_max": 55,
+      "gust_value": 65,
+      "wind_unit": "kmph",
+      "category": "Depression"
+    },
+    {
+      "lead_h": 18,
+      "valid_at_utc": "2024-10-22T18:00:00Z",
+      "valid_at_text": "22.10.24/2330",
+      "lat": 16.1,
+      "lon": 89.7,
+      "msw_min": 50,
+      "msw_max": 60,
+      "gust_value": 70,
+      "wind_unit": "kmph",
+      "category": "Deep Depression"
+    },
+    {
+      "lead_h": 24,
+      "valid_at_utc": "2024-10-23T00:00:00Z",
+      "valid_at_text": "23.10.24/0530",
+      "lat": 16.5,
+      "lon": 89.2,
+      "msw_min": 55,
+      "msw_max": 65,
+      "gust_value": 75,
+      "wind_unit": "kmph",
+      "category": "Deep Depression"
+    },
+    {
+      "lead_h": 36,
+      "valid_at_utc": "2024-10-23T12:00:00Z",
+      "valid_at_text": "23.10.24/1730",
+      "lat": 17.4,
+      "lon": 88.4,
+      "msw_min": 65,
+      "msw_max": 75,
+      "gust_value": 85,
+      "wind_unit": "kmph",
+      "category": "Cyclonic Storm"
+    },
+    {
+      "lead_h": 48,
+      "valid_at_utc": "2024-10-24T00:00:00Z",
+      "valid_at_text": "24.10.24/0530",
+      "lat": 18.7,
+      "lon": 87.8,
+      "msw_min": 80,
+      "msw_max": 90,
+      "gust_value": 100,
+      "wind_unit": "kmph",
+      "category": "Cyclonic Storm"
+    },
+    {
+      "lead_h": 60,
+      "valid_at_utc": "2024-10-24T12:00:00Z",
+      "valid_at_text": "24.10.24/1730",
+      "lat": 20.0,
+      "lon": 87.5,
+      "msw_min": 95,
+      "msw_max": 105,
+      "gust_value": 115,
+      "wind_unit": "kmph",
+      "category": "Severe Cyclonic Storm"
+    },
+    {
+      "lead_h": 72,
+      "valid_at_utc": "2024-10-25T00:00:00Z",
+      "valid_at_text": "25.10.24/0530",
+      "lat": 21.0,
+      "lon": 86.8,
+      "msw_min": 100,
+      "msw_max": 110,
+      "gust_value": 120,
+      "wind_unit": "kmph",
+      "category": "Severe Cyclonic Storm"
+    },
+    {
+      "lead_h": 84,
+      "valid_at_utc": "2024-10-25T12:00:00Z",
+      "valid_at_text": "25.10.24/1730",
+      "lat": 21.5,
+      "lon": 85.8,
+      "msw_min": 70,
+      "msw_max": 80,
+      "gust_value": 90,
+      "wind_unit": "kmph",
+      "category": "Cyclonic Storm"
+    }
+  ],
+  "landfall": {
+    "window_text": "during 1800 UTC of 24th and 0000 UTC OF 25th October, 2024",
+    "start_utc": "2024-10-24T18:00:00Z",
+    "end_utc": "2024-10-25T00:00:00Z",
+    "location_text": "cross north Odisha and West Bengal coasts between Puri and Sagar Island",
+    "lat": null,
+    "lon": null
+  },
+  "surge": [],
+  "rainfall_warnings": [
+    {
+      "area_text": "Andaman Islands",
+      "date_text": "21st October",
+      "category": "heavy_to_very_heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "Andaman Islands",
+      "date_text": "21st October",
+      "category": "other",
+      "coverage": "most"
+    },
+    {
+      "area_text": "Balasore, Bhadrak, Kendrapara, Jagatsingpur, , Puri, Khorda, Ganjam, Gajapati, districts of Odisha",
+      "date_text": "23rd Oct.",
+      "category": "heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "Balasore, Bhadrak, Kendrapara, Jagatsingpur, , Puri, Khorda, Ganjam, Gajapati, districts of Odisha",
+      "date_text": "23rd Oct.",
+      "category": "other",
+      "coverage": "most"
+    },
+    {
+      "area_text": "Baleswar, Mayurbhanj, Bhadrak, Kendrapara, Jagatsingpur Kendujhar, Jajpur, Cuttack and Dhenkanal and Puri districts of Odisha",
+      "date_text": "24th & 25th October",
+      "category": "heavy_to_very_heavy",
+      "coverage": "a_few"
+    },
+    {
+      "area_text": "Baleswar, Mayurbhanj, Bhadrak, Kendrapara, Jagatsingpur Kendujhar, Jajpur, Cuttack and Dhenkanal and Puri districts of Odisha",
+      "date_text": "24th & 25th October",
+      "category": "extremely_heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "South & North 24 Parganas, East & West Medinipur, Jhargram, Howrah, Hooghly, Kolkata and Bankura districts of Gangetic West Bengal",
+      "date_text": "23rd October",
+      "category": "heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "South & North 24 Parganas, East & West Medinipur, Jhargram, Howrah, Hooghly, Kolkata and Bankura districts of Gangetic West Bengal",
+      "date_text": "23rd October",
+      "category": "other",
+      "coverage": "most"
+    },
+    {
+      "area_text": "South & North 24 Parganas, East & West Medinipur, Jhargram, Howrah, Hooghly, Kolkata and Bankura districts of Gangetic West Bengal",
+      "date_text": "24th & 25th October",
+      "category": "heavy_to_very_heavy",
+      "coverage": "a_few"
+    },
+    {
+      "area_text": "South & North 24 Parganas, East & West Medinipur, Jhargram, Howrah, Hooghly, Kolkata and Bankura districts of Gangetic West Bengal",
+      "date_text": "24th & 25th October",
+      "category": "extremely_heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "Srikakulam, Vizianagaram and Vishakhapatnam districts of North coastal Andhra Pradesh",
+      "date_text": "24th and 25th October",
+      "category": "heavy",
+      "coverage": "isolated"
+    },
+    {
+      "area_text": "Srikakulam, Vizianagaram and Vishakhapatnam districts of North coastal Andhra Pradesh",
+      "date_text": "24th and 25th October",
+      "category": "other",
+      "coverage": "many"
+    }
+  ],
+  "wind_warnings": [
+    {
+      "area_text": "Eastcentral Bay of Bengal",
+      "date_text": "22nd October",
+      "speed_min": 40,
+      "speed_max": 50,
+      "gust": 60,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Eastcentral Bay of Bengal",
+      "date_text": "22nd night",
+      "speed_min": 55,
+      "speed_max": 65,
+      "gust": 75,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Eastcentral Bay of Bengal",
+      "date_text": "from 23rd evening till 24th morning",
+      "speed_min": 70,
+      "speed_max": 90,
+      "gust": 100,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Adjoining areas of Westcentral Bay of Bengal",
+      "date_text": "commence from 22nd evening",
+      "speed_min": 40,
+      "speed_max": 50,
+      "gust": 60,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Adjoining areas of Westcentral Bay of Bengal",
+      "date_text": "from 23rd morning to 24th afternoon",
+      "speed_min": 70,
+      "speed_max": 90,
+      "gust": 65,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Northwest Bay of Bengal",
+      "date_text": "commence from 23rd morning",
+      "speed_min": 40,
+      "speed_max": 50,
+      "gust": 60,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Northwest Bay of Bengal",
+      "date_text": "from 23rd night to 24th morning",
+      "speed_min": 70,
+      "speed_max": 90,
+      "gust": 100,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Northwest Bay of Bengal",
+      "date_text": "from 24th Oct evening to 25th Oct morning",
+      "speed_min": 100,
+      "speed_max": 110,
+      "gust": 120,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Adjoining areas of northeast Bay of Bengal",
+      "date_text": "from 23rd night till 25th morning",
+      "speed_min": 40,
+      "speed_max": 50,
+      "gust": 60,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Along & off Odisha-west Bengal coasts",
+      "date_text": "from 23rd Oct evening",
+      "speed_min": 40,
+      "speed_max": 50,
+      "gust": 60,
+      "unit": "kmph"
+    },
+    {
+      "area_text": "Along & off Odisha-west Bengal coasts",
+      "date_text": "from 24th Oct evening till 25th Oct morning",
+      "speed_min": 100,
+      "speed_max": 110,
+      "gust": 120,
+      "unit": "kmph"
+    }
+  ],
+  "source_quotes": [
+    {
+      "path": "current.lat",
+      "quote": "latitude 15.4° N"
+    },
+    {
+      "path": "current.lon",
+      "quote": "longitude 91.2°E"
+    },
+    {
+      "path": "current.msw_min",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "current.msw_max",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "current.gust_value",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "forecast[0].lat",
+      "quote": "15.4/91.2"
+    },
+    {
+      "path": "forecast[0].lon",
+      "quote": "15.4/91.2"
+    },
+    {
+      "path": "forecast[0].msw_min",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "forecast[0].msw_max",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "forecast[0].gust_value",
+      "quote": "35-45 gusting to 55"
+    },
+    {
+      "path": "forecast[1].lat",
+      "quote": "15.6/90.7"
+    },
+    {
+      "path": "forecast[1].lon",
+      "quote": "15.6/90.7"
+    },
+    {
+      "path": "forecast[1].msw_min",
+      "quote": "40-50 gusting to 60"
+    },
+    {
+      "path": "forecast[1].msw_max",
+      "quote": "40-50 gusting to 60"
+    },
+    {
+      "path": "forecast[1].gust_value",
+      "quote": "40-50 gusting to 60"
+    },
+    {
+      "path": "forecast[2].lat",
+      "quote": "15.8/90.2"
+    },
+    {
+      "path": "forecast[2].lon",
+      "quote": "15.8/90.2"
+    },
+    {
+      "path": "forecast[2].msw_min",
+      "quote": "45-55 gusting to 65"
+    },
+    {
+      "path": "forecast[2].msw_max",
+      "quote": "45-55 gusting to 65"
+    },
+    {
+      "path": "forecast[2].gust_value",
+      "quote": "45-55 gusting to 65"
+    },
+    {
+      "path": "forecast[3].lat",
+      "quote": "16.1/89.7"
+    },
+    {
+      "path": "forecast[3].lon",
+      "quote": "16.1/89.7"
+    },
+    {
+      "path": "forecast[3].msw_min",
+      "quote": "50-60 gusting to 70"
+    },
+    {
+      "path": "forecast[3].msw_max",
+      "quote": "50-60 gusting to 70"
+    },
+    {
+      "path": "forecast[3].gust_value",
+      "quote": "50-60 gusting to 70"
+    },
+    {
+      "path": "forecast[4].lat",
+      "quote": "16.5/89.2"
+    },
+    {
+      "path": "forecast[4].lon",
+      "quote": "16.5/89.2"
+    },
+    {
+      "path": "forecast[4].msw_min",
+      "quote": "55-65 gusting to 75"
+    },
+    {
+      "path": "forecast[4].msw_max",
+      "quote": "55-65 gusting to 75"
+    },
+    {
+      "path": "forecast[4].gust_value",
+      "quote": "55-65 gusting to 75"
+    },
+    {
+      "path": "forecast[5].lat",
+      "quote": "17.4/88.4"
+    },
+    {
+      "path": "forecast[5].lon",
+      "quote": "17.4/88.4"
+    },
+    {
+      "path": "forecast[5].msw_min",
+      "quote": "65-75 gusting to 85"
+    },
+    {
+      "path": "forecast[5].msw_max",
+      "quote": "65-75 gusting to 85"
+    },
+    {
+      "path": "forecast[5].gust_value",
+      "quote": "65-75 gusting to 85"
+    },
+    {
+      "path": "forecast[6].lat",
+      "quote": "18.7/87.8"
+    },
+    {
+      "path": "forecast[6].lon",
+      "quote": "18.7/87.8"
+    },
+    {
+      "path": "forecast[6].msw_min",
+      "quote": "80-90 gusting to 100"
+    },
+    {
+      "path": "forecast[6].msw_max",
+      "quote": "80-90 gusting to 100"
+    },
+    {
+      "path": "forecast[6].gust_value",
+      "quote": "80-90 gusting to 100"
+    },
+    {
+      "path": "forecast[7].lat",
+      "quote": "20.0/87.5"
+    },
+    {
+      "path": "forecast[7].lon",
+      "quote": "20.0/87.5"
+    },
+    {
+      "path": "forecast[7].msw_min",
+      "quote": "95-105 gusting to 115"
+    },
+    {
+      "path": "forecast[7].msw_max",
+      "quote": "95-105 gusting to 115"
+    },
+    {
+      "path": "forecast[7].gust_value",
+      "quote": "95-105 gusting to 115"
+    },
+    {
+      "path": "forecast[8].lat",
+      "quote": "21.0/86.8"
+    },
+    {
+      "path": "forecast[8].lon",
+      "quote": "21.0/86.8"
+    },
+    {
+      "path": "forecast[8].msw_min",
+      "quote": "100-110 gusting to 120"
+    },
+    {
+      "path": "forecast[8].msw_max",
+      "quote": "100-110 gusting to 120"
+    },
+    {
+      "path": "forecast[8].gust_value",
+      "quote": "100-110 gusting to 120"
+    },
+    {
+      "path": "forecast[9].lat",
+      "quote": "21.5/85.8"
+    },
+    {
+      "path": "forecast[9].lon",
+      "quote": "21.5/85.8"
+    },
+    {
+      "path": "forecast[9].msw_min",
+      "quote": "70-80 gusting 90"
+    },
+    {
+      "path": "forecast[9].msw_max",
+      "quote": "70-80 gusting 90"
+    },
+    {
+      "path": "forecast[9].gust_value",
+      "quote": "70-80 gusting 90"
+    },
+    {
+      "path": "wind_warnings[0]",
+      "quote": "Squally wind speed reaching 40-50 gusting to 60 kmph is very likely on 22nd October"
+    },
+    {
+      "path": "wind_warnings[1]",
+      "quote": "55-65 gusting to 75 kmph by 22nd night"
+    },
+    {
+      "path": "wind_warnings[2]",
+      "quote": "70-90 kmph gusting to 100 kmph from 23rd evening till 24th morning"
+    },
+    {
+      "path": "wind_warnings[3]",
+      "quote": "Squally wind speed reaching 40-50 gusting to 60 kmph is very likely to commence from 22nd evening"
+    },
+    {
+      "path": "wind_warnings[4]",
+      "quote": "70-90 gusting to 65 kmph from 23rd morning to 24th afternoon"
+    },
+    {
+      "path": "wind_warnings[5]",
+      "quote": "Squally wind speed reaching 40-50 gusting to 60 kmph is very likely to commence from 23rd morning"
+    },
+    {
+      "path": "wind_warnings[6]",
+      "quote": "reaching 70-90 gusting to 100 kmph from 23rd night to 24th morning"
+    },
+    {
+      "path": "wind_warnings[7]",
+      "quote": "100-110 kmph gusting to 120 kmph from 24th Oct evening to 25th Oct morning"
+    },
+    {
+      "path": "wind_warnings[8]",
+      "quote": "Squally wind speed reaching 40-50 gusting to 60 kmph is very likely to commence from 23rd night till 25th morning"
+    },
+    {
+      "path": "wind_warnings[9]",
+      "quote": "Squally wind speed reaching 40-50 gusting to 60 kmph is very likely to commence from 23rd Oct evening"
+    },
+    {
+      "path": "wind_warnings[10]",
+      "quote": "gale wind speed reaching 100-110 kmph gusting to 120 kmph from 24th Oct evening till 25th Oct morning"
+    }
+  ],
+  "uncertain_fields": ["current.pressure_hpa", "landfall.lat", "landfall.lon"],
+  "source_note": "Gemini Bulletin Reader (gemini-3.7-flash, bulletin-v2) on 29 Sep 2026 from IMD's PDF (sha256 297deb6e3a0f32d7...); checks failed: table: 9/9 table rows matched; differ: forecast[9] time not in table; pending officer confirmation"
+}

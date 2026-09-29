@@ -37,6 +37,26 @@ export const STORMS: StormInfo[] = [
       lon: 81.7,
     },
   },
+  {
+    stormId: "dana_2024",
+    name: "Severe Cyclonic Storm Dana (Oct 2024)",
+    status: "replay",
+    defaultRun: "dana_2024_b01",
+    runs: [
+      {
+        runId: "dana_2024_b01",
+        bulletinNo: "1",
+        label: "IMD National Bulletin 1 · 65 h before landfall · 97 futures",
+      },
+    ],
+    demoDistrict: "9588868",
+    observedLandfall: {
+      text: "Crossed the north Odisha coast near Habalikhati (Bhitarkanika) and Dhamara, 01:30 to 03:30 IST 25 Oct 2024 (IMD)",
+      utc: "2024-10-24T21:00:00Z",
+      lat: 20.8,
+      lon: 86.95,
+    },
+  },
 ];
 
 export function storm(stormId: string): StormInfo | undefined {
