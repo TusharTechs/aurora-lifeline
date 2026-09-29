@@ -1,6 +1,6 @@
 # Submission fields (Hack2Skill, Build with AI: Code for Communities, Second Edition)
 
-Paste-ready text. Every claim below describes something in the deployed build; numbers come from the published runs (Montha IMD Bulletin 21 unless stated). Update the two links marked TODO before submitting.
+Paste-ready text. Every claim below describes something in the deployed build; numbers come from the published runs (Montha IMD Bulletin 21 unless stated). Update the link marked TODO before submitting.
 
 ## Project name
 
@@ -21,7 +21,7 @@ Track 05: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster
 - Architecture (diagrams): https://github.com/TusharTechs/aurora-lifeline#architecture
 - Five-minute tour for judges: https://github.com/TusharTechs/aurora-lifeline#try-it-in-five-minutes
 - Deck (web version): https://aurora-lifeline.web.app/deck/
-- Video: TODO (unlisted YouTube link)
+- Video: https://youtu.be/sAHXhMi1_Vs
 - Deck (PDF): TODO
 
 ## Brief description (2–3 lines)

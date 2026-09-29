@@ -15,6 +15,7 @@ IMD tells you the storm. AURORA Lifeline tells you which PHC is cut off, how lik
 [![Deploy](https://github.com/TusharTechs/aurora-lifeline/actions/workflows/deploy.yml/badge.svg)](https://github.com/TusharTechs/aurora-lifeline/actions/workflows/deploy.yml)
 [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-3ee6c4)](LICENSE)
 [![Live app](https://img.shields.io/badge/live-aurora--lifeline.web.app-5cc8ff)](https://aurora-lifeline.web.app)
+[![Demo video](https://img.shields.io/badge/demo-video-ff4d4d)](https://youtu.be/sAHXhMi1_Vs)
 
 _Track 05: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster · Build with AI: Code for Communities, Second Edition_
 
@@ -22,6 +23,7 @@ _Track 05: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster 
 
 | For judges: you want to…           | Go to                                                                                                                                                                                                                                               |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Watch it in five minutes**       | [Demo video](https://youtu.be/sAHXhMi1_Vs): the problem, then every feature end to end, narrated                                                                                                                                                    |
 | **Try it now, nothing to install** | [Live app](https://aurora-lifeline.web.app): no sign-in · [Kakinada control room](https://aurora-lifeline.web.app/storm/montha_2025/district/13999862/): Cyclone Montha replay                                                                      |
 | **Follow a guided tour**           | [Try it in five minutes](#try-it-in-five-minutes): eight clicks, every answer cached                                                                                                                                                                |
 | **See a second state**             | [Dana, Kendrapara, Odisha](https://aurora-lifeline.web.app/storm/dana_2024/district/9588868/): same pipeline, configuration only                                                                                                                    |
