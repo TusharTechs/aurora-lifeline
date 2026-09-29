@@ -54,20 +54,19 @@ export function AuroraMark({ size = 32, mono = false, title, className, animated
           </radialGradient>
         </defs>
       )}
-      <g
-        transform="matrix(-1 0 0 1 48 0)"
-        strokeLinecap="round"
-        strokeWidth="4.2"
-        className={animated ? "aurora-arms aurora-spin" : "aurora-arms"}
-      >
-        {MARK_ROTATIONS.map((rot, i) => (
-          <path
-            key={rot}
-            d={MARK_ARM}
-            stroke={mono ? "currentColor" : `url(#${id}-a${i})`}
-            transform={`rotate(${rot} 24 24)`}
-          />
-        ))}
+      {/* Outer group turns (about the core); the inner group mirrors the arms. Kept separate so the
+          rotation origin does not shift the mirror. */}
+      <g className={animated ? "aurora-arms aurora-spin" : "aurora-arms"}>
+        <g transform="matrix(-1 0 0 1 48 0)" strokeLinecap="round" strokeWidth="4.2">
+          {MARK_ROTATIONS.map((rot, i) => (
+            <path
+              key={rot}
+              d={MARK_ARM}
+              stroke={mono ? "currentColor" : `url(#${id}-a${i})`}
+              transform={`rotate(${rot} 24 24)`}
+            />
+          ))}
+        </g>
       </g>
       <circle
         className="aurora-core"
