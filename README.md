@@ -249,11 +249,13 @@ Details: [`docs/eval-results.md`](docs/eval-results.md).
 
 ## Screenshots
 
-| Landing page                                                                                                                          | Advisory in Telugu, with checks                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="docs/assets/landing.jpg" alt="Landing page with the storm-futures hero" width="100%">                                       | <img src="docs/assets/advisory.jpg" alt="Telugu advisory draft with the number check passed and pending officer approval" width="100%"> |
-| **Bulletin Reader: checked in code**                                                                                                  | **Proof: scored against Sentinel-1**                                                                                                    |
-| <img src="docs/assets/bulletin.jpg" alt="Bulletin Reader showing the forecast track and the list of checks, one failed" width="100%"> | <img src="docs/assets/proof.jpg" alt="Proof page with Sentinel-1 scores and misses" width="100%">                                       |
+| Landing page                                                                                                                                 | Advisory in Telugu, with checks                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="docs/assets/landing.jpg" alt="Landing page with the storm-futures hero" width="100%">                                              | <img src="docs/assets/advisory.jpg" alt="Telugu advisory draft with the number check passed and pending officer approval" width="100%"> |
+| **Bulletin Reader: checked in code**                                                                                                         | **Proof: scored against Sentinel-1**                                                                                                    |
+| <img src="docs/assets/bulletin.jpg" alt="Bulletin Reader showing the forecast track and the list of checks, one failed" width="100%">        | <img src="docs/assets/proof.jpg" alt="Proof page with Sentinel-1 scores and misses" width="100%">                                       |
+| **Field report: Gemini assesses, rules route it**                                                                                            | **Second state: Dana, Kendrapara, Odisha**                                                                                              |
+| <img src="docs/assets/field.jpg" alt="Field tab: the demo photo assessed by Gemini and sent to the officer queue with reasons" width="100%"> | <img src="docs/assets/dana.jpg" alt="Kendrapara control room for Cyclone Dana with CHCs and PHCs at risk" width="100%">                 |
 
 ## Real versus simulated
 
