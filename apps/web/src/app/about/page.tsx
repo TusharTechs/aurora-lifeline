@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/site/Footer";
 import { Nav } from "@/components/site/Nav";
+import { PromptCards } from "@/components/PromptCards";
 import counts from "@/data/build_counts.json";
 import { STORMS } from "@/lib/storms";
 
@@ -116,6 +117,16 @@ export default function About() {
           National and international boundaries from OpenStreetMap are never rendered; district outlines are
           used only for aggregation and CAP areas.
         </p>
+
+        <h2 id="prompts" className="mt-14 scroll-mt-20 font-display text-2xl font-semibold">
+          Try the prompts in Google AI Studio
+        </h2>
+        <p className="mt-4 text-muted">
+          These are the agents&apos; real system instructions. Copy one into AI Studio&apos;s system
+          instructions and try it on public data, such as any IMD bulletin. The product itself calls Gemini on
+          Agent Platform, with the checks described above.
+        </p>
+        <PromptCards />
 
         <h2 className="mt-14 font-display text-2xl font-semibold">Google AI and tools used to build it</h2>
         <p className="mt-4 text-muted">
