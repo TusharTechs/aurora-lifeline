@@ -20,6 +20,7 @@ function validation(runId: string) {
   return JSON.parse(fs.readFileSync(f, "utf8")) as {
     total: { edges_observed: number; edges_observed_flooded: number } & Record<string, Scores | number>;
     sentinel1: { orbits?: Array<{ hours_after_t: number }> };
+    districts: Array<{ district_name: string; edges_observed_flooded: number; aurora: Scores }>;
   };
 }
 
@@ -178,8 +179,9 @@ export default function Deck() {
           ))}
         </ol>
         <p className="mt-6 text-lg text-muted">
-          Replays of Montha (Andhra Pradesh) and Dana (Odisha) use only forecasts published before landfall. A
-          season watch reads IMD&apos;s archive to show whether IMD is tracking a system today.
+          After landfall, field photos are checked by Gemini and routed by fixed rules to the map or an
+          officer. Replays of Montha (Andhra Pradesh) and Dana (Odisha) use only forecasts published before
+          landfall; a season watch reads IMD&apos;s archive to show whether IMD is tracking a system today.
         </p>
       </Slide>
 
@@ -218,7 +220,7 @@ export default function Deck() {
         </div>
         <p className="mt-6 text-lg text-muted">
           Plus: a map that plays the storm forward, a Bulletin 19 / 21 switch, indicative anticipatory-action
-          triggers, a Telugu advisory read aloud, and Ask AURORA.
+          triggers, a Telugu advisory read aloud, Ask AURORA, and a field-photo check after landfall.
         </p>
       </Slide>
 
@@ -227,7 +229,7 @@ export default function Deck() {
         eyebrow="AI approach"
         title="Gemini reads, writes and answers. The engine counts. An officer approves."
       >
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 gap-4">
           {[
             [
               "Reads",
@@ -241,14 +243,18 @@ export default function Deck() {
               "Answers",
               "Ask AURORA on ADK: five read-only tools; an after-model callback blocks any figure a tool did not return; the facts table if it fails.",
             ],
+            [
+              "Checks",
+              "Field Verifier: metadata stripped, Gemini assesses the photo, fixed rules route it; bridge reopenings always go to an officer.",
+            ],
           ].map(([a, b]) => (
-            <div key={a} className="card p-5">
-              <p className="font-display text-2xl font-semibold text-teal">{a}</p>
-              <p className="mt-2 text-muted">{b}</p>
+            <div key={a} className="card p-4">
+              <p className="font-display text-xl font-semibold text-teal">{a}</p>
+              <p className="mt-1 text-muted">{b}</p>
             </div>
           ))}
         </div>
-        <p className="mt-6 rounded-2xl border border-border bg-surface-2 p-4 font-mono text-sm text-violet">
+        <p className="mt-4 rounded-2xl border border-border bg-surface-2 p-3 font-mono text-sm text-violet">
           {
             "{{fac1_name}} has a {{fac1_p}} chance of losing road access to referral care; stage an earthmover at the {{act1_site}} by {{act1_deadline}}."
           }
@@ -261,15 +267,15 @@ export default function Deck() {
             ["Gemini 3.7 Flash", "Reads bulletins; drafts advisories; checks field photos"],
             ["Agent Development Kit", "Ask AURORA agent with a number guard"],
             ["Gemini 3.5 Flash-Lite · embedding-2", "Back-translation and similarity checks"],
-            ["Cloud TTS Gemini-TTS", "Advisories read aloud in Telugu and Hindi"],
+            ["Cloud TTS Gemini-TTS", "Advisories read aloud in Telugu, Hindi and English"],
             [
               "Google DeepMind WeatherNext",
               `${((s.provenance.members.WNX ?? 0) + (s.provenance.members.WNX_LARGE ?? 0)).toLocaleString("en-IN")} of Montha's storm futures`,
             ],
             ["Earth Engine", "Sentinel-1 flood mapping for validation"],
             ["Maps Platform", "Vector basemap under deck.gl"],
-            ["Cloud Run · Firebase Hosting", "API and site"],
-            ["Secret Manager · Workload Identity", "Keyless deploys from GitHub"],
+            ["Cloud Run · Firebase Hosting", "API; static site and tiles on the CDN"],
+            ["Cloud Storage · Firestore · WIF", "Gemini cache, daily cap, keyless deploys"],
           ].map(([a, b]) => (
             <div key={a} className="card p-4">
               <p className="font-display text-lg font-semibold">{a}</p>
@@ -304,7 +310,14 @@ export default function Deck() {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-3 text-sm text-warning">
+                <p className="mt-3 text-sm text-muted">
+                  By district:{" "}
+                  {v.districts
+                    .filter((x) => x.edges_observed_flooded > 0)
+                    .map((x) => `${x.district_name} ${x.aurora.hits} of ${x.edges_observed_flooded}`)
+                    .join(" · ")}
+                </p>
+                <p className="mt-2 text-sm text-warning">
                   A weak test: water had largely drained; the false-alarm rate is high.
                 </p>
               </>
@@ -380,7 +393,13 @@ export default function Deck() {
             Montha&apos;s 1,063 futures ran through 5.4 lakh road segments in 83 seconds on one 7-core
             machine; the site is static and cached.
           </li>
-          <li>Runs within a US$150 Google Cloud budget; Gemini outputs are cached per input.</li>
+          <li>
+            Static tiles on a CDN; the API on Cloud Run scales to zero, with per-IP limits, a daily model-call
+            cap and cached Gemini outputs, within a US$150 budget. Keyless CI/CD; 115 Python and 7 web tests.
+          </li>
+          <li>
+            Every input except the IMD bulletin is global open data; CAP 1.2 is an international standard.
+          </li>
         </ul>
       </Slide>
 
