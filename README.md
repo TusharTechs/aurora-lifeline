@@ -305,7 +305,9 @@ Method references: Holland (1980) for the wind profile; Barnes et al. (2014) pri
 
 Open-source components include numpy, pandas, geopandas, shapely, rasterio, pyosmium, h3, numba, scipy, pydantic, pillow, FastAPI, google-genai, google-adk, earthengine-api, Next.js, React, deck.gl, vis.gl react-google-maps, Tailwind CSS, Fontsource (SIL OFL fonts) and tippecanoe (build-time only). Licences are listed in each package; no GPL or AGPL code is imported or shipped.
 
-The code was written with the help of AI coding assistants, as declared in the hackathon submission.
+## AI tools disclosure
+
+We used **Gemini 3.6 Flash** for research and conceptualization of the idea, and **Claude Opus 5.5** for coding and development. Every dataset, method and result was checked by running the pipelines and the deployed service, and the design decisions and their reasons are recorded in [`docs/HANDOFF.md`](docs/HANDOFF.md). These tools helped build the project; the AI that runs inside the product is described in [Google AI in the product](#google-ai-in-the-product).
 
 ## Licence
 

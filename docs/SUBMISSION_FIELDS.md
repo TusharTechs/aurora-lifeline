@@ -99,7 +99,7 @@ Python 3.12 (numpy, pandas, geopandas, shapely, rasterio, pyosmium, h3, numba, s
 
 ## AI tools declaration
 
-The code was written with the help of AI coding assistants. All data, methods and results were checked by running the pipelines and the deployed service; the design decisions and their reasons are recorded in `docs/HANDOFF.md`.
+We used Gemini 3.6 Flash for research and conceptualization of the idea, and Claude Opus 5.5 for coding and development. All data, methods and results were checked by running the pipelines and the deployed service; the design decisions and their reasons are recorded in `docs/HANDOFF.md`.
 
 ## Not an official warning service
 
