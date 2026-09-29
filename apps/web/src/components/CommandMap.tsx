@@ -299,7 +299,7 @@ export function CommandMap({
   return (
     <div className="flex h-screen flex-col bg-bg text-fg">
       <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border px-4 py-2.5 text-sm">
-        <Link href="/" aria-label="AURORA Lifeline home" className="shrink-0">
+        <Link href="/" aria-label="AURORA Lifeline home" className="flex shrink-0 items-center">
           <Logo size={26} />
         </Link>
         <span className="hidden text-muted md:inline">{storm.name}</span>

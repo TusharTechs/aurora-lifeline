@@ -29,7 +29,7 @@ export function Nav({ controlRoomHref }: { controlRoomHref: string }) {
       }`}
     >
       <nav aria-label="Main" className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="AURORA Lifeline home" className="shrink-0">
+        <Link href="/" aria-label="AURORA Lifeline home" className="flex shrink-0 items-center">
           <Logo />
         </Link>
         <ul className="ml-6 hidden items-center gap-1 lg:flex">
