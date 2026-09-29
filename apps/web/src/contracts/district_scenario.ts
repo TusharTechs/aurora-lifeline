@@ -136,7 +136,7 @@ export interface Facility {
     string | null,
     string | null,
     string | null,
-    string | null,
+    string | null
   ];
   referral_p_isolated: number | null;
   power: {
