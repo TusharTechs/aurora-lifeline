@@ -40,7 +40,6 @@ export const metadata: Metadata = {
     siteName: "AURORA Lifeline",
     type: "website",
   },
-  icons: { apple: "/brand/aurora-app-icon.svg" },
 };
 
 export const viewport: Viewport = { themeColor: "#05080f", colorScheme: "dark" };

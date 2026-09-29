@@ -130,7 +130,7 @@ export default function Home() {
 
   const trust: TrustExample = {
     template:
-      "Derived from {{provenance}}: {{fac1_name}} may lose road access to referral care ({{fac1_p}} chance, {{fac1_window}}). Pre-position an earthmover at the {{act1_site}} by {{act1_deadline}}.",
+      "Derived from {{provenance}}: {{fac1_name}} has a {{fac1_p}} chance of losing road access to referral care; if it does, most likely from {{fac1_window}}. Pre-position an earthmover at the {{act1_site}} by {{act1_deadline}}.",
     rendered: "",
     facts: [
       ["provenance", `IMD National Bulletin No. ${prov.imd_bulletin_no}`, "district_scenario.provenance"],
@@ -213,7 +213,7 @@ export default function Home() {
           landfallH={d.hero.landfallH}
         />
         <Personas personas={personas} />
-        <Trust example={trust} />
+        <Trust example={trust} runId={storm.defaultRun} lgd={s.district_lgd} />
         <GoogleAI />
 
         <section aria-labelledby="districts-title" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">

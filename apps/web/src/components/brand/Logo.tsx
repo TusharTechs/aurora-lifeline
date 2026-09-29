@@ -58,7 +58,7 @@ export function AuroraMark({ size = 32, mono = false, title, className, animated
         transform="matrix(-1 0 0 1 48 0)"
         strokeLinecap="round"
         strokeWidth="4.2"
-        className={animated ? "aurora-spin" : undefined}
+        className={animated ? "aurora-arms aurora-spin" : "aurora-arms"}
       >
         {MARK_ROTATIONS.map((rot, i) => (
           <path
@@ -69,7 +69,13 @@ export function AuroraMark({ size = 32, mono = false, title, className, animated
           />
         ))}
       </g>
-      <circle cx="24" cy="24" r="4.4" fill={mono ? "currentColor" : `url(#${id}-c)`} />
+      <circle
+        className="aurora-core"
+        cx="24"
+        cy="24"
+        r="4.4"
+        fill={mono ? "currentColor" : `url(#${id}-c)`}
+      />
     </svg>
   );
 }
@@ -85,7 +91,7 @@ export function Wordmark({ className = "" }: { className?: string }) {
 
 export function Logo({ size = 30, className = "" }: { size?: number; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
+    <span className={`aurora-logo inline-flex items-center gap-2.5 ${className}`}>
       <AuroraMark size={size} />
       <Wordmark className="text-[1.05rem]" />
     </span>

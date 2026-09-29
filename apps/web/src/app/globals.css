@@ -283,11 +283,25 @@ body {
   transform: none;
 }
 
-/* The loader: the mark turns slowly (counter-clockwise, like a Northern Hemisphere cyclone). */
+/* The mark turns counter-clockwise about its core, as a Northern Hemisphere cyclone does:
+   slowly while loading, and one turn when the logo is hovered or focused. */
+.aurora-arms {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+}
 .aurora-spin {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: spin-ccw 2.6s linear infinite;
+}
+.aurora-logo:hover .aurora-arms,
+a:focus-visible .aurora-arms {
+  animation: spin-ccw 1.3s cubic-bezier(0.3, 0.75, 0.25, 1) 1;
+}
+.aurora-core {
+  transition: filter 0.5s var(--ease-out-soft);
+}
+.aurora-logo:hover .aurora-core,
+a:focus-visible .aurora-core {
+  filter: drop-shadow(0 0 3px var(--color-dawn));
 }
 @keyframes spin-ccw {
   to {

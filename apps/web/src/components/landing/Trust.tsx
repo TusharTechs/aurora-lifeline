@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { draftAdvisory } from "@/lib/api";
 
 export type TrustExample = { template: string; rendered: string; facts: Array<[string, string, string]> };
 
@@ -24,10 +25,39 @@ const PRINCIPLES: Array<[string, string]> = [
 ];
 
 /** Why an official can rely on it: the guardrails, with the placeholder mechanism made visible. */
-export function Trust({ example }: { example: TrustExample }) {
+export function Trust({ example, runId, lgd }: { example: TrustExample; runId: string; lgd: string }) {
   const [view, setView] = useState<"model" | "officer">("model");
-  const parts = example.template.split(/(\{\{[a-z0-9_]+\}\})/g);
-  const factText = Object.fromEntries(example.facts.map(([id, text]) => [id, text]));
+  // Prefer the real, cached Gemini draft for this district; fall back to the labelled illustration.
+  const [live, setLive] = useState<{ ex: TrustExample; model: string; version: string } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    draftAdvisory(runId, lgd, "en-IN", "district_officer")
+      .then((r) => {
+        const d = r.drafts?.["en-IN"];
+        if (!alive || r.status !== "draft" || !d) return;
+        const template = d.description;
+        const used = new Set([...template.matchAll(/\{\{([a-z0-9_]+)\}\}/g)].map((m) => m[1]));
+        const facts = r.facts
+          .filter((f) => used.has(f.id))
+          .map(
+            (f) =>
+              [f.id, f.text["en-IN"] ?? "", `${f.source.table} · ${f.source.row_id}`] as [
+                string,
+                string,
+                string,
+              ],
+          );
+        const model = (r as unknown as { calls?: Array<{ model: string }> }).calls?.[0]?.model ?? "Gemini";
+        setLive({ ex: { template, rendered: "", facts }, model, version: r.prompt_version });
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [runId, lgd]);
+  const ex = live?.ex ?? example;
+  const parts = ex.template.split(/(\{\{[a-z0-9_]+\}\})/g);
+  const factText = Object.fromEntries(ex.facts.map(([id, text]) => [id, text]));
   return (
     <section
       id="trust"
@@ -44,11 +74,13 @@ export function Trust({ example }: { example: TrustExample }) {
       <div className="mt-12 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
         <div className="card p-6 sm:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-display text-lg font-semibold">One sentence, two views</h3>
+            <h3 className="font-display text-lg font-semibold">
+              {live ? "A real Gemini draft, two views" : "One sentence, two views"}
+            </h3>
             <div className="flex rounded-full border border-border p-1" role="group" aria-label="View">
               {(
                 [
-                  ["model", "What Gemini wrote"],
+                  ["model", live ? "What Gemini wrote" : "Placeholders"],
                   ["officer", "What the officer sees"],
                 ] as const
               ).map(([k, label]) => (
@@ -95,7 +127,7 @@ export function Trust({ example }: { example: TrustExample }) {
               </tr>
             </thead>
             <tbody>
-              {example.facts.map(([id, text, src]) => (
+              {ex.facts.map(([id, text, src]) => (
                 <tr key={id} className="border-t border-border align-top">
                   <td className="py-2 pr-3 font-mono text-violet">{id}</td>
                   <td className="py-2 pr-3">{text}</td>
@@ -105,8 +137,9 @@ export function Trust({ example }: { example: TrustExample }) {
             </tbody>
           </table>
           <p className="mt-4 text-xs text-subtle">
-            Illustration assembled from this run&apos;s facts. Live drafts, with the same check, are in the
-            control room.
+            {live
+              ? `The description field of the Kakinada advisory, drafted by ${live.model} (${live.version}) and cached for the replay. Only the engine's facts can fill the placeholders.`
+              : "Illustration assembled from this run's facts; the live draft appears here when the API responds."}
           </p>
         </div>
         <ul className="grid gap-3">
