@@ -142,11 +142,31 @@ class Facility(BaseModel):
         dict[str, PIsolatedBySourceAdditionalProperty] | None,
         Field(description="Per-source probability (D15)"),
     ] = None
-    t10: AwareDatetime | None
-    t50: AwareDatetime | None
-    t90: AwareDatetime | None
+    t10: Annotated[
+        AwareDatetime | None,
+        Field(
+            description="Conditional window: the 10th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
+        ),
+    ]
+    t50: Annotated[
+        AwareDatetime | None,
+        Field(
+            description="Conditional window: the 50th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
+        ),
+    ]
+    t90: Annotated[
+        AwareDatetime | None,
+        Field(
+            description="Conditional window: the 90th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
+        ),
+    ]
     iso_deciles: Annotated[
-        list[AwareDatetime | None], Field(max_length=9, min_length=9)
+        list[AwareDatetime | None],
+        Field(
+            description="Unconditional: decile k is the first time by which k/10 of the weighted storm futures cut this facility off (null if never). P(t) = largest k/10 with decile_k <= t.",
+            max_length=9,
+            min_length=9,
+        ),
     ]
     referral_p_isolated: Annotated[float | None, Field(ge=0.0, le=1.0)]
     power: Power

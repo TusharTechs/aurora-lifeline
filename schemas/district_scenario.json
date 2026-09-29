@@ -347,15 +347,18 @@
         },
         "t10": {
           "type": ["string", "null"],
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Conditional window: the 10th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
         },
         "t50": {
           "type": ["string", "null"],
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Conditional window: the 50th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
         },
         "t90": {
           "type": ["string", "null"],
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Conditional window: the 90th percentile of the time the facility is cut off, over the futures in which it is cut off at all."
         },
         "iso_deciles": {
           "type": "array",
@@ -364,7 +367,8 @@
           "items": {
             "type": ["string", "null"],
             "format": "date-time"
-          }
+          },
+          "description": "Unconditional: decile k is the first time by which k/10 of the weighted storm futures cut this facility off (null if never). P(t) = largest k/10 with decile_k <= t."
         },
         "referral_p_isolated": {
           "type": ["number", "null"],

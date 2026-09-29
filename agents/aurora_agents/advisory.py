@@ -23,7 +23,7 @@ from .facts import LANGS, build_facts, schema_view
 from .gemini import MODEL_LITE, MODEL_MAIN, CallInfo, Gemini
 from .paths import SCHEMAS_DIR
 
-PROMPT_VERSION = "advisory-v2"
+PROMPT_VERSION = "advisory-v3"
 BACK_PROMPT_VERSION = "backtranslate-v1"
 SMS_MAX = 320
 SIMILARITY_FLAG_BELOW = 0.85  # PRIOR: not yet calibrated on the evaluation set

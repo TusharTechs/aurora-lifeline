@@ -274,7 +274,7 @@ def build_facts(
                 f"{fid}_window", "time_window", [f["t10"], f["t90"]], None,
                 _per_lang(lambda lang, f=f: RANGE[lang].format(a=fmt_time(f["t10"], lang), b=fmt_time(f["t90"], lang))),
                 "district_scenario.facilities", row, k == 1,
-                f"likely time window (tenth to ninetieth percentile) in which the {ORD[k]} facility loses road access",
+                f"if the {ORD[k]} facility is cut off, the likely time window (tenth to ninetieth percentile, among the storm futures where it is)",
             ))  # fmt: skip
     for k, a in enumerate(scenario["actions"][:n_actions], start=1):
         aid, row = f"act{k}", a["action_id"]

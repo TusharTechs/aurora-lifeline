@@ -60,24 +60,37 @@ def iso(now: pd.Timestamp, h: float) -> str | None:
 
 
 def isolation_stats(b: np.ndarray, w: np.ndarray, landfall_h: float) -> dict[str, Any]:
-    """Probability of isolation by landfall and time quantiles for one node across members."""
+    """Isolation of one node across members: P(by landfall), deciles over time, and a window.
+
+    * ``dec`` (published as ``iso_deciles``): unconditional. Decile k is the first hour by which
+      the weighted share of all routed members in which the node is cut off reaches k/10; None if
+      it never does. The client reads P(t) as the largest k/10 with dk <= t (as for the tiles).
+    * ``win`` (published as t10/t50/t90): conditional on the node being cut off at some point in
+      the horizon: "if it is cut off, most likely between t10 and t90". Blank when fewer than 10%
+      of members cut it off (too few to describe).
+    """
     routed = ~np.isneginf(b)
     if not routed.any() or w[routed].sum() == 0:
-        return {"p": None, "dec": [None] * 9, "no_route": True, "never": False}
+        return {"p": None, "dec": [None] * 9, "win": [None] * 3, "no_route": True, "never": False}
     wr = w[routed] / w[routed].sum()
     br = b[routed]
     p = float((wr * (br <= landfall_h)).sum())
     finite = np.isfinite(br)
-    dec = (
-        weighted_quantiles(br[finite], wr[finite], DECILES) if finite.any() else np.full(9, np.nan)
-    )
-    # Deciles are over members where the node is isolated at some point; blank when that share
-    # is under 10% (the decile would describe too few members to mean anything).
-    if wr[finite].sum() < 0.1:
-        dec = np.full(9, np.nan)
+    dec: list[float | None] = [None] * 9
+    win: list[float | None] = [None] * 3
+    if finite.any():
+        order = np.argsort(br[finite], kind="stable")
+        hours, cw = br[finite][order], np.cumsum(wr[finite][order])
+        for k, q in enumerate(DECILES):
+            i = int(np.searchsorted(cw, q - 1e-12, side="left"))
+            dec[k] = float(hours[i]) if i < len(hours) else None
+        if wr[finite].sum() >= 0.1:
+            qs = weighted_quantiles(br[finite], wr[finite], np.array([0.1, 0.5, 0.9]))
+            win = [float(x) for x in qs]
     return {
         "p": p,
-        "dec": [float(x) if np.isfinite(x) else None for x in dec],
+        "dec": dec,
+        "win": win,
         "no_route": False,
         "never": bool(wr[~finite].sum() >= 0.9),
     }
@@ -229,7 +242,7 @@ def main() -> int:
                 badges.append("referral isolation")
             if stt["no_route"]:
                 badges.append("no mapped route (possible OSM gap)")
-            dec = stt["dec"]
+            dec, win = stt["dec"], stt["win"]
             rows.append(
                 {
                     "facility_id": fr.facility_id,
@@ -240,9 +253,9 @@ def main() -> int:
                     "is_simulated": bool(fr.is_simulated),
                     "p_isolated_by_landfall": None if mode == "deterministic" else stt["p"],
                     "p_isolated_by_source": by_src,
-                    "t10": iso(now, dec[0]) if dec[0] is not None else None,
-                    "t50": iso(now, dec[4]) if dec[4] is not None else None,
-                    "t90": iso(now, dec[8]) if dec[8] is not None else None,
+                    "t10": iso(now, win[0]) if win[0] is not None else None,
+                    "t50": iso(now, win[1]) if win[1] is not None else None,
+                    "t90": iso(now, win[2]) if win[2] is not None else None,
                     "iso_deciles": [iso(now, x) if x is not None else None for x in dec],
                     "referral_p_isolated": stt["p"] if use_ref and mode == "ensemble" else None,
                     "power": {"p": None, "class": None},

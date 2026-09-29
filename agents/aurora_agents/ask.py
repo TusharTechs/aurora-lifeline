@@ -37,7 +37,7 @@ from .facts import (
 )
 from .gemini import MAX_OUTPUT_TOKENS, MODEL_MAIN
 
-PROMPT_VERSION = "ask-v2"
+PROMPT_VERSION = "ask-v3"
 MAX_ROWS = 50
 FALLBACK = "__AURORA_FALLBACK__"
 
@@ -208,7 +208,7 @@ def make_tools(run: RunData) -> list[Callable[..., dict[str, Any]]]:
                         )
                     ),
                     f"district_scenario:{lgd}.facilities:{f['facility_id']}",
-                    "likely time window of losing road access",
+                    "if it is cut off, the likely time window (among futures where it is)",
                 )
             out.append(item)
         return {

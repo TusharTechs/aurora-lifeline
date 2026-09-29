@@ -109,10 +109,21 @@ export interface Facility {
   p_isolated_by_source?: {
     [k: string]: number;
   };
+  /**
+   * Conditional window: the 10th percentile of the time the facility is cut off, over the futures in which it is cut off at all.
+   */
   t10: string | null;
+  /**
+   * Conditional window: the 50th percentile of the time the facility is cut off, over the futures in which it is cut off at all.
+   */
   t50: string | null;
+  /**
+   * Conditional window: the 90th percentile of the time the facility is cut off, over the futures in which it is cut off at all.
+   */
   t90: string | null;
   /**
+   * Unconditional: decile k is the first time by which k/10 of the weighted storm futures cut this facility off (null if never). P(t) = largest k/10 with decile_k <= t.
+   *
    * @minItems 9
    * @maxItems 9
    */
@@ -125,7 +136,7 @@ export interface Facility {
     string | null,
     string | null,
     string | null,
-    string | null
+    string | null,
   ];
   referral_p_isolated: number | null;
   power: {
