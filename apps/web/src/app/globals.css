@@ -336,3 +336,35 @@ a:focus-visible .aurora-core {
   opacity: 1;
   transform: none;
 }
+
+/* The deck prints one slide per 16:9 page (Chrome: landscape, no margins, background graphics). */
+@media print {
+  @page {
+    size: 1280px 720px;
+    margin: 0;
+  }
+  html,
+  body {
+    background: var(--color-bg) !important;
+  }
+  .skip-link,
+  .deck-hint {
+    display: none !important;
+  }
+  .deck {
+    padding: 0 !important;
+  }
+  .deck > * + * {
+    margin-top: 0 !important;
+  }
+  .deck-slide {
+    width: 1280px !important;
+    height: 720px !important;
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

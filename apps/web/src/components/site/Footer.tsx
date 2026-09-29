@@ -36,6 +36,7 @@ export function Footer({ controlRoomHref }: { controlRoomHref: string }) {
           title="Project"
           links={[
             ["/about/", "About, data and credits"],
+            ["/deck/", "Deck"],
             ["/about/#accessibility", "Accessibility"],
             ["/about/#privacy", "Privacy"],
             [REPO, "Source code (Apache-2.0)"],
