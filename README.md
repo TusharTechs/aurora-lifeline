@@ -16,19 +16,25 @@ IMD tells you the storm. AURORA Lifeline tells you which PHC is cut off, how lik
 [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-3ee6c4)](LICENSE)
 [![Live app](https://img.shields.io/badge/live-aurora--lifeline.web.app-5cc8ff)](https://aurora-lifeline.web.app)
 
-**[Live app](https://aurora-lifeline.web.app)** ·
-**[Control room](https://aurora-lifeline.web.app/storm/montha_2025/district/13999862/)** ·
-**[Try it in five minutes](#try-it-in-five-minutes)** ·
-**[Architecture](#architecture)** ·
-**[Google AI](#google-ai-in-the-product)** ·
-**[Validation](#validation-misses-included)** ·
-**[Judging criteria](#where-to-find-each-judging-criterion)** ·
-**[Deck](https://aurora-lifeline.web.app/deck/)** ·
-**[Run it](#run-it-locally)**
-
 _Track 05: Track-Based Cyclone Impact & Infrastructure Vulnerability Forecaster · Build with AI: Code for Communities, Second Edition_
 
 </div>
+
+| For judges: you want to…           | Go to                                                                                                                                                                                                                                               |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Try it now, nothing to install** | [Live app](https://aurora-lifeline.web.app): no sign-in · [Kakinada control room](https://aurora-lifeline.web.app/storm/montha_2025/district/13999862/): Cyclone Montha replay                                                                      |
+| **Follow a guided tour**           | [Try it in five minutes](#try-it-in-five-minutes): eight clicks, every answer cached                                                                                                                                                                |
+| **See a second state**             | [Dana, Kendrapara, Odisha](https://aurora-lifeline.web.app/storm/dana_2024/district/9588868/): same pipeline, configuration only                                                                                                                    |
+| **Read the pitch**                 | [Deck](https://aurora-lifeline.web.app/deck/): eleven slides, printable · [submission text](docs/SUBMISSION_FIELDS.md)                                                                                                                              |
+| **See the Google AI at work**      | [Google AI](#google-ai-in-the-product): each model's job · [Bulletin Reader](https://aurora-lifeline.web.app/bulletin/): Gemini reads a live IMD PDF · [prompts](https://aurora-lifeline.web.app/about/): open in AI Studio                         |
+| **Check the guardrails**           | [Guardrails](#guardrails) · [number check](agents/aurora_agents/numbers.py): no Gemini-written digits · [real versus simulated](#real-versus-simulated)                                                                                             |
+| **Check the results**              | [Proof page](https://aurora-lifeline.web.app/proof/): Sentinel-1, misses included · [validation](#validation-misses-included): the figures · [agent evaluation](docs/eval-results.md): Bulletin Reader scores                                       |
+| **Read the architecture and code** | [Architecture diagrams](#architecture) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · [ENGINE.md](docs/ENGINE.md): algorithms and parameters · [AI_AGENTS.md](docs/AI_AGENTS.md): prompts and schemas · [DATA.md](docs/DATA.md): datasets and licences |
+| **Judge deployability**            | [CI](.github/workflows/ci.yml): tests and secret scan · [deploy](.github/workflows/deploy.yml): keyless · [Cloud Shell setup](infra/cloudshell/): one-time · [COSTS.md](docs/COSTS.md): US$150 budget                                               |
+| **Score it against the criteria**  | [Judging criteria](#where-to-find-each-judging-criterion): evidence per criterion                                                                                                                                                                   |
+| **Use the API**                    | [11 operations](https://aurora-lifeline.web.app/api/docs), with an OpenAPI document at `/api/openapi.json`                                                                                                                                          |
+| **Run it yourself**                | [Run it locally](#run-it-locally): `make setup`, `make replay`, `make web`                                                                                                                                                                          |
+| **Know the limits**                | [What it does not do yet](#limits) · [decision log](docs/HANDOFF.md): every choice and why                                                                                                                                                          |
 
 <p align="center"><img src="docs/assets/control.jpg" alt="The Kakinada control room at landfall of Cyclone Montha: roads coloured by chance of closure, health facilities at risk, machinery staging sites, and the list of PHCs most likely to lose referral access with their time windows" width="100%"></p>
 
