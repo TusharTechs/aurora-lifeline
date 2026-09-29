@@ -35,7 +35,7 @@ from .gemini import MODEL_MAIN, Gemini
 from .geo import haversine_km
 from .paths import SCHEMAS_DIR
 
-PROMPT_VERSION = "bulletin-v1"
+PROMPT_VERSION = "bulletin-v2"
 MAX_PDF_BYTES = 5 * 1024 * 1024
 MAX_PAGES = 40  # IMD national bulletins carry long district-wise warning tables
 KMPH_PER_KT = 1.852
@@ -48,7 +48,9 @@ Times: convert IST to UTC only when the bulletin gives an explicit time and zone
 current is the system's latest observed position. forecast holds the rows of the forecast track table in order; lead_h is hours after the first (observed) row; include the observed row with lead_h 0 only if the table lists it.
 system_stage codes: Depression D, Deep Depression DD, Cyclonic Storm CS, Severe Cyclonic Storm SCS, Very Severe VSCS, Extremely Severe ESCS, Super Cyclonic Storm SuCS; low pressure area LPA, well marked low WML.
 Rainfall coverage: "at isolated places" isolated, "at a few places" a_few, "at many places" many, "at most places" most; otherwise unspecified. Use category other for rainfall that is not heavy or above.
-For every extracted numeric value, add a short verbatim supporting quote (at most 20 words) in source_quotes with the JSON path of the field, for example forecast[2].lat or current.msw_max. Copy quotes exactly as printed.
+bulletin_no is the bulletin's number only, for example "21", without any other identifiers.
+For every extracted numeric value, add a short verbatim supporting quote (at most 20 words) in source_quotes with the JSON path of the field, for example forecast[2].lat or current.msw_max. Every wind_warnings[i] and surge[i] entry needs its own quote too.
+A quote must be one contiguous span copied exactly as printed: no ellipses, no joining of separate lines or cells, no rewording.
 Return JSON that matches the schema exactly."""
 
 # IMD classification by maximum sustained wind (kmph), with the codes used in the schema.
@@ -203,7 +205,14 @@ def run_checks(reading: dict[str, Any], text: str) -> list[dict[str, str]]:  # n
 def compare_with_labels(reading: dict[str, Any], labels: dict[str, Any]) -> dict[str, Any]:
     """Field-level agreement with a hand-entered reading (AI_AGENTS §9 metric)."""
     fields: list[tuple[str, bool]] = []
-    fields.append(("bulletin_no", reading.get("bulletin_no") == labels.get("bulletin_no")))
+
+    def number(v: object) -> str:
+        m = re.search(r"\d+", str(v or ""))
+        return m.group(0).lstrip("0") if m else ""
+
+    fields.append(
+        ("bulletin_no", number(reading.get("bulletin_no")) == number(labels.get("bulletin_no")))
+    )
     fields.append(
         (
             "issued_at_utc",
