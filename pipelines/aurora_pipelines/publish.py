@@ -390,7 +390,7 @@ def main() -> int:
                 "members": {k: int(v) for k, v in meta["members"].items()},
                 "mode": mode,
                 "data_versions": {
-                    "osm": "geofabrik southern-zone 2026-09-27",
+                    "osm": "geofabrik " + Path(osm_dir).name.replace("-20", " 20", 1),
                     "population": "WorldPop 2020 constrained",
                     "dem": "Copernicus GLO-30",
                     "hand": "AURORA 90 m from GLO-30",

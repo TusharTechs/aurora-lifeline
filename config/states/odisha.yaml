@@ -1,0 +1,19 @@
+# State configuration (ARCHITECTURE §3). Geography is configuration: a new state is a new file.
+state_lgd: null # fill from the LGD directory
+name: Odisha
+osm_extract: eastern-zone # Geofabrik India sub-extract that contains the state (verified)
+aoi: null
+districts_csv: config/states/odisha_districts.csv
+# IMD has one meteorological subdivision for Odisha; its bulletins name districts or use these
+# regional phrases (imd_region values in the districts CSV).
+imd_region_phrases:
+  north coastal: north_coastal
+  south coastal: south_coastal
+  north interior: north_interior
+  south interior: south_interior
+crude_birth_rate_per_1000: null
+district_buffer_km: 30 # PRIOR
+# Landfall region for the Dana replay: the coastal districts around Bhitarkanika and Dhamara.
+build_regions:
+  north_odisha:
+    districts: [Kendrapara, Bhadrak, Balasore, Jagatsinghpur, Jajpur, Cuttack]

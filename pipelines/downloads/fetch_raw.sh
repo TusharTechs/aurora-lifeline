@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Approval-free raw downloads for the Montha 2025 slice (BUILD_PLAN task 1.4a).
+# Approval-free raw downloads for a storm replay (BUILD_PLAN task 1.4a). Defaults are Montha 2025;
+# Dana 2024: FIRST_DAY=20241020 LAST_DAY=20241025 OSM_ZONE=eastern-zone DEM_LATS="19 20 21 22"
+#            DEM_LONS="84 85 86 87" JRC_TILE=80E_30N
 # Writes to data/raw/<source>/<version>/ and records sha256sums.txt per directory.
 # Re-runnable: existing files are skipped.
 set -uo pipefail
@@ -9,6 +11,8 @@ RAW="$ROOT/data/raw"
 FIRST_DAY="${FIRST_DAY:-20251023}"
 LAST_DAY="${LAST_DAY:-20251029}"
 WITH_OSM="${WITH_OSM:-1}"
+OSM_ZONE="${OSM_ZONE:-southern-zone}"
+JRC_TILE="${JRC_TILE:-80E_20N}"
 
 fetch() {  # fetch <url> <dest_dir> [<filename>]
   local url="$1" dir="$2" name="${3:-$(basename "$1")}"
@@ -68,19 +72,19 @@ checksum "$RAW/ibtracs/v04r01"
 fetch "https://docs.oasis-open.org/emergency/cap/v1.2/CAP-v1.2.xsd" "$RAW/cap/1.2"
 checksum "$RAW/cap/1.2"
 
-# Geofabrik OSM extract for Andhra Pradesh (southern-zone, ~531 MB, ODbL).
+# Geofabrik OSM extract (southern-zone holds Andhra Pradesh, eastern-zone Odisha; ODbL).
 if [[ "$WITH_OSM" == 1 ]]; then
-  url="https://download.geofabrik.de/asia/india/southern-zone-latest.osm.pbf"
+  url="https://download.geofabrik.de/asia/india/${OSM_ZONE}-latest.osm.pbf"
   # "latest" redirects to a dated file, e.g. southern-zone-260927.osm.pbf; use that date as the version.
   dated=$(curl -fsSI "$url" | awk -F': ' 'tolower($1)=="location"{print $2}' | tr -d '\r')
   yymmdd=$(basename "$dated" | sed -nE 's/.*-([0-9]{6})\.osm\.pbf/\1/p')
   if [[ -z "$yymmdd" ]]; then echo "FAIL could not resolve Geofabrik version"; exit 1; fi
   version="20${yymmdd:0:2}-${yymmdd:2:2}-${yymmdd:4:2}"
-  dir="$RAW/geofabrik/southern-zone/$version"
+  dir="$RAW/geofabrik/$OSM_ZONE/$version"
   fetch "$url" "$dir"
   fetch "$url.md5" "$dir"
-  (cd "$dir" && expected=$(awk '{print $1}' southern-zone-latest.osm.pbf.md5) \
-    && actual=$(md5 -q southern-zone-latest.osm.pbf 2>/dev/null || md5sum southern-zone-latest.osm.pbf | awk '{print $1}') \
+  (cd "$dir" && expected=$(awk '{print $1}' "$OSM_ZONE-latest.osm.pbf.md5") \
+    && actual=$(md5 -q "$OSM_ZONE-latest.osm.pbf" 2>/dev/null || md5sum "$OSM_ZONE-latest.osm.pbf" | awk '{print $1}') \
     && [[ "$expected" == "$actual" ]] && echo "MD5  ok ($version)" || echo "MD5  MISMATCH ($version)")
   checksum "$dir"
 fi
@@ -98,7 +102,8 @@ for lat in $DEM_LATS; do
   done
 done
 checksum "$DEM_DIR"
-# JRC Global Surface Water occurrence v1.4 (2021), 10x10 degree tile covering 80-90 E, 10-20 N.
-fetch "https://storage.googleapis.com/global-surface-water/downloads2021/occurrence/occurrence_80E_20Nv1_4_2021.tif" "$RAW/jrc_gsw/v1_4_2021"
+# JRC Global Surface Water occurrence v1.4 (2021), 10x10 degree tiles named by their north-west corner
+# (80E_20N covers 80-90 E, 10-20 N; 80E_30N covers 80-90 E, 20-30 N).
+fetch "https://storage.googleapis.com/global-surface-water/downloads2021/occurrence/occurrence_${JRC_TILE}v1_4_2021.tif" "$RAW/jrc_gsw/v1_4_2021"
 checksum "$RAW/jrc_gsw/v1_4_2021"
 echo "DONE terrain/water $(date -u +%FT%TZ)"

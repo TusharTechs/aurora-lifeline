@@ -386,7 +386,8 @@ def main() -> int:
     )
     settle = gpd.read_parquet(build_dir / "settlements.parquet")
     districts = gpd.read_parquet(build_dir / "districts.parquet")
-    dcsv = pd.read_csv(ROOT / "config/states/andhra_pradesh_districts.csv", dtype=str).fillna("")
+    state_cfg = yaml.safe_load((ROOT / f"config/states/{args.state}.yaml").read_text())
+    dcsv = pd.read_csv(ROOT / state_cfg["districts_csv"], dtype=str).fillna("")
     district_codes = districts["osm_relation_id"].tolist()
     district_names = districts["name"].tolist()
 
@@ -407,7 +408,7 @@ def main() -> int:
     )
 
     # Coast and surge.
-    osm_dir = sorted((ROOT / "data/ref/osm").glob("southern-zone-*"))[-1]
+    osm_dir = sorted((ROOT / "data/ref/osm").glob(f"{state_cfg['osm_extract']}-*"))[-1]
     coast = gpd.read_parquet(osm_dir / "coastline.parquet")
     w, s, e, n = (float(v) for v in edges.total_bounds)
     bounds = (w - 0.05, s - 0.05, e + 0.05, n + 0.05)
@@ -434,7 +435,11 @@ def main() -> int:
     )
 
     # Rain categories from the bulletin (ENGINE §5).
-    dr = daily_rain(reading["rainfall_warnings"], dcsv, "Andhra Pradesh", 2025, 10)
+    issued = pd.Timestamp(reading["issued_at_utc"])
+    dr = daily_rain(
+        reading["rainfall_warnings"], dcsv, state_cfg["name"], issued.year, issued.month,
+        region_phrases=state_cfg.get("imd_region_phrases"),
+    )  # fmt: skip
     daily = dr.table[dr.table["district"].isin(district_names)]
     days = sorted(set(daily["day"]))
 

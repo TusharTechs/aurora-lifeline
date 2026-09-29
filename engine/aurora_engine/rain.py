@@ -77,10 +77,26 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z ]", " ", s.lower()).replace("  ", " ").strip()
 
 
-def match_districts(area_text: str, districts: pd.DataFrame, state_name: str) -> set[str] | None:
+AP_REGION_PHRASES = {
+    "north coastal": "north_coastal",
+    "south coastal": "south_coastal",
+    "rayalaseema": "rayalaseema",
+}
+STATES = {"andhra pradesh", "telangana", "odisha", "tamil nadu", "west bengal", "karnataka",
+          "kerala", "puducherry", "jharkhand", "chhattisgarh", "bihar"}  # fmt: skip
+
+
+def match_districts(
+    area_text: str,
+    districts: pd.DataFrame,
+    state_name: str,
+    region_phrases: dict[str, str] | None = None,
+) -> set[str] | None:
     """District names an IMD area phrase covers; None if it cannot be matched (needs review).
 
     ``districts`` has columns name, name_variants ('|'-separated), imd_subdivision, imd_region.
+    ``region_phrases`` maps IMD's regional wording (for example "north coastal") to imd_region
+    values; it comes from the state config (Andhra Pradesh's by default).
     """
     t = _norm(area_text)
     named: set[str] = set()
@@ -90,17 +106,14 @@ def match_districts(area_text: str, districts: pd.DataFrame, state_name: str) ->
             named.add(str(name))
     if named:
         return named
-    region_map = {
-        "north coastal": districts["imd_region"] == "north_coastal",
-        "south coastal": districts["imd_region"] == "south_coastal",
-        "rayalaseema": districts["imd_region"] == "rayalaseema",
-    }
-    for phrase, mask in region_map.items():
+    for phrase, region in (region_phrases or AP_REGION_PHRASES).items():
         if phrase in t:
-            return {str(n) for n in districts.loc[mask, "name"]}
+            return {str(n) for n in districts.loc[districts["imd_region"] == region, "name"]}
     state = _norm(state_name)
     if "coastal" in t and state in t:
-        coastal = districts["imd_subdivision"].str.startswith("Coastal")
+        coastal = districts["imd_subdivision"].str.startswith("Coastal") | districts[
+            "imd_region"
+        ].str.endswith("coastal")
         return {str(n) for n in districts.loc[coastal, "name"]}
     if state in t:
         return {str(n) for n in districts["name"]}
@@ -117,20 +130,26 @@ class DailyRain:
 
 
 def daily_rain(
-    warnings: list[dict[str, str]], districts: pd.DataFrame, state_name: str, year: int, month: int
+    warnings: list[dict[str, str]],
+    districts: pd.DataFrame,
+    state_name: str,
+    year: int,
+    month: int,
+    *,
+    region_phrases: dict[str, str] | None = None,
 ) -> DailyRain:
     """Applies rule steps 1-2 to a bulletin's rainfall warnings for one state."""
     cover: dict[tuple[str, date, str], float] = {}
     needs_review = False
     used = []
-    other_states = {"telangana", "odisha", "tamil nadu", "west bengal", "karnataka", "kerala"}
+    other_states = STATES - {_norm(state_name)}
     for w in warnings:
         cat = w["category"]
         frac = COVERAGE_FRACTION.get(w.get("coverage", "unspecified"), 1.0)
         if cat not in CATEGORY_MM:
             needs_review = True
             continue
-        covered = match_districts(w["area_text"], districts, state_name)
+        covered = match_districts(w["area_text"], districts, state_name, region_phrases)
         if covered is None:
             if not any(o in _norm(w["area_text"]) for o in other_states):
                 needs_review = True

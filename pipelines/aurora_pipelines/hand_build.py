@@ -59,13 +59,18 @@ def main() -> int:
     outlet = ~np.isfinite(elev) | (elev <= 0.0)
 
     water = np.zeros(elev.shape, dtype=np.float32)
-    jrc = sorted((ROOT / "data/raw/jrc_gsw/v1_4_2021").glob("occurrence_*.tif"))
-    if jrc:
-        with rasterio.open(jrc[0]) as ds:
+    # Every JRC tile overlapping the grid (tiles are 10 x 10 degrees); keep the maximum occurrence.
+    for tile in sorted((ROOT / "data/raw/jrc_gsw/v1_4_2021").glob("occurrence_*.tif")):
+        with rasterio.open(tile) as ds:
+            b = ds.bounds
+            if b.right <= w or b.left >= e or b.top <= s or b.bottom >= n:
+                continue
+            part = np.zeros(elev.shape, dtype=np.float32)
             reproject(
-                rasterio.band(ds, 1), water, dst_transform=transform, dst_crs="EPSG:4326",
+                rasterio.band(ds, 1), part, dst_transform=transform, dst_crs="EPSG:4326",
                 resampling=Resampling.max,
             )  # fmt: skip
+            water = np.maximum(water, np.where(part <= 100, part, 0))
     permanent = (water >= PERMANENT_WATER_OCCURRENCE) & (water <= 100)
     print(f"grid {elev.shape[1]} x {elev.shape[0]} cells; outlets {outlet.mean():.1%}; "
           f"permanent water {permanent.mean():.1%}; {time.time() - t0:.0f} s")  # fmt: skip
