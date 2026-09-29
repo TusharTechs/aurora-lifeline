@@ -1,0 +1,63 @@
+{
+  "voice": "Charon",
+  "language": "en-IN",
+  "style": "You are narrating a short documentary-style product film for disaster-management officials. Speak in a calm, warm, confident male voice, clearly and at an unhurried pace, with natural pauses between sentences. Do not sound like an advertisement.",
+  "scenes": [
+    {
+      "id": "01_problem_a",
+      "text": "Almost every year, a cyclone crosses India's eastern coast. Warnings have improved, and evacuations now save many lives. But when the storm lands, the roads flood. Bridges and culverts close. And villages lose their only road to a hospital."
+    },
+    {
+      "id": "01_problem_b",
+      "text": "A woman in labour. A snakebite. A patient who needs dialysis. For days, help cannot get through."
+    },
+    {
+      "id": "01_problem_c",
+      "text": "Three days before landfall, a district control room knows where the storm is going. What it does not know is which health centre will be cut off, how likely that is, when, and what to move there before the roads close."
+    },
+    {
+      "id": "02_intro",
+      "text": "This is AURORA Lifeline. It turns the official IMD cyclone bulletin into a plan a district can act on: who will be cut off, how likely, when, and what to move first."
+    },
+    {
+      "id": "03_bulletin",
+      "text": "It starts where officials start: the IMD bulletin. Gemini reads the PDF itself, text and tables, and returns every value with a word-for-word quote. Then code checks it: positions, speeds, the category, every quote against the PDF, and the track against an independent table parser. When a check fails, it says so, and an officer confirms the reading before it drives a forecast."
+    },
+    {
+      "id": "04_futures",
+      "text": "This is Cyclone Montha, replayed from IMD bulletin twenty-one, sixty-two hours before it crossed the Andhra Pradesh coast, using only forecasts published by then. AURORA aligns more than a thousand storm futures, from Google DeepMind's WeatherNext and from ECMWF, to IMD's official track. It puts wind, rain and storm surge on more than five lakh road segments, hour by hour. As the storm comes in, you can watch the roads close."
+    },
+    {
+      "id": "05_who_when",
+      "text": "For every future, it finds the hour each village and health facility loses its last road to a public hospital. Across all of them, that gives a chance and a time window. In Kakinada, about three point three lakh people are likely to be cut off by landfall. The primary health centre at Rachapalli has a thirty-six percent chance of losing referral access, most likely between the evening of the twenty-seventh and the early hours of the twenty-ninth."
+    },
+    {
+      "id": "06_actions",
+      "text": "Then it decides what to move. Earthmovers go to the crossings that protect the most people, each with a deadline and its basis: six hours before that crossing is likely to start closing. Pre-agreed anticipatory-action triggers show which thresholds have been crossed."
+    },
+    {
+      "id": "07_advisory",
+      "text": "Gemini drafts the advisory for the Collector, in English, Telugu or Hindi. But Gemini never writes a number. It writes placeholders, and code fills in every figure from the engine, rejecting any digit it did not supply. The draft is back-translated and scored, read aloud with Gemini text-to-speech, and exported as a CAP alert for the state's authorised originator. Nothing is sent until an officer approves."
+    },
+    {
+      "id": "08_ask",
+      "text": "Officers can also just ask. Ask AURORA is an agent built with Google's Agent Development Kit. It answers only from this run's facts, with citations, and a guard blocks any number its tools did not return."
+    },
+    {
+      "id": "09_field",
+      "text": "After landfall, field teams send photos. AURORA removes the photo's metadata, Gemini assesses the road: whether it is passable, how deep the water is, and the damage. Then fixed rules decide. A report it cannot place goes to an officer, and a bridge reopening always does."
+    },
+    {
+      "id": "10_proof",
+      "text": "Every forecast is scored against what actually happened, using Sentinel-1 radar through Earth Engine, and the misses are published. This is a weak test: the first radar passes came three to four days after landfall, and AURORA's false-alarm rate against them is high. We show that, too."
+    },
+    {
+      "id": "11_dana",
+      "text": "And geography is configuration. The same pipeline runs Cyclone Dana in Odisha, from IMD's very first bulletin."
+    },
+    {
+      "id": "12_close",
+      "text": "IMD tells you the storm. AURORA Lifeline tells you which health centre is cut off, how likely, when, and what to move there now."
+    }
+  ]
+}
