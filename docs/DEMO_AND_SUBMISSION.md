@@ -1,22 +1,23 @@
 # Demo and submission
 
-## 1. Demo script (4:45, recorded on the deterministic Montha replay)
+## 1. Demo script (4:45; the deployed build on 29–30 Sep 2026)
 
-The demo follows four beats (who is cut off, what goes dark, what to move where, what happened after landfall), then proof and scale. Fill every [bracket] from the actual run. **Show and name only features that exist in the build being judged.** The 30 Sep video has no OR-Tools plan, no SMS or IVR, no Ask AURORA, no inland replay and no load test.
+Record at https://aurora-lifeline.web.app in Chrome, 1440 x 900, dark theme, no personal data on screen. Every figure below comes from the live replay; read it off the screen rather than from this script. Show and name only what exists.
 
-| Time | On screen | Voice-over | Technology to name |
+| Time | Click path (what is on screen) | Voice-over | Name |
 | --- | --- | --- | --- |
-| 0:00–0:25 | Credited Montha damage photos; the BOB 06 headline | "Cyclone deaths have fallen close to zero. Lifelines have not. Seventy-two hours out, a control room knows the storm's category, not which PHC will be cut off." | — |
-| 0:25–0:50 | IMD bulletin PDF beside Gemini's structured reading; ensemble members fan out (or the "deterministic" badge if there are no members) | "The official bulletin goes in. Gemini reads it into data we check. The ensembles show the uncertainty around IMD's track." | Gemini 3.7 Flash; ECMWF and WeatherNext Cyclones (if Montha coverage is confirmed) |
-| 0:50–1:40 | Lifeline Countdown slider from the bulletin time to landfall; PHCs and settlements fade, with probability halos and windows | "This PHC has a [P] chance of losing its last road between [T1] and [T2]. [N] people lose access to any working hospital. About [B] births are expected in that window." | Earth Engine; OSM lifeline graph; BigQuery; deck.gl on Google Maps |
-| 1:40–2:10 | Substation service areas; completeness badge | "At least [M] people are served by substations at risk. That is a lower bound: we show how much of the grid is mapped." | BigQuery GIS; WorldPop |
-| 2:10–2:50 | Action cards with deadlines and their basis; Gemini drafts a Telugu advisory; the demo officer edits and approves; an in-app push with a voice note; the CAP file validates (`status=Exercise`) | "Stage a machine here before this road's earliest likely closure; generators to these PHCs. The officer approves, and the Telugu advisory arrives as a push with its voice note." | Gemini drafting; Cloud Text-to-Speech; Firestore approval; Firebase Cloud Messaging |
-| 2:50–3:25 | Staged photo of a bridge; Gemini's verdict; the officer confirms; the bridge reopens and the PHC turns green on two screens | "After landfall, one verified photo reopens a bridge, and every control room sees it within seconds." | Gemini multimodal; Cloud Run; Firestore listeners |
-| 3:25–3:55 | Proof page: Sentinel-1 hits and misses, POD/FAR/CSI against baselines; the surge table; bulletin accuracy | "Here is how we did on Montha, misses included." | Earth Engine Sentinel-1 |
-| 3:55–4:20 | A second district or state from the same pipeline; the architecture slide | "Geography is configuration: the same pipeline runs for any coastal district." | Cloud Run jobs; Firebase Hosting |
-| 4:20–4:45 | Google stack slide; measured results; Demo Day roadmap shown as roadmap | "Google AI is the engine, not a chatbot on top." | — |
+| 0:00–0:20 | Landing page, hero playing: the storm futures sweep to the coast; the time card counts people cut off | "Seventy-two hours before a cyclone lands, a control room knows the storm. It does not know which PHC will lose its last road. AURORA Lifeline does." | — |
+| 0:20–0:35 | Point at the season-watch strip; the "four questions" section: click through the four answers | "It runs on every official IMD bulletin. For Kakinada, from Bulletin 21, it answered four questions: which facility, how likely, when, and what to move." | IMD |
+| 0:35–1:05 | Bulletin reader: click the live IMD bulletin (or Montha No. 21); show the checks and the forecast table with IMD's words | "Gemini reads the bulletin PDF itself. Every value comes with a verbatim quote, and code checks it against the PDF and an independent parser. An officer confirms before it drives a forecast." | Gemini 3.7 Flash on Agent Platform |
+| 1:05–1:50 | Open the Kakinada control room. Play the timeline from Bulletin 21 to landfall; hover a red PHC; switch Bulletin 19 / 21 | "A thousand storm futures from Google DeepMind WeatherNext and ECMWF, aligned to IMD's track, put water on five lakh road segments. This PHC has a [p] chance of losing referral access, most likely between [t1] and [t2]." | WeatherNext; Maps Platform; deck.gl |
+| 1:50–2:10 | Forecast tab: the action list; Triggers tab: open the fired triggers | "Machinery goes to the bridge that protects the most people, six hours before its earliest likely closure. Pre-agreed triggers fire for the facilities above threshold." | — |
+| 2:10–2:50 | Advisory tab: Telugu, Collector; Draft; show the placeholders view and cited facts; Listen; Download CAP; Approve (simulated) | "Gemini drafts the Telugu advisory, but it never writes a number: code inserts every figure from the engine. It is read aloud with Gemini-TTS, and exported as a CAP message for the SDMA's originator, after an officer approves." | Gemini; gemini-embedding-2; Cloud TTS Gemini-TTS |
+| 2:50–3:20 | Ask AURORA tab: click "Where should we pre-position JCBs first, and by when?"; open the citations | "Ask AURORA is an agent built with Google's Agent Development Kit. It answers only from the run's facts, and a guard blocks any number the tools did not return." | Agent Development Kit |
+| 3:20–3:55 | Proof page: the Sentinel-1 table and "How to read this"; the Bulletin Reader scores | "We scored it against Sentinel-1 radar. It is a weak test, the passes came days later, and we publish the misses. The Bulletin Reader agrees with hand-checked labels on 48 of 49 fields." | Earth Engine |
+| 3:55–4:20 | Landing page: the Dana card; open Kendrapara | "Geography is configuration. The same pipeline runs Cyclone Dana in Odisha." | Cloud Run; Firebase Hosting |
+| 4:20–4:45 | Deck slide 7 (Google stack) then slide 11 | "Google AI is the engine, not a chatbot on top. Next: a shadow-mode pilot with an SDMA this season." | — |
 
-**Recording tips:** 1080p; the browser zoomed for legibility; English captions; no personal data on screen; demo accounts badged SIMULATED. Claude writes a click-path script with timings; the owner records it.
+**Before recording:** open each page once so cached answers are warm; turn on "Reduce motion" only if the machine stutters. **Captions:** English, from this script.
 
 ## 2. Wow moments and backups
 
@@ -39,33 +40,23 @@ The demo follows four beats (who is cut off, what goes dark, what to move where,
 | Cloud Run or Firestore | The static replay still works; Firestore offline cache |
 | Cold start | Warm instance 1–23 Oct plus a scheduled ping |
 
-## 4. Track text to feature (for the README and one slide; slice only)
+## 4. Track text to feature (the 30 Sep build)
 
-| Track 05 asks for | Where it lives in the 30 Sep build |
+| Track 05 asks for | Where it lives |
 | --- | --- |
-| AI-powered predictive risk and vulnerability modelling | Hazard engine, lifeline graph, isolation, power (substation lower bound), health (SPEC M2–M6) |
-| Google Earth Engine satellite feeds | Earth Engine precompute of terrain, drainage, water, population and buildings; Sentinel-1 validation |
-| Real-time meteorological data | IMD bulletins; ECMWF and WeatherNext Cyclones tracks (if coverage confirmed). The 6-hourly archiver is Demo Day |
-| Gemini 3.7 Flash multimodal reasoning | Bulletin Reader, Field Verifier, Advisory Writer (Ask AURORA on Demo Day) |
-| Simulate storm surges | Surge screening model scaled to IMD bulletin surge guidance, with a validation table. INCOIS products are linked, not ingested |
-| Predict local rainfall damage pathways | IMD rainfall categories → drainage-based flooding → road and bridge closures → isolation |
-| Exposure of power grids, arterial roads and medical shelters | Substation service areas; road graph with bridges and culverts; health-continuity view |
-| Automated early-warning advisory dispatch | Drafting, officer approval, CAP 1.2, in-app push (SMS and IVR on Demo Day) |
-| Evacuation planning, hardening, parametric liquidity | Rule-based pre-positioning and evacuation actions with deadlines. Capacity-aware shelter assignment and a trigger panel are Demo Day |
+| AI-powered predictive risk and vulnerability modelling | Storm futures → hazards on every road → bottleneck isolation for every facility and village (control room) |
+| Google Earth Engine satellite feeds | Sentinel-1 flood mapping for validation (proof page) |
+| Real-time meteorological data | IMD bulletins (season watch reads IMD's archive; the Bulletin Reader reads the latest bulletin live); ECMWF and WeatherNext ensembles |
+| Gemini multimodal reasoning | Bulletin Reader (PDF), Advisory Writer, Ask AURORA (ADK) |
+| Simulate storm surges | Surge screening model scaled to IMD surge guidance (Montha); Dana's first bulletin had none |
+| Predict local rainfall damage pathways | IMD rainfall categories and coverage → height-above-drainage flooding → road, bridge and culvert closures → isolation |
+| Exposure of power grids, arterial roads and medical shelters | Roads, bridges, culverts, PHCs, CHCs, hospitals and shelters; power is on the roadmap |
+| Automated early-warning advisory dispatch | Drafts in three languages, voice, officer approval (simulated in the demo), CAP 1.2 for Sachet |
+| Evacuation planning, hardening, parametric liquidity | Machinery staging with deadlines; indicative anticipatory-action triggers |
 
 ## 5. Deck (11 slides)
 
-1. **Title:** "IMD tells you the storm. AURORA Lifeline tells you which PHC is cut off, how likely, when, and what to move there now."
-2. **Problem:** lifelines, not deaths (Fani outages, Montha damage, BOB 06 inland deaths; cited).
-3. **What exists and the gap:** IMD's category damage table; Web-DCRA (district-level composite risk as documented to 2023; 2026 status unconfirmed); INCOIS surge; Sachet delivery. Government tools only; no competitor names.
-4. **Solution:** the four beats.
-5. **Demo screens.**
-6. **AI approach:** Gemini reads, verifies and writes; the engine counts; the human approves.
-7. **Google stack:** Earth Engine, Gemini 3.7 Flash, BigQuery, Cloud Run, Firebase, Maps, Cloud Text-to-Speech, plus WeatherNext Cyclones (Weather Lab) **only if Montha coverage is confirmed**. Demo Day adds OR-Tools and ADK.
-8. **Proof:** Montha skill against baselines, misses included; bulletin-reading accuracy.
-9. **Who it serves and the pilot:** a district emergency operations centre and SDMA shadow-mode pilot in the October–December season; CAP for Sachet; Digital Public Good.
-10. **Scale:** geography as configuration; cost per state; the static 10,000-user design (load test on Demo Day); BRICS and APAC coasts; the Earth Engine commercial path.
-11. **Roadmap and ask:** a pilot state, data agreements, the Demo Day additions.
+The deck is a page of the site: https://aurora-lifeline.web.app/deck/ . Print it from Chrome (landscape, margins none, background graphics on) to get the PDF; every figure is read from the published runs at build time.
 
 ## 6. Submission checklist (30 Sep; submit by 22:00 IST)
 
