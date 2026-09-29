@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import coast from "@/data/coast.json";
-import { readKnownBulletin, readUploadedBulletin, type BulletinResult } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
+import {
+  getSeason,
+  readKnownBulletin,
+  readLatestBulletin,
+  readUploadedBulletin,
+  type BulletinResult,
+  type Season,
+} from "@/lib/api";
 import { ist } from "@/lib/format";
 
 const STAGES = ["Fetching the PDF", "Gemini is reading it", "Checking every value in code"];
@@ -35,6 +43,16 @@ export function BulletinReader({ stormId, known }: Props) {
   const [res, setRes] = useState<BulletinResult | null>(null);
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [season, setSeason] = useState<Season | null>(null);
+  const params = useSearchParams();
+  const wantLatest = params.get("latest") === "1";
+  useEffect(() => {
+    let alive = true;
+    void getSeason().then((v) => alive && setSeason(v));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const run = async (fn: () => Promise<BulletinResult>) => {
     setBusy(true);
@@ -72,12 +90,28 @@ export function BulletinReader({ stormId, known }: Props) {
     <div className="space-y-10">
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <div className="card p-6">
-          <h2 className="font-display text-lg font-semibold">Try a Montha bulletin</h2>
+          <h2 className="font-display text-lg font-semibold">Read an IMD bulletin</h2>
           <p className="mt-1 text-sm text-muted">
             Fetched live from IMD&apos;s RSMC archive and verified by checksum. AURORA never re-hosts IMD
             documents.
           </p>
           <div className="mt-4 grid gap-2">
+            {season?.active && season.latest && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void run(() => readLatestBulletin())}
+                className={`btn justify-between !rounded-2xl text-left text-sm ${wantLatest ? "btn-primary" : "btn-ghost !border-warning/50"}`}
+              >
+                <span>
+                  <span className="mr-2 inline-block rounded-full bg-warning/20 px-2 py-0.5 text-[11px] font-semibold text-warning">
+                    LIVE
+                  </span>
+                  IMD National Bulletin No. {season.latest.bulletin_no ?? "?"} · {season.latest.based_on_ist}
+                </span>
+                <span aria-hidden>→</span>
+              </button>
+            )}
             {known.map((k) => (
               <button
                 key={k.bulletinNo}

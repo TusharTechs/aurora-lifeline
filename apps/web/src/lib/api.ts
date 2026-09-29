@@ -111,3 +111,30 @@ export async function readUploadedBulletin(file: File): Promise<BulletinResult> 
   }
   return (await r.json()) as BulletinResult;
 }
+
+export type Season = {
+  status: "ok" | "unavailable";
+  checked_at_ist: string;
+  active?: boolean;
+  latest?: {
+    title: string;
+    bulletin_no: string | null;
+    based_on_ist: string;
+    age_h: number;
+    url: string | null;
+  } | null;
+  source?: string;
+  active_rule?: string;
+};
+
+export async function getSeason(): Promise<Season | null> {
+  try {
+    const r = await fetch(`${BASE}/api/v1/season`);
+    return r.ok ? ((await r.json()) as Season) : null;
+  } catch {
+    return null;
+  }
+}
+
+export const readLatestBulletin = () =>
+  post<BulletinResult & { live?: { based_on_ist: string; source_url: string } }>("bulletins/read-latest", {});

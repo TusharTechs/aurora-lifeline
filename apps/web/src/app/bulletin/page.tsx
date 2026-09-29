@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { BulletinReader } from "@/components/bulletin/BulletinReader";
 import { Footer } from "@/components/site/Footer";
 import { Nav } from "@/components/site/Nav";
@@ -27,14 +28,16 @@ export default function BulletinPage() {
             table parser. An officer confirms before it drives a forecast.
           </p>
           <div className="mt-10">
-            <BulletinReader
-              stormId={s.stormId}
-              known={s.runs.map((r) => ({
-                bulletinNo: r.bulletinNo,
-                label: `Montha · National Bulletin No. ${r.bulletinNo}`,
-                runHref: href,
-              }))}
-            />
+            <Suspense>
+              <BulletinReader
+                stormId={s.stormId}
+                known={s.runs.map((r) => ({
+                  bulletinNo: r.bulletinNo,
+                  label: `Montha · National Bulletin No. ${r.bulletinNo}`,
+                  runHref: href,
+                }))}
+              />
+            </Suspense>
           </div>
         </div>
       </main>

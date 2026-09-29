@@ -7,13 +7,17 @@ deterministic. Nothing here dispatches an advisory or issues an alert: advisorie
 drafts that need officer approval (CLAUDE.md non-negotiable 3).
 """
 
+import base64
 import hashlib
+import html
 import json
 import logging
 import os
+import re
 import time
+import urllib.parse
 from collections import defaultdict, deque
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Literal
 
@@ -41,6 +45,7 @@ SITE = os.environ.get("AURORA_SITE_URL", "https://aurora-lifeline.web.app")
 DAILY_MODEL_RUNS = int(os.environ.get("AURORA_DAILY_MODEL_RUNS", "300"))
 PER_IP_PER_MIN = int(os.environ.get("AURORA_PER_IP_PER_MIN", "8"))
 VERSION = os.environ.get("AURORA_VERSION", "dev")
+IST = timezone(timedelta(hours=5, minutes=30))
 MODEL_DOWN = "The AI service did not answer; please try again. Cached results still work."
 
 app = FastAPI(
@@ -309,3 +314,106 @@ async def read_upload(request: Request, file: UploadFile = File(...)) -> dict[st
     if len(pdf) > bulletin_reader.MAX_PDF_BYTES:
         raise HTTPException(413, "PDF larger than 5 MB")
     return _read_pdf(pdf, request)
+
+
+# ---------------------------------------------------------------- season watch
+IMD_ARCHIVE = "https://rsmcnewdelhi.imd.gov.in/archive-information.php"
+IMD_ROW = re.compile(
+    r"<tr>\s*<td>\d+</td>\s*<td>(?P<title>.*?)</td>\s*<td[^>]*>(?P<listed>.*?)</td>\s*<td>(?P<file>.*?)</td>",
+    re.S,
+)
+ACTIVE_WITHIN_H = 36
+_season: dict[str, Any] = {"at": 0.0, "value": None}
+
+
+def _b64(v: int | str) -> str:
+    return base64.b64encode(str(v).encode()).decode()
+
+
+BASED_ON = re.compile(r"based on (\d{2}):(\d{2})(?::\d{2})? UTC of (\d{2})-(\d{2})-(\d{4})", re.I)
+BULLETIN_NO = re.compile(r"National_Bulletin_No[._]?0*(\d+)", re.I)
+
+
+def _latest_national_bulletin() -> dict[str, Any] | None:
+    """Newest IMD national bulletin: IMD issues these only while a depression or stronger exists."""
+    year = datetime.now(IST).year
+    params: dict[str, str | int] = {
+        "internal_menu": _b64(1), "pageno": 1, "menu_id": _b64(4), "search_year": _b64(year),
+    }  # fmt: skip
+    text = (
+        httpx.get(
+            IMD_ARCHIVE, params=params, timeout=10, headers={"User-Agent": "aurora-lifeline/1.0"}
+        )
+        .raise_for_status()
+        .text
+    )
+    m = IMD_ROW.search(text)
+    if not m:
+        return None
+    title = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m["title"]))).strip()
+    href = re.search(r'href="([^"]+)"', m["file"])
+    url = urllib.parse.urljoin(IMD_ARCHIVE, html.unescape(href.group(1))) if href else None
+    b = BASED_ON.search(title)
+    if not b:
+        return None
+    hh, mi, dd, mo, yy = (int(x) for x in b.groups())
+    based = datetime(yy, mo, dd, hh, mi, tzinfo=UTC)
+    no = BULLETIN_NO.search(url or "")
+    return {
+        "title": title,
+        "bulletin_no": no.group(1) if no else None,
+        "based_on_ist": based.astimezone(IST).strftime("%d %b %Y, %H:%M IST"),
+        "age_h": round((datetime.now(UTC) - based).total_seconds() / 3600, 1),
+        "url": url,
+    }
+
+
+@app.get("/api/v1/season")
+def season() -> dict[str, Any]:
+    """Is IMD issuing tropical-cyclone bulletins right now? (checked at most every 30 minutes)"""
+    now = time.time()
+    if _season["value"] is not None and now - _season["at"] < 1800:
+        return dict(_season["value"])
+    checked = datetime.now(IST).strftime("%d %b %Y, %H:%M IST")
+    try:
+        latest = _latest_national_bulletin()
+        value: dict[str, Any] = {
+            "status": "ok",
+            "checked_at_ist": checked,
+            "active": bool(latest and latest["age_h"] <= ACTIVE_WITHIN_H),
+            "latest": latest,
+            "source": "IMD RSMC New Delhi archive, national bulletins",
+            "active_rule": f"a national bulletin based on observations in the last {ACTIVE_WITHIN_H} hours",
+        }
+    except Exception:
+        log.warning("season check failed", exc_info=True)
+        value = {"status": "unavailable", "checked_at_ist": checked}
+    _season.update(at=now, value=value)
+    return dict(value)
+
+
+@app.post("/api/v1/bulletins/read-latest")
+def read_latest(request: Request) -> dict[str, Any]:
+    """Reads IMD's newest national bulletin (URL taken from IMD's own archive listing)."""
+    info = season()
+    latest = info.get("latest") or {}
+    url = latest.get("url")
+    if info.get("status") != "ok" or not url:
+        raise HTTPException(503, "IMD's archive listing is not available right now.")
+    if urllib.parse.urlparse(url).hostname != "rsmcnewdelhi.imd.gov.in":
+        raise HTTPException(502, "Unexpected bulletin location.")
+    try:
+        pdf = httpx.get(url, timeout=30, follow_redirects=False).raise_for_status().content
+    except httpx.HTTPError as e:
+        raise HTTPException(
+            502, "Could not fetch the bulletin from IMD's archive right now."
+        ) from e
+    out = _read_pdf(pdf, request)
+    return {
+        **out,
+        "live": {
+            "based_on_ist": latest.get("based_on_ist"),
+            "source_url": url,
+            "title": latest.get("title"),
+        },
+    }

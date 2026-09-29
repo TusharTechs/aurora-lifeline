@@ -8,6 +8,7 @@ import { Personas, type Persona } from "@/components/landing/Personas";
 import { Trust, type TrustExample } from "@/components/landing/Trust";
 import { Footer } from "@/components/site/Footer";
 import { Nav } from "@/components/site/Nav";
+import { SeasonWatch } from "@/components/site/SeasonWatch";
 import counts from "@/data/build_counts.json";
 import { cleanName, ist, pct, people, siteLabel } from "@/lib/format";
 import { landingData } from "@/lib/landingData";
@@ -155,6 +156,9 @@ export default function Home() {
         >
           <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
             <div className="max-w-2xl">
+              <div className="mb-6">
+                <SeasonWatch />
+              </div>
               <p className="eyebrow">Cyclone decision support for district control rooms</p>
               <h1
                 id="hero-title"
@@ -176,8 +180,9 @@ export default function Home() {
                 </Link>
               </div>
               <p className="mt-8 max-w-xl text-sm text-subtle">
-                Showing Cyclone Montha as AURORA would have seen it {leadH} hours before landfall, from{" "}
-                {bulletin}, using only forecasts published by then. {storm.observedLandfall.text}.
+                Below: Cyclone Montha, a past storm, as AURORA would have seen it {leadH} hours before
+                landfall, from {bulletin}, using only forecasts published by then.{" "}
+                {storm.observedLandfall.text}.
               </p>
             </div>
           </div>
