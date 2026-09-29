@@ -299,7 +299,7 @@ export function CommandMap({
     .join(" · ");
 
   return (
-    <div className="flex h-screen flex-col bg-bg text-fg">
+    <div className="flex min-h-screen flex-col bg-bg text-fg md:h-screen">
       <header className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border px-4 py-2.5 text-sm">
         <Link href="/" aria-label="AURORA Lifeline home" className="flex shrink-0 items-center">
           <Logo size={26} />
@@ -338,8 +338,8 @@ export function CommandMap({
         {prov.mode === "deterministic" && <span className="chip">deterministic: IMD track only</span>}
       </header>
 
-      <div className="flex min-h-0 flex-1">
-        <div className="relative min-w-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+        <div className="relative h-[55svh] min-w-0 md:h-auto md:flex-1">
           {MAPS_KEY ? (
             <APIProvider apiKey={MAPS_KEY}>
               <Map
@@ -408,7 +408,7 @@ export function CommandMap({
           </div>
         </div>
 
-        <aside className="w-[400px] shrink-0 overflow-y-auto border-l border-border p-4 text-sm">
+        <aside className="w-full shrink-0 border-t border-border p-4 text-sm md:w-[400px] md:overflow-y-auto md:border-l md:border-t-0">
           <div className="mb-3 flex gap-1" role="tablist">
             {(
               [
@@ -513,7 +513,7 @@ export function CommandMap({
         </aside>
       </div>
 
-      <footer className="border-t border-border px-4 py-2">
+      <footer className="sticky bottom-0 z-20 border-t border-border bg-bg/95 px-4 py-2 backdrop-blur md:static md:bg-bg">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPlaying((p) => !p)}
@@ -535,7 +535,7 @@ export function CommandMap({
             {istAfter(scenario.time_axis.now_utc, t)}
           </span>
         </div>
-        <div className="mt-1 text-[11px] text-subtle">
+        <div className="mt-1 line-clamp-2 text-[11px] text-subtle md:line-clamp-none">
           Derived from IMD National Bulletin No. {prov.imd_bulletin_no} issued{" "}
           {istAfter(prov.imd_issued_at_utc, 0)} · members: {members} · ensemble aligned to the IMD official
           forecast · WeatherNext and ECMWF are a non-official uncertainty envelope ·{" "}
