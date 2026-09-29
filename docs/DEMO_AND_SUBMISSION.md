@@ -12,10 +12,11 @@ Record at https://aurora-lifeline.web.app in Chrome, 1440 x 900, dark theme, no 
 | 1:05–1:50 | Open the Kakinada control room. Play the timeline from Bulletin 21 to landfall; hover a red PHC; switch Bulletin 19 / 21 | "A thousand storm futures from Google DeepMind WeatherNext and ECMWF, aligned to IMD's track, put water on five lakh road segments. This PHC has a [p] chance of losing referral access, most likely between [t1] and [t2]." | WeatherNext; Maps Platform; deck.gl |
 | 1:50–2:10 | Forecast tab: the action list; Triggers tab: open the fired triggers | "Machinery goes to the bridge that protects the most people, six hours before its earliest likely closure. Pre-agreed triggers fire for the facilities above threshold." | — |
 | 2:10–2:50 | Advisory tab: Telugu, Collector; Draft; show the placeholders view and cited facts; Listen; Download CAP; Approve (simulated) | "Gemini drafts the Telugu advisory, but it never writes a number: code inserts every figure from the engine. It is read aloud with Gemini-TTS, and exported as a CAP message for the SDMA's originator, after an officer approves." | Gemini; gemini-embedding-2; Cloud TTS Gemini-TTS |
-| 2:50–3:20 | Ask AURORA tab: click "Where should we pre-position JCBs first, and by when?"; open the citations | "Ask AURORA is an agent built with Google's Agent Development Kit. It answers only from the run's facts, and a guard blocks any number the tools did not return." | Agent Development Kit |
-| 3:20–3:55 | Proof page: the Sentinel-1 table and "How to read this"; the Bulletin Reader scores | "We scored it against Sentinel-1 radar. It is a weak test, the passes came days later, and we publish the misses. The Bulletin Reader agrees with hand-checked labels on 48 of 49 fields." | Earth Engine |
-| 3:55–4:20 | Landing page: the Dana card; open Kendrapara | "Geography is configuration. The same pipeline runs Cyclone Dana in Odisha." | Cloud Run; Firebase Hosting |
-| 4:20–4:45 | Deck slide 7 (Google stack) then slide 11 | "Google AI is the engine, not a chatbot on top. Next: a shadow-mode pilot with an SDMA this season." | — |
+| 2:50–3:15 | Ask AURORA tab: click "Where should we pre-position JCBs first, and by when?"; open the citations | "Ask AURORA is an agent built with Google's Agent Development Kit. It answers only from the run's facts, and a guard blocks any number the tools did not return." | Agent Development Kit |
+| 3:15–3:35 | Field tab: "Use the demo photo"; Send; show the assessment chips and "Sent to the officer queue" with its reasons; "Confirm as officer (SIMULATED)"; the marker appears on the map | "After landfall, field teams send photos. Gemini reads the damage; fixed rules decide. A report it cannot place goes to an officer, and a bridge reopening always does." | Gemini 3.7 Flash |
+| 3:35–4:05 | Proof page: the Sentinel-1 table and "How to read this"; the Bulletin Reader scores | "We scored it against Sentinel-1 radar. It is a weak test, the passes came days later, and we publish the misses. The Bulletin Reader agrees with hand-checked labels on 48 of 49 fields." | Earth Engine |
+| 4:05–4:25 | Landing page: the Dana card; open Kendrapara | "Geography is configuration. The same pipeline runs Cyclone Dana in Odisha." | Cloud Run; Firebase Hosting |
+| 4:25–4:45 | Deck slide 7 (Google stack) then slide 11 | "Google AI is the engine, not a chatbot on top. Next: a shadow-mode pilot with an SDMA this season." | — |
 
 **Before recording:** open each page once so cached answers are warm; turn on "Reduce motion" only if the machine stutters. **Captions:** English, from this script.
 
@@ -26,7 +27,7 @@ Record at https://aurora-lifeline.web.app in Chrome, 1440 x 900, dark theme, no 
 | Bulletin PDF becomes checked data | Cached reading shown side by side |
 | Lifeline Countdown | Pre-tiled layers, a lower default zoom, a recorded clip |
 | Telugu voice advisory after approval | Pre-rendered or cached audio |
-| A photo reopens a bridge | Cached verdict; the officer-confirm path in one browser |
+| A field photo is checked and routed to the officer | Cached verdict (same photo, same claimed place) |
 | Proof page with misses | Static page |
 
 ## 3. Failure plan (judge mode is a static replay first)

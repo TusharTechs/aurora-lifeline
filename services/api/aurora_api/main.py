@@ -23,13 +23,14 @@ from typing import Any, Literal
 
 import httpx
 import yaml
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from aurora_agents import advisory, bulletin_reader, voice
+from aurora_agents import advisory, bulletin_reader, field_verifier, voice
 from aurora_agents.ask import PROMPT_VERSION as ASK_PROMPT_VERSION
 from aurora_agents.ask import RunData, ask
+from aurora_agents.facts import site_text
 from aurora_agents.gemini import Gemini, default_cache
 
 logging.basicConfig(level=logging.INFO)
@@ -444,3 +445,90 @@ def read_latest(request: Request) -> dict[str, Any]:
             "title": latest.get("title"),
         },
     }
+
+
+# ---------------------------------------------------------------- field reports (all simulated here)
+def _candidates(scenario: dict[str, Any], near_action: str | None) -> list[dict[str, Any]]:
+    """Ranked crossings in the district, nearest to the claimed one first (at most ten)."""
+    acts = [a for a in scenario["actions"] if a.get("site")]
+    ref = next((a for a in acts if a["action_id"] == near_action), acts[0] if acts else None)
+    if ref is None:
+        return []
+
+    def dist(a: dict[str, Any]) -> float:
+        return float(
+            (a["site"]["lat"] - ref["site"]["lat"]) ** 2
+            + (a["site"]["lon"] - ref["site"]["lon"]) ** 2
+        )
+
+    out = []
+    for a in sorted(acts, key=dist)[:10]:
+        out.append({
+            "asset_id": a["target_id"],
+            "action_id": a["action_id"],
+            "type": a["site"].get("crossing_type") or "road",
+            "description": site_text(a["site"], "en-IN"),
+            "lat": a["site"]["lat"],
+            "lon": a["site"]["lon"],
+        })  # fmt: skip
+    return out
+
+
+@app.post("/api/v1/field-reports")
+async def field_report(
+    request: Request,
+    file: UploadFile = File(...),  # noqa: B008
+    run_id: str = Form(...),
+    district_lgd: str = Form(...),
+    claimed_action: str = Form(""),
+    claimed_time: str = Form(""),
+) -> dict[str, Any]:
+    run = _run(run_id)
+    scenario = run["scenarios"].get(district_lgd)
+    if scenario is None:
+        raise HTTPException(404, "unknown district for this run")
+    image = await file.read(field_verifier.MAX_BYTES + 1)
+    if len(image) > field_verifier.MAX_BYTES:
+        raise HTTPException(413, "Photo larger than 8 MB")
+    cands = _candidates(scenario, claimed_action or None)
+    claimed = next(
+        (c for c in cands if c["action_id"] == claimed_action), cands[0] if cands else None
+    )
+    place = (
+        f"{claimed['description']} ({claimed['lat']:.4f}, {claimed['lon']:.4f}), {scenario['district_name']} district"
+        if claimed
+        else scenario["district_name"]
+    )
+    key = _response_cache_key(
+        "field",
+        {
+            "img": hashlib.sha256(image).hexdigest(),
+            "run": run_id,
+            "d": district_lgd,
+            "a": claimed_action,
+            "t": claimed_time,
+            "v": field_verifier.PROMPT_VERSION,
+        },
+    )
+    g = gem()
+    if (hit := g.cache.get(key)) is not None:
+        return {**hit["output"], "cached": True}
+    _rate_limit(request)
+    _spend_model_run()
+    try:
+        out = field_verifier.verify(
+            g, image, claimed_place=place, claimed_time=claimed_time or "not given", candidates=cands,
+        )  # fmt: skip
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    except Exception as e:
+        log.exception("field verification failed")
+        raise HTTPException(502, f"{MODEL_DOWN} ({type(e).__name__}: {str(e)[:160]})") from e
+    out["claimed"] = {
+        "place": place,
+        "time": claimed_time or None,
+        "action_id": claimed["action_id"] if claimed else None,
+    }
+    out["candidates"] = cands
+    g.cache.put(key, {"output": out})
+    return {**out, "cached": False}

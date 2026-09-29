@@ -156,3 +156,63 @@ export type VoiceResult = {
 
 export const advisoryVoice = (runId: string, lgd: string, language: Lang, audience: Audience) =>
   post<VoiceResult>("advisories/voice", { run_id: runId, district_lgd: lgd, language, audience });
+
+export type FieldResult = {
+  observation: {
+    asset_id: string | null;
+    asset_type: string;
+    passable: "yes" | "no" | "unknown";
+    water_depth_band: string;
+    damage_state: string;
+    blockage: string;
+    location_consistency: string;
+    time_consistency: string;
+    evidence_notes: string;
+    confidence: number;
+  };
+  confidence_band: "high" | "medium" | "low";
+  routing: {
+    decision: "auto_apply" | "officer_queue";
+    reasons: string[];
+    asset: { asset_id: string; description: string; lat: number; lon: number } | null;
+  };
+  claimed: { place: string; time: string | null; action_id: string | null };
+  candidates: Array<{
+    asset_id: string;
+    action_id: string;
+    type: string;
+    description: string;
+    lat: number;
+    lon: number;
+  }>;
+  model: string;
+  prompt_version: string;
+  cached: boolean;
+};
+
+export async function submitFieldReport(
+  photo: Blob,
+  runId: string,
+  lgd: string,
+  claimedAction: string,
+  claimedTime: string,
+): Promise<FieldResult> {
+  const form = new FormData();
+  form.append("file", photo, "field-report.jpg");
+  form.append("run_id", runId);
+  form.append("district_lgd", lgd);
+  form.append("claimed_action", claimedAction);
+  form.append("claimed_time", claimedTime);
+  const r = await fetch(`${DIRECT}/api/v1/field-reports`, { method: "POST", body: form });
+  if (!r.ok) {
+    let msg = `${r.status}`;
+    try {
+      const j = (await r.json()) as { detail?: unknown };
+      if (typeof j.detail === "string") msg = j.detail;
+    } catch {
+      /* not JSON */
+    }
+    throw new Error(msg);
+  }
+  return (await r.json()) as FieldResult;
+}

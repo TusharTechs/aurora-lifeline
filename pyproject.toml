@@ -59,7 +59,8 @@ known-first-party = ["aurora_engine", "aurora_agents", "aurora_api", "aurora_pip
 "agents/aurora_agents/advisory.py" = ["E501"]
 "agents/aurora_agents/ask.py" = ["E501", "PLR0915"]
 "agents/aurora_agents/bulletin_reader.py" = ["E501"]
-"services/api/aurora_api/main.py" = ["E501"]
+"agents/aurora_agents/field_verifier.py" = ["E501"]
+"services/api/aurora_api/main.py" = ["E501", "PLR0917"]  # FastAPI form parameters
 
 [tool.mypy]
 python_version = "3.12"

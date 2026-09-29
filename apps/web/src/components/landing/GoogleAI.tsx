@@ -20,6 +20,16 @@ const ITEMS: Array<[string, string, string]> = [
     "Telugu and Hindi drafts are translated back and compared with the English draft; low similarity is flagged.",
   ],
   [
+    "Gemini 3.7 Flash",
+    "Checks field photos",
+    "After landfall, a photo is assessed for passability, depth and damage; fixed rules decide whether it updates the map or goes to an officer.",
+  ],
+  [
+    "Cloud TTS Gemini-TTS",
+    "Reads advisories aloud",
+    "Approved advisories spoken in Telugu, Hindi and English for radio and phone relay.",
+  ],
+  [
     "Google DeepMind WeatherNext",
     "Most of the storm futures",
     "Weather Lab's ensembles supply 1,011 of the 1,062 tracks, alongside 51 from ECMWF.",

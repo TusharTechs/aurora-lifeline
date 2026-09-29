@@ -31,6 +31,11 @@ const DATA: Array<[string, string, string]> = [
   ["Surface water occurrence", "Source: EC JRC/Google (Global Surface Water)", "Free, with credit"],
   ["Population 2020 (constrained)", "WorldPop, University of Southampton", "CC BY 4.0"],
   ["Basemap", "Google Maps Platform", "Map data © Google"],
+  [
+    "Demo field photo (Field tab)",
+    "“Kerala Flood 9-8-2019 at Kidangoor–Mookkannoor road near Angamaly” by Navaneeth Krishnan S, via Wikimedia Commons; resized, metadata removed. Not from Cyclone Montha",
+    "CC BY-SA 3.0",
+  ],
   ["CAP 1.2 schema", "OASIS", "OASIS IPR policy"],
 ];
 

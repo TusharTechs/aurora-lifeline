@@ -15,12 +15,13 @@ import { AuroraLoader, Logo } from "./brand/Logo";
 import { AdvisoryPanel } from "./AdvisoryPanel";
 import { AskPanel } from "./AskPanel";
 import { TriggerPanel } from "./TriggerPanel";
+import { FieldPanel, type FieldMark } from "./FieldPanel";
 
 type Overlay = { url: string; bounds: [number, number, number, number]; label: string };
 type Overlays = { extent?: [number, number, number, number]; flood: Overlay; surge: Overlay };
 type Facility = DistrictScenario["facilities"][number];
 type Action = DistrictScenario["actions"][number];
-type Tab = "forecast" | "triggers" | "advisory" | "ask";
+type Tab = "forecast" | "triggers" | "advisory" | "ask" | "field";
 
 const MAPS_KEY = process.env.NEXT_PUBLIC_MAPS_API_KEY ?? "";
 const MAP_ID = process.env.NEXT_PUBLIC_MAPS_MAP_ID ?? "";
@@ -98,6 +99,7 @@ export function CommandMap({
   });
   const [hover, setHover] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("forecast");
+  const [marks, setMarks] = useState<FieldMark[]>([]);
   const base = `/runs/${runId}`;
 
   useEffect(() => {
@@ -249,8 +251,22 @@ export function CommandMap({
         }),
       );
     }
+    if (marks.length)
+      out.push(
+        new ScatterplotLayer<FieldMark>({
+          id: "field-marks",
+          data: marks,
+          getPosition: (m) => [m.lon, m.lat],
+          getRadius: 11,
+          radiusUnits: "pixels",
+          stroked: true,
+          lineWidthMinPixels: 3,
+          getLineColor: [255, 255, 255, 255],
+          getFillColor: (m) => (m.passable === "no" ? [220, 38, 38, 255] : [52, 211, 153, 255]),
+        }),
+      );
     return out;
-  }, [overlays, show, runId, t, base, scenario, facHours]);
+  }, [overlays, show, runId, t, base, scenario, facHours, marks]);
 
   const onHover = (info: PickingInfo) => {
     const o = info.object as {
@@ -416,6 +432,7 @@ export function CommandMap({
                 ["triggers", "Triggers"],
                 ["advisory", "Advisory"],
                 ["ask", "Ask AURORA"],
+                ["field", "Field"],
               ] as Array<[Tab, string]>
             ).map(([k, label]) => (
               <button
@@ -430,6 +447,9 @@ export function CommandMap({
             ))}
           </div>
           {tab === "triggers" && <TriggerPanel scenario={scenario} />}
+          {tab === "field" && (
+            <FieldPanel runId={runId} scenario={scenario} onConfirm={(m) => setMarks((ms) => [...ms, m])} />
+          )}
           {tab === "advisory" && <AdvisoryPanel runId={runId} lgd={lgd} />}
           {tab === "ask" && <AskPanel runId={runId} />}
           {tab === "forecast" && (

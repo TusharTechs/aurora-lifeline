@@ -258,7 +258,7 @@ export default function Deck() {
       <Slide n={7} eyebrow="Google stack" title="Every Google model here has a job.">
         <div className="grid grid-cols-3 gap-4">
           {[
-            ["Gemini 3.7 Flash", "Reads bulletins; drafts advisories"],
+            ["Gemini 3.7 Flash", "Reads bulletins; drafts advisories; checks field photos"],
             ["Agent Development Kit", "Ask AURORA agent with a number guard"],
             ["Gemini 3.5 Flash-Lite · embedding-2", "Back-translation and similarity checks"],
             ["Cloud TTS Gemini-TTS", "Advisories read aloud in Telugu and Hindi"],
@@ -390,7 +390,7 @@ export default function Deck() {
             <p className="font-display text-xl font-semibold">Roadmap</p>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-muted">
               <li>Power-grid exposure and VIIRS outage validation</li>
-              <li>Field photos that reopen a road, verified by Gemini</li>
+              <li>Field reports by WhatsApp and voice note, into the same checks</li>
               <li>SMS and IVR through Sachet partners</li>
               <li>Automatic runs on every IMD bulletin in season</li>
               <li>More states: Tamil Nadu, West Bengal, Gujarat</li>
