@@ -5,7 +5,8 @@ from typing import Any
 
 from PIL import Image
 
-from aurora_agents.field_verifier import confidence_band, read_and_strip, route
+from aurora_agents.field_verifier import confidence_band, read_and_strip, route, verify
+from aurora_agents.gemini import CallInfo
 
 CANDS = [
     {"asset_id": "edge_1", "type": "bridge", "description": "bridge near Uppada"},
@@ -55,3 +56,45 @@ def test_metadata_is_read_then_stripped() -> None:
     clean, meta = read_and_strip(buf.getvalue())
     assert meta["captured_text"] == "2025:10:28 22:10:00"
     assert not Image.open(io.BytesIO(clean)).getexif()
+
+
+class FakeGemini:
+    """Returns the queued observations in order and records the prompts it was sent."""
+
+    def __init__(self, *notes: str) -> None:
+        self.notes = list(notes)
+        self.prompts: list[list[Any]] = []
+
+    def generate_json(self, **kw: Any) -> tuple[dict[str, Any], CallInfo]:
+        self.prompts.append(kw["parts"])
+        o = {
+            "asset_id": None, "asset_type": "road", "passable": "no", "water_depth_band": "15_30cm",
+            "damage_state": "minor", "blockage": "water", "location_consistency": "unknown",
+            "time_consistency": "unknown", "voice_language": None, "voice_summary_en": None,
+            "evidence_notes": self.notes.pop(0), "confidence": 0.9,
+        }  # fmt: skip
+        return o, CallInfo(model="fake", cached=False, key="k")
+
+
+def jpeg() -> bytes:
+    buf = io.BytesIO()
+    Image.new("RGB", (16, 16)).save(buf, format="JPEG")
+    return buf.getvalue()
+
+
+def run(gem: FakeGemini) -> dict[str, Any]:
+    return verify(gem, jpeg(), claimed_place="p", claimed_time="t", candidates=CANDS)  # type: ignore[arg-type]
+
+
+def test_numbers_in_the_notes_get_one_retry() -> None:
+    gem = FakeGemini("Water about 30 cm deep.", "Water covers the road.")
+    out = run(gem)
+    assert len(gem.prompts) == 2 and "number check" in str(gem.prompts[1][-1])
+    assert out["observation"]["evidence_notes"] == "Water covers the road."
+    assert not out["notes_withheld"]
+
+
+def test_notes_are_withheld_if_numbers_remain() -> None:
+    out = run(FakeGemini("Water about 30 cm deep.", "Around thirty centimetres."))
+    assert out["observation"]["evidence_notes"] == ""
+    assert out["notes_withheld"]

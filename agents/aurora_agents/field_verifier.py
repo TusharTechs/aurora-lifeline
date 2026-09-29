@@ -5,7 +5,9 @@ file (then stripped), and up to ten candidate assets near the claimed place. It 
 ``schemas/field_observation.json``. Routing is deterministic: a report is applied automatically
 only if it names an asset, the location is consistent, passability is known, confidence is at
 least 0.8, and it is not a bridge reopening; everything else goes to the officer queue. The UI
-shows confidence as high, medium or low, never as a number.
+shows confidence as high, medium or low, never as a number. The free-text evidence notes pass the
+same number check as advisories (no digits, number words or percent signs; non-negotiable 1): one
+corrective retry, then the notes are withheld.
 """
 
 import hashlib
@@ -18,11 +20,12 @@ from google.genai import types
 from PIL import ExifTags, Image, UnidentifiedImageError
 from pydantic import ValidationError
 
+from . import numbers
 from .contracts import FieldObservation
 from .gemini import MODEL_MAIN, Gemini
 from .paths import SCHEMAS_DIR
 
-PROMPT_VERSION = "field-v1"
+PROMPT_VERSION = "field-v2"
 MAX_BYTES = 8 * 1024 * 1024
 AUTO_APPLY_CONFIDENCE = 0.8
 
@@ -31,6 +34,7 @@ Decide only what the evidence shows. Pick the asset from the candidate list only
 Report passability, water-depth band, damage state and blockage using the enums. If the evidence does not show something, use "unknown".
 Judge whether the media is consistent with the claimed place and time using visible cues and the provided metadata; do not guess.
 For voice notes, summarise what the speaker reports in one sentence in English and record the language.
+Write evidence_notes in words only: no digits, number words, times or measurements (the depth goes only in water_depth_band).
 Give a confidence from 0 to 1 for your overall assessment. Return JSON matching the schema exactly."""
 
 
@@ -110,24 +114,39 @@ def verify(
             {k: c[k] for k in ("asset_id", "type", "description")} for c in candidates[:10]
         ],
     }
-    obs, info = gem.generate_json(
-        model=MODEL_MAIN, system=SYSTEM,
-        parts=[types.Part.from_bytes(data=clean, mime_type="image/jpeg"), json.dumps(context, ensure_ascii=False)],
-        schema=response_schema(), prompt_version=PROMPT_VERSION, schema_version="field_observation.v1",
-        thinking="low", cache_inputs=[hashlib.sha256(clean).hexdigest(), context],
-    )  # fmt: skip
-    try:
-        FieldObservation.model_validate(obs)
-    except ValidationError as e:
-        raise ValueError(
-            f"the model returned an invalid observation: {e.errors()[0]['msg']}"
-        ) from e
+    image_part = types.Part.from_bytes(data=clean, mime_type="image/jpeg")
+    feedback: list[str] = []
+    for _ in range(2):
+        parts: list[types.Part | str] = [image_part, json.dumps(context, ensure_ascii=False)]
+        if feedback:
+            parts.append(
+                "Your evidence_notes were rejected by the number check. Rewrite them in words only:\n- "
+                + "\n- ".join(feedback)
+            )
+        obs, info = gem.generate_json(
+            model=MODEL_MAIN, system=SYSTEM, parts=parts,
+            schema=response_schema(), prompt_version=PROMPT_VERSION, schema_version="field_observation.v1",
+            thinking="low", cache_inputs=[hashlib.sha256(clean).hexdigest(), context, feedback],
+        )  # fmt: skip
+        try:
+            FieldObservation.model_validate(obs)
+        except ValidationError as e:
+            raise ValueError(
+                f"the model returned an invalid observation: {e.errors()[0]['msg']}"
+            ) from e
+        feedback = numbers.check({"evidence_notes": obs["evidence_notes"]}, allowed=()).problems
+        if not feedback:
+            break
+    notes_withheld = bool(feedback)
+    if notes_withheld:
+        obs = {**obs, "evidence_notes": ""}
     routing = route(obs, candidates, previous_state)
     return {
         "observation": obs,
         "confidence_band": confidence_band(float(obs["confidence"])),
         "routing": routing,
         "metadata": meta,
+        "notes_withheld": notes_withheld,
         "simulated": True,
         "received_at": datetime.now().astimezone().replace(microsecond=0).isoformat(),
         "model": info.model,

@@ -171,6 +171,7 @@ export type FieldResult = {
     confidence: number;
   };
   confidence_band: "high" | "medium" | "low";
+  notes_withheld?: boolean;
   routing: {
     decision: "auto_apply" | "officer_queue";
     reasons: string[];

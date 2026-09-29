@@ -64,7 +64,7 @@ secrets: ## Scan the working tree and history for secrets
 	gitleaks dir --no-banner --redact --config .gitleaks.toml .
 
 # ---------------------------------------------------------------- data and engine
-.PHONY: download graph replay tiles validate eval publish sandbox-reset
+.PHONY: download graph replay tiles validate
 download: ## Approval-free raw downloads (task 1.4a)
 	pipelines/downloads/fetch_raw.sh
 
@@ -79,34 +79,17 @@ replay: ## Run the storm pipeline for STORM and RUN (default montha_2025_b21), t
 tiles: ## Build MVT tiles and scenario JSON for STORM
 	$(PY) python -m aurora_pipelines.tiles --storm $(STORM)
 
-validate: ## Sentinel-1 road skill, baselines and surge table for STORM
-	$(PY) python -m aurora_pipelines.backtest --storm $(STORM)
-
-eval: ## Agent evaluation sets -> docs/eval-results.md
-	$(PY) python -m aurora_agents.evaluate
-
-publish: ## Load local run outputs to BigQuery, Cloud Storage and Firestore
-	@test -n "$(RUN)" || (echo "usage: make publish RUN=<run_id>" && exit 2)
-	$(PY) python -m aurora_pipelines.publish --run $(RUN)
-
-sandbox-reset: ## Reset the demo-officer sandbox storm
-	$(PY) python -m aurora_pipelines.sandbox_reset
+validate: ## Score RUN against the Sentinel-1 flood mask (tiles from infra/cloudshell/04_sentinel1.sh)
+	$(PY) python -m aurora_pipelines.validate_s1 --storm $(STORM) --run $(RUN)
 
 # ---------------------------------------------------------------- web and deploy
-.PHONY: web web-data deploy-api deploy-web deploy-jobs
+.PHONY: web web-data deploy-web
 web: ## Run the web app locally
 	pnpm --dir apps/web dev
 
 web-data: ## Push generated tiles and run JSON to the web-data branch (Cloud Shell deploys from it)
 	scripts/push_web_data.sh
 
-deploy-web: ## Static export and deploy to Firebase Hosting
+deploy-web: ## Static export and deploy to Firebase Hosting (normally done by .github/workflows/deploy.yml)
 	pnpm --dir apps/web build
 	pnpm exec firebase deploy --only hosting
-
-deploy-api: ## Deploy the API to Cloud Run
-	gcloud run deploy aurora-api --source services/api --region asia-south1 \
-		--memory 2Gi --max-instances 10 --concurrency 80
-
-deploy-jobs: ## Deploy the pipeline jobs to Cloud Run
-	@echo "deploy-jobs: defined in task 1.2 once the Cloud project exists" && exit 1

@@ -156,9 +156,16 @@ export function FieldPanel({
             <span className="chip">time: {o.time_consistency}</span>
             <span className="chip">confidence: {res.confidence_band}</span>
           </div>
-          <p className="text-muted">
-            &ldquo;{o.evidence_notes}&rdquo; ({res.model})
-          </p>
+          {o.evidence_notes ? (
+            <p className="text-muted">
+              &ldquo;{o.evidence_notes}&rdquo; ({res.model})
+            </p>
+          ) : (
+            <p className="text-subtle">
+              Gemini&apos;s notes were withheld: they contained a number, and only the engine may show
+              numbers. The depth band above is a fixed category.
+            </p>
+          )}
           <div
             className={`rounded-lg p-2 ${res.routing.decision === "auto_apply" ? "bg-safe/10" : "bg-warning/10"}`}
           >
