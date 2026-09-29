@@ -1,26 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans_Devanagari, Noto_Sans_Telugu, Sora } from "next/font/google";
+// Fonts are self-hosted from npm (Fontsource, SIL OFL): the build never depends on a network fetch.
+import "@fontsource-variable/inter";
+import "@fontsource-variable/sora";
+import "@fontsource/noto-sans-telugu/400.css";
+import "@fontsource/noto-sans-telugu/600.css";
+import "@fontsource/noto-sans-devanagari/400.css";
+import "@fontsource/noto-sans-devanagari/600.css";
 import "./globals.css";
-
-const sora = Sora({
-  subsets: ["latin"],
-  weight: ["300", "400", "600"],
-  variable: "--font-sora",
-  display: "swap",
-});
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const telugu = Noto_Sans_Telugu({
-  subsets: ["telugu"],
-  weight: ["400", "600"],
-  variable: "--font-telugu",
-  display: "swap",
-});
-const devanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari"],
-  weight: ["400", "600"],
-  variable: "--font-devanagari",
-  display: "swap",
-});
 
 const DESCRIPTION =
   "From the official IMD cyclone bulletin to a district plan: which PHCs, hospitals, shelters and villages lose road access, how likely, when, and what to move there now.";
@@ -49,10 +35,7 @@ const PREFS = `try{var p=JSON.parse(localStorage.getItem("aurora-a11y")||"{}");v
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${sora.variable} ${inter.variable} ${telugu.variable} ${devanagari.variable}`}
-    >
+    <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREFS }} />
       </head>

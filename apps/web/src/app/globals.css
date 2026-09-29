@@ -6,9 +6,9 @@
  * Hazard colours are reserved for risk (amber -> red); aurora colours are for the product itself.
  */
 @theme {
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora Variable", ui-sans-serif, system-ui, sans-serif;
   --font-sans:
-    var(--font-inter), var(--font-telugu), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+    "Inter Variable", "Noto Sans Telugu", "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --color-bg: #05080f;

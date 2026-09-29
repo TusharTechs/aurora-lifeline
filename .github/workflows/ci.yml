@@ -77,3 +77,7 @@ jobs:
           mkdir -p apps/web/public
           git archive --format=tar FETCH_HEAD runs | tar -xf - -C apps/web/public
       - run: pnpm --dir apps/web build
+      - name: the export carries the design system and self-hosted fonts
+        run: |
+          grep -rqs -- "--color-bg" apps/web/out/_next/static || { echo "global stylesheet missing from the export"; exit 1; }
+          grep -rqs "Sora Variable" apps/web/out/_next/static || { echo "self-hosted fonts missing from the export"; exit 1; }
