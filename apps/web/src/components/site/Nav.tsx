@@ -32,12 +32,12 @@ export function Nav({ controlRoomHref }: { controlRoomHref: string }) {
         <Link href="/" aria-label="AURORA Lifeline home" className="flex shrink-0 items-center">
           <Logo />
         </Link>
-        <ul className="ml-6 hidden items-center gap-1 lg:flex">
+        <ul className="ml-6 hidden items-center gap-1 xl:flex">
           {LINKS.map(([href, label]) => (
             <li key={href}>
               <Link
                 href={href}
-                className="rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
+                className="whitespace-nowrap rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
               >
                 {label}
               </Link>
@@ -48,13 +48,13 @@ export function Nav({ controlRoomHref }: { controlRoomHref: string }) {
           <A11yControl />
           <Link
             href={controlRoomHref}
-            className="btn btn-primary hidden !min-h-10 !py-2 text-sm sm:inline-flex"
+            className="btn btn-primary hidden whitespace-nowrap !min-h-10 !py-2 text-sm sm:inline-flex"
           >
             Open control room
           </Link>
           <button
             type="button"
-            className="btn btn-ghost !min-h-10 !px-3 lg:hidden"
+            className="btn btn-ghost !min-h-10 !px-3 xl:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((o) => !o)}
@@ -78,7 +78,7 @@ export function Nav({ controlRoomHref }: { controlRoomHref: string }) {
       {open && (
         <ul
           id="mobile-menu"
-          className="border-t border-border bg-bg/95 px-4 pb-4 pt-2 backdrop-blur-xl lg:hidden"
+          className="border-t border-border bg-bg/95 px-4 pb-4 pt-2 backdrop-blur-xl xl:hidden"
         >
           {[...LINKS, [controlRoomHref, "Open control room"] as [string, string]].map(([href, label]) => (
             <li key={href}>

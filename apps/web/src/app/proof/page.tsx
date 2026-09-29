@@ -69,6 +69,37 @@ const METHODS: Array<[keyof DistrictRow, string]> = [
   ["baseline_low_hand", "Baseline: lowest ground"],
 ];
 
+/** What this test can and cannot say, generated from the scores (no hand-picked numbers). */
+function Reading({ v }: { v: Validation }) {
+  const t = v.total as unknown as Record<string, Scores>;
+  const a = t.aurora;
+  const hand = t.baseline_low_hand;
+  const track = t.baseline_distance_to_track;
+  const unobserved = v.districts.filter((d) => d.status !== "observed").map((d) => d.district_name);
+  const hours = (v.sentinel1.orbits ?? []).map((o) => o.hours_after_t);
+  if (!a || !hand || !track) return null;
+  const cmp = (x: number, y: number) => (x > y ? "more" : x < y ? "fewer" : "as many");
+  return (
+    <div className="card mt-6 space-y-2 p-5 text-sm">
+      <p className="font-semibold">How to read this</p>
+      <p className="text-muted">
+        The first Sentinel-1 pass came {hours.join(" and ")} hours after landfall, when much of the water had
+        drained, and it found water at only {v.total.edges_observed_flooded.toLocaleString("en-IN")} observed
+        road segments.{" "}
+        {unobserved.length > 0 &&
+          `It did not image ${unobserved.join(" or ")}, the districts nearest the landfall, so they are not scored. `}
+        This is a weak test of a landfall-day forecast, and AURORA&apos;s false-alarm rate against it is very
+        high.
+      </p>
+      <p className="text-muted">
+        Flagging the same number of segments, AURORA caught {cmp(a.hits, hand.hits)} flooded segments than the
+        lowest-ground baseline ({a.hits} against {hand.hits}) and {cmp(a.hits, track.hits)} than the
+        nearest-to-track baseline ({a.hits} against {track.hits}).
+      </p>
+    </div>
+  );
+}
+
 export default function Proof() {
   const s = STORMS[0]!;
   const href = `/storm/${s.stormId}/district/${s.demoDistrict}/`;
@@ -100,6 +131,7 @@ export default function Proof() {
                 {v.total.edges_observed.toLocaleString("en-IN")} segments were observed;{" "}
                 {v.total.edges_observed_flooded.toLocaleString("en-IN")} showed water.
               </p>
+              <Reading v={v} />
               <div className="mt-6 overflow-x-auto">
                 <table className="w-full min-w-[760px] text-left text-sm">
                   <caption className="sr-only">Skill scores per district and method</caption>

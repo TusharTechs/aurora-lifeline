@@ -9,7 +9,7 @@ metadata JSON and prints download URLs for a 3 x 3 grid of GeoTIFF tiles, each w
 
 Method (ENGINE §10, UN-SPIDER practice), per Sentinel-1 relative orbit:
 1. pre-event: median IW VV, same relative orbit, T-30 to T-3 days;
-2. post-event: first acquisition from T to T+4 days (T+6 if none), per orbit;
+2. post-event: first acquisition from T to T+4 days, extended to T+6 where there is none, per orbit;
 3. 50 m focal median on both;
 4. flooded = (post - pre < -3 dB) AND (post < -16 dB) AND NOT permanent water (JRC occurrence
    > 80%) AND slope < 5 degrees (Copernicus GLO-30) AND HAND < 15 m (MERIT Hydro hnd).
@@ -75,11 +75,10 @@ def main() -> int:
             .sort("system:time_start")
         )
 
-    window_days = 4
+    # ENGINE §10: first pass within T+4 d; where none, extend to T+6 d. Searching six days and
+    # keeping the earliest pass per pixel does both (a 4-day pass always wins where it exists).
+    window_days = 6
     scenes = post_scenes(window_days)
-    if scenes.size().getInfo() == 0:
-        window_days = 6
-        scenes = post_scenes(window_days)
     info: list[int] = scenes.aggregate_array("relativeOrbitNumber_start").getInfo() or []
     times: list[int] = scenes.aggregate_array("system:time_start").getInfo() or []
     ids: list[str] = scenes.aggregate_array("system:index").getInfo() or []
